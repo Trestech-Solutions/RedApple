@@ -199,6 +199,12 @@ export type StoreSettings = {
   item_price_border_color?: string
   price_rounder_center?: boolean
   category_navbar_background_color?: string
+  // Product card design variant
+  product_card_design?: 'card-1' | 'card-2' | 'card-3'
+  // Category nav design variant
+  category_design?: 'category-1' | 'category-2' | 'category-3'
+  // Order/Location modal design: 'modal-1' = existing (dropdown cities), 'modal-2' = image city cards
+  order_modal_design?: 'modal-1' | 'modal-2'
 
   // Android / iOS app
   android_icon?: string | null
@@ -377,9 +383,10 @@ export type City = {
   id: number;
   name: string;
   status?: boolean;
-  branch?: number;           // Legacy: FK to Branch
-  branch_id?: number;        // New storefront API: FK to Branch (per user's flow)
+  branch?: number;
+  branch_id?: number;
   branch_name?: string | null;
+  image?: string | null;       // city landmark/icon image
   latitude?: string | null;
   longitude?: string | null;
   radius_km?: string | null;
@@ -445,6 +452,7 @@ export type MenuItem = {
   item_sku?: string;
   name: string;
   description?: string | null;
+  time_duration?: string | null;
   status?: boolean | number;
   feature_image?: string | null;  // product image
   front_price?: string;           // base price
@@ -580,6 +588,18 @@ export type MenuResponse = {
   on_spot_deals?:  MenuOnSpotDeal[];
   // Branch-wise promotional banners (shown in hero carousel)
   banners?:        MenuBanner[];
+  // Social media links
+  social_media_links?: {
+    facebook_link:  string;
+    instagram_link: string;
+    twitter_link:   string;
+    youtube_link:   string;
+    tiktok_link:    string;
+    linkedin_link:  string;
+    snapchat_link:  string;
+    pinterest_link: string;
+    whatsapp_link:  string;
+  };
   // Legacy fallback
   categories?:      MenuCategory[];
 };

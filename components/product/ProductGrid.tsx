@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ProductCard, type ProductData } from './ProductCard'
 import { ProductDetailModal } from './ProductDetailModal'
 import { ShoppingBag } from 'lucide-react'
+import { useStoreSettings } from '@/lib/hooks/useCart'
 
 interface ProductGridProps {
   products: ProductData[]
@@ -12,18 +13,21 @@ interface ProductGridProps {
 
 export function ProductGrid({ products, searchQuery }: ProductGridProps) {
   const [selected, setSelected] = useState<ProductData | null>(null)
+  const { settings } = useStoreSettings()
+  const design = (settings.product_card_design as string | undefined) ?? 'card-1'
+
+  // card-1 = horizontal list (1→2→3 cols)
+  // card-2/card-3 = portrait grid (2→4 cols, no intermediate 3-col step)
+  const gridClass = design === 'card-1'
+    ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'
+    : 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4'
 
   useEffect(() => {
     if (!selected) return
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSelected(null)
-    }
-
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeyDown)
-
     return () => {
       document.body.style.overflow = prevOverflow
       document.removeEventListener('keydown', onKeyDown)
@@ -47,7 +51,7 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 items-stretch">
+      <div className={`${gridClass} items-stretch`}>
         {products.map((p) => (
           <div key={p.id} className="h-full">
             <ProductCard product={p} onOpen={setSelected} />

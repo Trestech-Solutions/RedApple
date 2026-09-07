@@ -204,6 +204,7 @@ function itemToProduct(
     branchIds:     '*',
     name:          item.name,
     description:   item.description || '',
+    timeDuration:  item.time_duration || undefined,
     price:         String(priceInt),
     originalPrice: combinedOriginal,
     fromLabel:     Boolean(item._from_label),

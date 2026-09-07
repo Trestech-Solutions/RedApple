@@ -6,49 +6,45 @@ import { Check, Minus, Plus } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 
 export interface SizeMeta {
-  sizeId: number                  // size_prices.id — cart variantId PK
-  sizeFk: number                  // size_prices.size — Size table FK
-  sizeName: string                // size_prices.size_name e.g. "Large"
-  price: number                   // size_prices.price (after discount)
-  originalPrice?: number          // derived from size_prices.discount
-  discountLabel?: string          // e.g. "20% OFF" or "Save 20"
-  hasDiscountTag?: boolean        // whether to render a discount badge for this size
+  sizeId: number
+  sizeFk: number
+  sizeName: string
+  price: number
+  originalPrice?: number
+  discountLabel?: string
+  hasDiscountTag?: boolean
 }
 
 export interface ProductData {
   id: string
-  productId: number | null   // null = display-only (Dish), not orderable
+  productId: number | null
   name: string
   description: string
-  price: string              // price_at_branch or front_price — '' means "no price set"
-                             // When size_prices exist this is the *default/first* size price.
+  timeDuration?: string
+  price: string
   originalPrice?: string
   fromLabel?: boolean
-  options: string[]          // size names (size_prices.size_name) OR legacy option names
+  options: string[]
   tag?: string
-  discount?: string          // item-level discount label (or default size discount)
+  discount?: string
   image: string
-  // Size-level metadata — populated when menu API returns size_prices[] on an Item.
-  // NOTE: size selection UI lives only in ProductDetailModal — the card always
-  // shows the default (first) size's price and never lets the user switch here.
   sizes?: SizeMeta[]
-  // Deal metadata — set when this card represents a Fixed Deal or On Spot Deal
   dealType?: 'fixed_deal' | 'on_spot_deal'
   dealMeta?: {
     dealId: number
     finalPrice: string
-    timeWindow?: string | null      // "HH:MM – HH:MM" for on_spot
+    timeWindow?: string | null
     isAvailableNow?: boolean
-    includedItems?: { name: string; qty: number }[]   // fixed_deal items_detail
-    groups?: {                                         // on_spot groups_detail
+    includedItems?: { name: string; qty: number }[]
+    groups?: {
       name: string
       isRequired: boolean
       selectQty: number
       options: {
-        id: number | null      // null for addon_items options
+        id: number | null
         name: string
         qty: number
-        maxQty: number | null  // null = capped only by group's selectQty
+        maxQty: number | null
       }[]
     }[]
   }
@@ -59,33 +55,17 @@ interface ProductCardProps {
   onOpen?: (product: ProductData) => void
 }
 
-export function ProductCard({ product, onOpen }: ProductCardProps) {
+// ─── Shared cart logic hook ───────────────────────────────────────────────────
+
+function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
   const { settings } = useStoreSettings()
   const [added, setAdded] = useState(false)
 
-  // ─── Visual overrides from settings ──────────────────────────────────────
-  const priceBg = settings.item_price_background
-  const priceFg = settings.item_price_text_color
-  const priceBorder = settings.item_price_border_color
-  const discountBg = settings.discount_background_color
-  const discountFg = settings.discount_text_color
-  const stackTagBg = settings.stack_tag_background_color
-  const stackTagFg = settings.stack_tag_color
-  const priceRoundedCenter = Boolean(settings.price_rounder_center)
-  const showStackTag = Boolean(settings.show_stack_tag_on_item)
-  // If item not available and policy is 'hide' — bail out completely
-  if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') {
-    return null
-  }
-
-  // Default size is always the first one — no in-card size switching.
-  const hasSizes = !!product.sizes && product.sizes.length > 0
+  const hasSizes    = !!product.sizes && product.sizes.length > 0
   const defaultSize = hasSizes ? product.sizes![0]! : undefined
   const defaultOption = product.options[0] ?? ''
 
-  // Quick-add only works when there's nothing to choose — a single size/option
-  // and no deal groups. Anything requiring a choice must go through the modal.
   const needsSelection =
     !!product.dealMeta ||
     (hasSizes && product.sizes!.length > 1) ||
@@ -93,6 +73,8 @@ export function ProductCard({ product, onOpen }: ProductCardProps) {
 
   const displayPriceNum = defaultSize
     ? defaultSize.price
+    : product.dealMeta
+    ? (Math.round(parseFloat(product.dealMeta.finalPrice)) || 0)
     : (parseInt(product.price, 10) || 0)
   const displayPriceStr = String(displayPriceNum)
   const displayOriginal = defaultSize
@@ -102,9 +84,15 @@ export function ProductCard({ product, onOpen }: ProductCardProps) {
     ? (defaultSize.hasDiscountTag ? defaultSize.discountLabel : undefined)
     : product.discount
 
+  // Deals don't carry a `productId` (only dealMeta.dealId) and their price
+  // lives in dealMeta.finalPrice, not product.price — so both checks need a
+  // deal-aware branch or the Add/+ button never renders for deals.
   const hasPrice    = displayPriceStr !== '' && displayPriceNum > 0
-  const isOrderable = hasPrice && product.productId !== null && product.productId !== undefined
-  const price       = displayPriceNum
+  const isOrderable = hasPrice && (
+    product.dealMeta
+      ? product.dealMeta.dealId != null
+      : product.productId !== null && product.productId !== undefined
+  )
 
   const cartItem = items.find((i) =>
     hasSizes
@@ -113,24 +101,16 @@ export function ProductCard({ product, onOpen }: ProductCardProps) {
   )
   const cartQty = cartItem?.quantity ?? 0
 
-  const handleCardClick = () => onOpen?.(product)
-
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isOrderable) return
-    if (needsSelection) {
-      onOpen?.(product)
-      return
-    }
+    if (needsSelection) { onOpen?.(product); return }
     addItem({
-      id:             product.id,
-      productId:      product.productId,
-      name:           product.name,
-      price,
-      image:          product.image,
+      id: product.id, productId: product.productId, name: product.name,
+      price: displayPriceNum, image: product.image,
       selectedOption: defaultOption || undefined,
-      variantId:      defaultSize ? defaultSize.sizeId : undefined,
-      sizeFk:         defaultSize ? defaultSize.sizeFk : undefined,
+      variantId: defaultSize ? defaultSize.sizeId : undefined,
+      sizeFk:    defaultSize ? defaultSize.sizeFk  : undefined,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
@@ -148,185 +128,281 @@ export function ProductCard({ product, onOpen }: ProductCardProps) {
     else updateQuantity(cartItem, cartItem.quantity - 1)
   }
 
+  return {
+    settings, added, hasSizes, defaultSize, defaultOption, needsSelection,
+    displayPriceNum, displayOriginal, displayDiscount, hasPrice, isOrderable,
+    cartItem, cartQty, handleAdd, handleIncrease, handleDecrease,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARD-1  (default) — horizontal: text left, image right
+// Matches: "Chicken Tikka" screenshot — small circular + button bottom-right
+// of the image, discount pill top-right of the image, plain (non-boxed) price.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Card1({ product, onOpen }: ProductCardProps) {
+  const {
+    settings, added, needsSelection,
+    displayPriceNum, displayOriginal, displayDiscount, isOrderable,
+    cartQty, handleAdd, handleIncrease, handleDecrease,
+  } = useCardLogic(product, onOpen)
+
+  const priceBg      = settings.item_price_background
+  const priceFg      = settings.item_price_text_color
+  const priceBorder  = settings.item_price_border_color
+  const discountBg   = settings.discount_background_color
+  const discountFg   = settings.discount_text_color
+  const stackTagBg   = settings.stack_tag_background_color
+  const stackTagFg   = settings.stack_tag_color
+  const priceRounded = Boolean(settings.price_rounder_center)
+  const showStack    = Boolean(settings.show_stack_tag_on_item)
+
+  if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
+
   return (
     <div
-      onClick={handleCardClick}
+      onClick={() => onOpen?.(product)}
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
-      onKeyDown={(e) => {
-        if (onOpen && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault()
-          onOpen(product)
-        }
-      }}
-      className={`group relative flex h-full items-stretch gap-2 overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:shadow-xl sm:gap-4 sm:p-4 ${
-        onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2' : ''
-      }`}
+      onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
+      className={`group relative flex h-full items-stretch gap-2 overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:shadow-xl sm:gap-4 sm:p-4 ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
     >
-      {/* Left: text content */}
+      {/* Text */}
       <div className="flex flex-1 flex-col justify-between py-0.5 min-w-0">
         <div>
-          {/* Deal type badge */}
           {product.dealType && (
-            <span className={`mb-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide sm:text-[10px] ${
-              product.dealType === 'on_spot_deal'
-                ? 'bg-amber-100 text-amber-700'
-                : 'bg-sky-100 text-sky-700'
-            }`}>
+            <span className={`mb-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide sm:text-[10px] ${product.dealType === 'on_spot_deal' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700'}`}>
               {product.dealType === 'on_spot_deal' ? '⚡ On Spot Deal' : 'Fixed Deal'}
             </span>
           )}
-          <h3 className="text-base font-bold text-neutral-900 leading-snug line-clamp-2 sm:text-lg">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-neutral-400 sm:mt-2 sm:text-sm">
-              {product.description}
-            </p>
-          )}
-          {/* On Spot time window */}
+          <h3 className="text-base font-bold text-neutral-900 leading-snug line-clamp-2 sm:text-lg">{product.name}</h3>
+          {product.description && <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-neutral-400 sm:mt-2 sm:text-sm">{product.description}</p>}
           {product.dealMeta?.timeWindow && (
             <p className="mt-1 text-[10px] font-medium text-amber-600 sm:text-xs">
               🕐 {product.dealMeta.timeWindow}
-              {product.dealMeta.isAvailableNow === false && (
-                <span className="ml-1 text-neutral-400">(not available now)</span>
-              )}
+              {product.dealMeta.isAvailableNow === false && <span className="ml-1 text-neutral-400">(not available now)</span>}
             </p>
           )}
         </div>
-
-        {/* Price */}
         {isOrderable && (
-          <div className={`mt-2 flex items-baseline gap-1.5 sm:mt-3 sm:gap-2 ${
-            priceRoundedCenter ? 'justify-center rounded-2xl px-3 py-2 border' : ''
-          }`} style={{
-            ...(priceRoundedCenter && priceBg ? { backgroundColor: priceBg } : {}),
-            ...(priceRoundedCenter && priceFg ? { color: priceFg } : {}),
-            ...(priceRoundedCenter && priceBorder ? { borderColor: priceBorder } : {}),
-            ...(priceRoundedCenter && !priceBorder ? { borderColor: 'rgba(0,0,0,0.08)' } : {}),
-          }}>
-            {product.fromLabel && (
-              <span className={`text-xs sm:text-sm ${priceFg ? '' : 'text-neutral-500'}`}
-                style={priceFg ? { color: priceFg, opacity: 0.85 } : undefined}>
-                From
-              </span>
-            )}
-            {displayOriginal && (
-              <span className={`text-xs line-through sm:text-sm ${priceFg ? '' : 'text-neutral-400'}`}
-                style={priceFg ? { color: priceFg, opacity: 0.55 } : undefined}>
-                Rs.{parseInt(displayOriginal, 10).toLocaleString()}
-              </span>
-            )}
-            <span className={`text-base font-bold sm:text-lg ${priceFg ? '' : 'text-neutral-900'}`}
-              style={priceFg ? { color: priceFg } : undefined}>
-              Rs. {price.toLocaleString()}
-            </span>
+          <div className={`mt-2 flex items-baseline gap-1.5 sm:mt-3 sm:gap-2 ${priceRounded ? 'justify-center rounded-2xl px-3 py-2 border' : ''}`}
+            style={{ ...(priceRounded && priceBg ? { backgroundColor: priceBg } : {}), ...(priceRounded && priceFg ? { color: priceFg } : {}), ...(priceRounded ? { borderColor: priceBorder || 'rgba(0,0,0,0.08)' } : {}) }}>
+            {displayOriginal && <span className="text-xs line-through sm:text-sm text-neutral-400" style={priceFg ? { color: priceFg, opacity: 0.55 } : undefined}>Rs.{parseInt(displayOriginal, 10).toLocaleString()}</span>}
+            <span className="text-base font-bold sm:text-lg text-neutral-900" style={priceFg ? { color: priceFg } : undefined}>Rs. {displayPriceNum.toLocaleString()}</span>
           </div>
         )}
-        {/* Deal non-orderable price display */}
         {!isOrderable && product.dealMeta && (
           <div className="mt-2 flex items-baseline gap-1.5 sm:mt-3 sm:gap-2">
-            {product.dealMeta.finalPrice && parseFloat(product.dealMeta.finalPrice) !== parseFloat(product.price) && (
-              <span className="text-xs text-neutral-400 line-through sm:text-sm">
-                Rs.{Math.round(parseFloat(product.price)).toLocaleString()}
-              </span>
-            )}
-            <span className="text-base font-bold text-neutral-900 sm:text-lg">
-              Rs. {Math.round(parseFloat(product.dealMeta.finalPrice)).toLocaleString()}
-            </span>
+            <span className="text-base font-bold text-neutral-900 sm:text-lg">Rs. {Math.round(parseFloat(product.dealMeta.finalPrice)).toLocaleString()}</span>
           </div>
         )}
-
-        {/* Cart controls (only shown once added, since + sits on image otherwise) */}
         {isOrderable && !needsSelection && cartQty > 0 && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="mt-2 flex w-fit items-center gap-1.5 rounded-full border-2 border-neutral-900 px-1.5 py-1 sm:gap-2 sm:px-2 sm:py-1"
-          >
-            <button
-              type="button"
-              onClick={handleDecrease}
-              aria-label="Decrease quantity"
-              className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-900/10 transition-colors sm:h-7 sm:w-7"
-            >
-              <Minus size={12} className="sm:hidden" />
-              <Minus size={14} className="hidden sm:block" />
-            </button>
-            <span className="w-5 text-center text-xs font-bold text-neutral-900 sm:w-6 sm:text-sm">
-              {cartQty}
-            </span>
-            <button
-              type="button"
-              onClick={handleIncrease}
-              aria-label="Increase quantity"
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-neutral-800 transition-colors sm:h-7 sm:w-7"
-            >
-              <Plus size={12} className="sm:hidden" />
-              <Plus size={14} className="hidden sm:block" />
-            </button>
+          <div onClick={(e) => e.stopPropagation()} className="mt-2 flex w-fit items-center gap-1.5 rounded-full border-2 border-neutral-900 px-1.5 py-1 sm:gap-2 sm:px-2">
+            <button type="button" onClick={handleDecrease} aria-label="Decrease" className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-900/10"><Minus size={13} /></button>
+            <span className="w-5 text-center text-xs font-bold text-neutral-900 sm:w-6">{cartQty}</span>
+            <button type="button" onClick={handleIncrease} aria-label="Increase" className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-neutral-800"><Plus size={13} /></button>
           </div>
         )}
       </div>
 
-      {/* Right: image with overlapping + button and discount tag */}
+      {/* Image */}
       <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-50 sm:h-36 sm:w-36 md:h-40 md:w-40">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(min-width: 768px) 160px, (min-width: 640px) 144px, 112px"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-
-        {product.tag && showStackTag ? (
-          <span
-            className="absolute left-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm sm:px-2.5 sm:py-1 sm:text-[10px]"
-            style={{
-              backgroundColor: stackTagBg || '#ffffff',
-              color: stackTagFg || '#000000',
-            }}
-          >
-            {product.tag}
-          </span>
-        ) : product.tag && !showStackTag ? (
-          <span className="absolute left-1.5 top-1.5 rounded bg-white px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm sm:px-2.5 sm:py-1 sm:text-[10px]">
-            {product.tag}
-          </span>
-        ) : null}
-        {displayDiscount && (
-          <span
-            className="absolute right-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm sm:px-2.5 sm:py-1 sm:text-[10px]"
-            style={{
-              backgroundColor: discountBg || '#f2c14e',
-              color: discountFg || '#000000',
-            }}
-          >
-            {displayDiscount}
-          </span>
-        )}
-        {!isOrderable && !product.dealMeta && (
-          <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]">
-            <span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold text-neutral-700 shadow">
-              Coming Soon
-            </span>
-          </span>
-        )}
-
-        {/* Overlapping ADD (+) button — bottom-right corner of image.
-           Opens the modal instead of adding directly when a choice is needed. */}
+        <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 160px, 144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+        {product.tag && showStack
+          ? <span className="absolute left-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: stackTagBg || '#fff', color: stackTagFg || '#000' }}>{product.tag}</span>
+          : product.tag
+          ? <span className="absolute left-1.5 top-1.5 rounded bg-white px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm">{product.tag}</span>
+          : null
+        }
+        {displayDiscount && <span className="absolute right-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</span>}
+        {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold text-neutral-700 shadow">Coming Soon</span></span>}
         {isOrderable && (needsSelection || cartQty === 0) && (
-          <button
-            type="button"
-            onClick={handleAdd}
-            aria-label={needsSelection ? 'Choose options' : 'Add to cart'}
-            className={`absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${
-              added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800'
-            }`}
-          >
+          <button type="button" onClick={handleAdd} aria-label="Add to cart"
+            className={`absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}>
             {added ? <Check size={16} /> : <Plus size={18} />}
           </button>
         )}
       </div>
     </div>
   )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARD-2  — portrait: large image top, name + description + price, ADD button
+// Matches: "Rainbow Cake" screenshot — badge top-left over image, uppercase
+// bold name, teal-blue price + pill "ADD" button on the same row.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Card2({ product, onOpen }: ProductCardProps) {
+  const {
+    settings, added, needsSelection,
+    displayPriceNum, displayOriginal, displayDiscount, isOrderable,
+    cartQty, handleAdd, handleIncrease, handleDecrease,
+  } = useCardLogic(product, onOpen)
+
+  const discountBg = settings.discount_background_color
+  const discountFg = settings.discount_text_color
+  const stackTagBg = settings.stack_tag_background_color
+  const stackTagFg = settings.stack_tag_color
+  const showStack  = Boolean(settings.show_stack_tag_on_item)
+
+  if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
+
+  return (
+    <div
+      onClick={() => onOpen?.(product)}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
+    >
+      {/* Image top */}
+      <div className="relative h-48 w-full overflow-hidden bg-neutral-100">
+        <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+        {/* Tag badge */}
+        {product.tag && showStack
+          ? <span className="absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold shadow" style={{ backgroundColor: stackTagBg || '#f2c14e', color: stackTagFg || '#000' }}>{product.tag}</span>
+          : product.tag
+          ? <span className="absolute left-3 top-3 rounded-full bg-[#f2c14e] px-3 py-1 text-[10px] font-bold text-neutral-900 shadow">{product.tag}</span>
+          : null
+        }
+        {displayDiscount && <span className="absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold shadow" style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</span>}
+        {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-neutral-700 shadow">Coming Soon</span></span>}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
+        {product.description && <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-neutral-500">{product.description}</p>}
+        {product.dealMeta?.timeWindow && (
+          <p className="mt-1.5 text-[10px] font-medium text-amber-600">🕐 {product.dealMeta.timeWindow}</p>
+        )}
+
+        {/* Price + Add row */}
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-1.5">
+            {displayOriginal && <span className="text-xs text-neutral-400 line-through">Rs.{parseInt(displayOriginal, 10).toLocaleString()}</span>}
+            {(isOrderable || product.dealMeta) && (
+              <span className="text-base font-bold text-[#1a6fa0]">
+                Rs. {isOrderable ? displayPriceNum.toLocaleString() : Math.round(parseFloat(product.dealMeta!.finalPrice)).toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          {/* Cart controls */}
+          {isOrderable && !needsSelection && cartQty > 0 ? (
+            <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-1.5 rounded-full border-2 border-neutral-900 px-2 py-1">
+              <button type="button" onClick={handleDecrease} className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-900/10"><Minus size={11} /></button>
+              <span className="w-4 text-center text-xs font-bold text-neutral-900">{cartQty}</span>
+              <button type="button" onClick={handleIncrease} className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-neutral-800"><Plus size={11} /></button>
+            </div>
+          ) : isOrderable ? (
+            <button
+              type="button"
+              onClick={handleAdd}
+              aria-label="Add to cart"
+              className={`flex h-9 items-center gap-1.5 rounded-xl px-4 text-sm font-bold transition-all ${added ? 'bg-green-600 text-white' : 'bg-[#1a6fa0] text-white hover:bg-[#155a82]'}`}
+            >
+              {added ? <Check size={14} /> : <Plus size={14} />}
+              {added ? 'Added' : 'ADD'}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARD-3  — portrait: full image background, name/description overlay bottom,
+// price + full-width "ADD TO CART" button at bottom
+// Matches: "Midnight Deal" screenshot — red full-width pill button.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Card3({ product, onOpen }: ProductCardProps) {
+  const {
+    settings, added, needsSelection,
+    displayPriceNum, displayOriginal, displayDiscount, isOrderable,
+    cartQty, handleAdd, handleIncrease, handleDecrease,
+  } = useCardLogic(product, onOpen)
+
+  const discountBg = settings.discount_background_color
+  const discountFg = settings.discount_text_color
+  const stackTagBg = settings.stack_tag_background_color
+  const stackTagFg = settings.stack_tag_color
+  const showStack  = Boolean(settings.show_stack_tag_on_item)
+
+  if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
+
+  return (
+    <div
+      onClick={() => onOpen?.(product)}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
+    >
+      {/* Full-card image area */}
+      <div className="relative h-52 w-full overflow-hidden bg-neutral-100">
+        <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+        {product.tag && showStack
+          ? <span className="absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold shadow" style={{ backgroundColor: stackTagBg || '#f2c14e', color: stackTagFg || '#000' }}>{product.tag}</span>
+          : product.tag
+          ? <span className="absolute left-3 top-3 rounded-full bg-[#f2c14e] px-3 py-1 text-[10px] font-bold text-neutral-900 shadow">{product.tag}</span>
+          : null
+        }
+        {displayDiscount && <span className="absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold shadow" style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</span>}
+        {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-neutral-700 shadow">Coming Soon</span></span>}
+      </div>
+
+      {/* Name + description + price */}
+      <div className="flex flex-col gap-1 px-4 pt-4 pb-3">
+        <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
+        {product.description && <p className="text-xs leading-relaxed text-neutral-400 line-clamp-2">{product.description}</p>}
+        {product.dealMeta?.timeWindow && <p className="text-[10px] font-medium text-amber-600">🕐 {product.dealMeta.timeWindow}</p>}
+        <div className="mt-1 flex items-baseline gap-1.5">
+          {displayOriginal && <span className="text-xs text-neutral-400 line-through">Rs.{parseInt(displayOriginal, 10).toLocaleString()}</span>}
+          {(isOrderable || product.dealMeta) && (
+            <span className="text-base font-bold text-neutral-900">
+              Rs. {isOrderable ? displayPriceNum.toLocaleString() : Math.round(parseFloat(product.dealMeta!.finalPrice)).toLocaleString()}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Full-width ADD TO CART / cart controls */}
+      <div className="px-4 pb-4">
+        {isOrderable && !needsSelection && cartQty > 0 ? (
+          <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-3 rounded-full border-2 border-neutral-900 py-2">
+            <button type="button" onClick={handleDecrease} className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-900/10"><Minus size={14} /></button>
+            <span className="min-w-[1.5rem] text-center text-sm font-bold text-neutral-900">{cartQty}</span>
+            <button type="button" onClick={handleIncrease} className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-neutral-800"><Plus size={14} /></button>
+          </div>
+        ) : isOrderable ? (
+          <button
+            type="button"
+            onClick={handleAdd}
+            aria-label="Add to cart"
+            className={`w-full rounded-full py-2.5 text-sm font-bold uppercase tracking-wide transition-all ${added ? 'bg-green-600 text-white' : 'bg-[#c0392b] text-white hover:bg-[#a93226]'}`}
+          >
+            {added ? '✓ Added' : 'Add to Cart'}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main export — reads product_card_design from settings and renders accordingly
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function ProductCard({ product, onOpen }: ProductCardProps) {
+  const { settings } = useStoreSettings()
+  const design = (settings.product_card_design as string | undefined) ?? 'card-1'
+
+  if (design === 'card-2') return <Card2 product={product} onOpen={onOpen} />
+  if (design === 'card-3') return <Card3 product={product} onOpen={onOpen} />
+  return <Card1 product={product} onOpen={onOpen} />
 }

@@ -214,8 +214,15 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
             </div>
           </div>
 
-          {isOnSpot && dealMeta?.timeWindow && (
-            <div className={`mx-6 mb-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium sm:mx-10 ${
+          {/* Prep / Cook time */}
+          {!isDeal && product.timeDuration && (
+            <div className="mx-6 mb-4 flex items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-medium text-neutral-600 sm:mx-10">
+              <Clock size={14} className="shrink-0 text-neutral-400" />
+              <span>Ready in <span className="font-semibold text-neutral-800">{product.timeDuration}</span></span>
+            </div>
+          )}
+
+          {isOnSpot && dealMeta?.timeWindow && (            <div className={`mx-6 mb-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium sm:mx-10 ${
               !isAvailableNow ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
             }`}>
               <Clock size={14} className="shrink-0" />

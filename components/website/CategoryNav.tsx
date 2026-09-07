@@ -1,7 +1,9 @@
 'use client'
 
+import { useRef } from 'react'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
+import { ChevronRight } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 
 type CategoryIcon = { type: 'image'; value: string } | { type: 'iconify'; value: string }
@@ -17,53 +19,162 @@ interface CategoryNavProps {
   onSelect: (categoryId: string) => void
 }
 
-export function CategoryNav({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
+// ─────────────────────────────────────────────────────────────────────────────
+// CATEGORY-1 (default) — dark bg, icon above label, active = white bg panel
+// matches screenshot-1: green bg, pill-shaped active (red/dark), white text
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
   const { settings } = useStoreSettings()
-  const navBg = settings.category_navbar_background_color || '#000000'
+  const navBg = settings.category_navbar_background_color || '#1a5e1a'
 
   return (
     <nav className="sticky top-0 z-30" style={{ backgroundColor: navBg }}>
-      <div className="mx-auto flex max-w-[1400px] overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x">
+      <div className="mx-auto flex max-w-[1400px] overflow-x-auto scrollbar-hide snap-x touch-pan-x">
         {categories.map((cat) => {
           const isActive = cat.id === activeCategoryId
-
           return (
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id)}
-              className={`snap-start relative flex min-w-[90px] flex-col items-center justify-center gap-1.5 px-2 py-3 text-xs font-bold transition-colors sm:min-w-[110px] sm:gap-2 sm:px-3 sm:py-4 sm:text-sm md:min-w-[130px] md:px-4 md:py-5 md:text-base ${
+              className={`snap-start relative flex-shrink-0 px-4 py-2.5 text-xs font-bold uppercase tracking-wide transition-all sm:px-5 sm:py-3 sm:text-sm rounded-sm mx-0.5 my-1.5 ${
                 isActive
-                  ? 'bg-[#ffffff] text-neutral-900'
-                  : 'text-white hover:bg-white/10'
+                  ? 'bg-[#cc1111] text-white'
+                  : 'text-white hover:bg-white/15'
               }`}
             >
               {cat.badge && (
-                <span className="absolute left-0 top-0 rounded-br-md bg-[#ffffff] px-1 py-0.5 text-[8px] font-extrabold uppercase text-black sm:px-1.5 sm:py-0.5 sm:text-[9px]">
+                <span className="absolute -right-1 -top-1 rounded-full bg-white px-1 py-0.5 text-[8px] font-extrabold text-black shadow">
                   {cat.badge}
                 </span>
               )}
-
-              <div className="relative flex h-8 w-8 items-center justify-center sm:h-10 sm:w-10 md:h-12 md:w-12">
-                {cat.icon.type === 'image' ? (
-                  <Image
-                    src={cat.icon.value}
-                    alt={cat.label}
-                    fill
-                    sizes="48px"
-                    className="object-contain"
-                  />
-                ) : (
-                  <Icon icon={cat.icon.value} width="100%" height="100%" />
-                )}
-              </div>
-
-              <span className="text-center leading-tight whitespace-nowrap">
-                {cat.label}
-              </span>
+              {cat.label}
             </button>
           )
         })}
       </div>
     </nav>
   )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATEGORY-2 — colored bg (red/brand), text-only pills, active = yellow oval
+// matches screenshot-2: red/yellow bg, active = yellow rounded pill, plain text
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
+  const { settings } = useStoreSettings()
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const navBg = settings.category_navbar_background_color || '#cc1111'
+
+  const scrollRight = () => {
+    scrollRef.current?.scrollBy({ left: 240, behavior: 'smooth' })
+  }
+
+  return (
+    <nav className="sticky  top-0 z-30 shadow-sm relative" style={{ backgroundColor: navBg }}>
+      <div className="mx-auto flex max-w-[1400px] items-center pr-10">
+        <div
+          ref={scrollRef}
+          className="flex flex-1 overflow-x-auto scrollbar-hide snap-x touch-pan-x gap-1 px-3 py-2.5 sm:gap-2 sm:px-4 sm:py-3"
+        >
+          {categories.map((cat) => {
+            const isActive = cat.id === activeCategoryId
+            return (
+              <button
+                key={cat.id}
+                onClick={() => onSelect(cat.id)}
+                className={`snap-start relative flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all sm:px-5 sm:py-2 sm:text-sm whitespace-nowrap ${
+                  isActive
+                    ? 'bg-[#f5c518] text-neutral-900 shadow-md scale-105'
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                {cat.badge && (
+                  <span className="absolute -right-1 -top-1 rounded-full bg-white px-1 py-0.5 text-[8px] font-extrabold text-black shadow">
+                    {cat.badge}
+                  </span>
+                )}
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+        {/* Scroll right arrow */}
+        <button
+          onClick={scrollRight}
+          className="absolute right-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors sm:h-9 sm:w-9"
+          aria-label="Scroll categories"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+    </nav>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATEGORY-3 — white/light bg, icon + label, active = colored underline tab
+// minimal, clean tab-bar style
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
+  const { settings } = useStoreSettings()
+  const navBg = settings.category_navbar_background_color || '#000000'
+  const isLight = navBg === '#ffffff' || navBg === 'white' || navBg.toLowerCase() === '#fff'
+
+  return (
+    <nav className={`sticky top-0 z-30 border-b ${isLight ? 'border-neutral-200 shadow-sm' : 'border-white/10'}`}
+      style={{ backgroundColor: navBg }}>
+      <div className="mx-auto flex max-w-[1400px] overflow-x-auto scrollbar-hide snap-x touch-pan-x">
+        {categories.map((cat) => {
+          const isActive = cat.id === activeCategoryId
+          const textColor = isLight
+            ? isActive ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'
+            : isActive ? 'text-white' : 'text-white/60 hover:text-white'
+          const borderColor = isActive ? 'border-b-2 border-[#cc1111]' : 'border-b-2 border-transparent'
+
+          return (
+            <button
+              key={cat.id}
+              onClick={() => onSelect(cat.id)}
+              className={`snap-start relative flex min-w-[80px] flex-col items-center justify-center gap-1 px-3 py-3 text-[11px] font-semibold transition-all sm:min-w-[100px] sm:px-4 sm:py-4 sm:text-xs md:min-w-[120px] md:text-sm ${textColor} ${borderColor}`}
+            >
+              {cat.badge && (
+                <span className="absolute right-1 top-1 rounded-full bg-[#cc1111] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow">
+                  {cat.badge}
+                </span>
+              )}
+
+              {/* Icon */}
+              <div className="relative flex h-7 w-7 items-center justify-center sm:h-20 sm:w-20">
+                {cat.icon.type === 'image' ? (
+                  <Image src={cat.icon.value} alt={cat.label} fill sizes="62px"
+                    className={`object-contain transition-all ${isActive ? 'opacity-100' : 'opacity-60'}`} />
+                ) : (
+                  <Icon icon={cat.icon.value} width="100%" height="100%"
+                    className={`transition-all ${isActive ? 'opacity-100' : 'opacity-60'}`} />
+                )}
+              </div>
+
+              <span className="text-center leading-tight whitespace-nowrap">{cat.label}</span>
+            </button>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main export — reads category_design from settings
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function CategoryNav(props: CategoryNavProps) {
+  const { settings } = useStoreSettings()
+  const design = (settings.category_design as string | undefined) ?? 'category-3'
+
+  if (design === 'category-2') return <Cat2 {...props} />
+  if (design === 'category-3') return <Cat3 {...props} />
+  return <Cat1 {...props} />
 }
