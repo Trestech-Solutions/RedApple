@@ -908,7 +908,7 @@ export default function HomePage() {
           })}
         </div>
       )}
-
+{/* 
       <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-8">
         <h3 className="font-serif text-2xl font-bold text-neutral-900 sm:text-3xl">
           Discover the Delightful Range at United King
@@ -917,7 +917,7 @@ export default function HomePage() {
           United King is Karachi&apos;s premier bakery, offering a wide selection of cakes,
           sweets, mithai, frozen food and fast food.
         </p>
-      </section>
+      </section> */}
     </div>
   )
 }
