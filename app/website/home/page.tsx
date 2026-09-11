@@ -690,7 +690,13 @@ export default function HomePage() {
     <div className="min-h-screen font-sans text-neutral-800">
       {/* Hero carousel — only rendered when banners or legacy slides are available */}
       {heroActive && (
-        <section className="bg-white px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
+        <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8" style={{
+          backgroundColor: settings.background_color || '',
+          backgroundImage: settings.menu_page_background_image ? `url("${settings.menu_page_background_image}")` : '',
+          backgroundRepeat: 'repeat',
+          backgroundSize: 'auto',
+          backgroundAttachment: 'fixed',
+        }}>
         <div className="relative mx-auto h-[20vh] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 sm:h-[40vh] sm:rounded-3xl md:h-[55vh] lg:h-[70vh] xl:h-[75vh]">
           {HERO_SLIDES.map((s, i) => {
             const isActive = i === currentSlide
@@ -854,7 +860,14 @@ export default function HomePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="mb-6 flex items-center justify-between rounded-2xl bg-gradient-to-r from-neutral-900 to-neutral-700 px-5 py-4 sm:px-8 sm:py-5 shadow-md">
+                    <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4 sm:px-8 sm:py-5 shadow-md" style={{
+                      backgroundColor: settings.background_color || '#1f1f1f',
+                      backgroundImage: settings.menu_page_background_image ? `url("${settings.menu_page_background_image}")` : '',
+                      backgroundRepeat: 'repeat',
+                      backgroundSize: 'auto',
+                      backgroundAttachment: 'fixed',
+                      backgroundBlendMode: 'overlay',
+                    }}>
                       <div>
                         <h2 className="text-lg font-bold text-white sm:text-xl md:text-2xl">
                           {cat.label}
