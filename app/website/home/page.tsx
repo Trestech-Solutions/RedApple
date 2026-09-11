@@ -686,13 +686,16 @@ export default function HomePage() {
     )
   }
 
+  // Resolve full URLs for background images
+  const resolvedBgImage = resolveMediaUrl(settings.menu_page_background_image)
+
   return (
     <div className="min-h-screen font-sans text-neutral-800">
       {/* Hero carousel — only rendered when banners or legacy slides are available */}
       {heroActive && (
         <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8" style={{
           backgroundColor: settings.background_color || '',
-          backgroundImage: settings.menu_page_background_image ? `url("${settings.menu_page_background_image}")` : '',
+          backgroundImage: resolvedBgImage ? `url("${resolvedBgImage}")` : '',
           backgroundRepeat: 'repeat',
           backgroundSize: 'auto',
           backgroundAttachment: 'fixed',
@@ -862,7 +865,7 @@ export default function HomePage() {
                   ) : (
                     <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4 sm:px-8 sm:py-5 shadow-md" style={{
                       backgroundColor: settings.background_color || '#1f1f1f',
-                      backgroundImage: settings.menu_page_background_image ? `url("${settings.menu_page_background_image}")` : '',
+                      backgroundImage: resolvedBgImage ? `url("${resolvedBgImage}")` : '',
                       backgroundRepeat: 'repeat',
                       backgroundSize: 'auto',
                       backgroundAttachment: 'fixed',

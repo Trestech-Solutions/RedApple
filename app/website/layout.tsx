@@ -19,6 +19,19 @@ import { OrderTypeModal } from '@/components/website/OrderTypeModal'
 
 const DEFAULT_PATTERN_URL =
   'https://assets.indolj.io/upload/1693394669-Final-Pattern.png'
+const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? ''
+
+/** Resolves a relative /media/... path to a full URL. Pass-through for absolute URLs. */
+function resolveMediaUrl(path?: string | null): string | undefined {
+  if (!path || path.trim() === '') return undefined
+  if (path.startsWith('http')) return path
+  if (path.startsWith('/')) {
+    const base = MEDIA_BASE.replace(/\/+$/, '').replace(/\/api$/i, '')
+    if (!base) return undefined
+    return `${base}${path}`
+  }
+  return path
+}
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -44,7 +57,7 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   if (isLoading) return <WebsiteSkeleton />
 
   // Background: prefer menu_page_background_image → background_color → default pattern
-  const bgImage = settings.menu_page_background_image || DEFAULT_PATTERN_URL
+  const bgImage = resolveMediaUrl(settings.menu_page_background_image) || DEFAULT_PATTERN_URL
   const bgColor = settings.background_color || ''
 
   return (
