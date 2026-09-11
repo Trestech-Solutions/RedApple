@@ -84,9 +84,6 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
     ? (defaultSize.hasDiscountTag ? defaultSize.discountLabel : undefined)
     : product.discount
 
-  // Deals don't carry a `productId` (only dealMeta.dealId) and their price
-  // lives in dealMeta.finalPrice, not product.price — so both checks need a
-  // deal-aware branch or the Add/+ button never renders for deals.
   const hasPrice    = displayPriceStr !== '' && displayPriceNum > 0
   const isOrderable = hasPrice && (
     product.dealMeta
@@ -136,9 +133,10 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CARD-1  (default) — horizontal: text left, image right
-// Matches: "Chicken Tikka" screenshot — small circular + button bottom-right
-// of the image, discount pill top-right of the image, plain (non-boxed) price.
+// CARD-1 (default) — horizontal: text left, image right
+// FIX: image's overflow-hidden was clipping the -bottom-2/-right-2 "+" button.
+// Now the outer image slot has NO overflow-hidden (so the button/badges can
+// hang over the edge), and only an inner wrapper clips the <Image> itself.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Card1({ product, onOpen }: ProductCardProps) {
@@ -166,7 +164,7 @@ function Card1({ product, onOpen }: ProductCardProps) {
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
       onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
-      className={`group relative flex h-full items-stretch gap-2 overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:shadow-xl sm:gap-4 sm:p-4 ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
+      className={`group relative flex h-full items-stretch gap-2 rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:shadow-xl sm:gap-4 sm:p-4 ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
     >
       {/* Text */}
       <div className="flex flex-1 flex-col justify-between py-0.5 min-w-0">
@@ -206,20 +204,25 @@ function Card1({ product, onOpen }: ProductCardProps) {
         )}
       </div>
 
-      {/* Image */}
-      <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-50 sm:h-36 sm:w-36 md:h-40 md:w-40">
-        <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 160px, 144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+      {/* Image slot — NOT overflow-hidden, so badges/button can hang over the edge */}
+      <div className="relative h-28 w-28 flex-shrink-0 sm:h-36 sm:w-36 md:h-40 md:w-40">
+        {/* Inner clip wrapper — only this clips the <Image> */}
+        <div className="absolute inset-0 overflow-hidden rounded-xl bg-neutral-50">
+          <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 160px, 144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+          {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold text-neutral-700 shadow">Coming Soon</span></span>}
+        </div>
+
         {product.tag && showStack
-          ? <span className="absolute left-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: stackTagBg || '#fff', color: stackTagFg || '#000' }}>{product.tag}</span>
+          ? <span className="absolute left-1.5 top-1.5 z-10 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: stackTagBg || '#fff', color: stackTagFg || '#000' }}>{product.tag}</span>
           : product.tag
-          ? <span className="absolute left-1.5 top-1.5 rounded bg-white px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm">{product.tag}</span>
+          ? <span className="absolute left-1.5 top-1.5 z-10 rounded bg-white px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm">{product.tag}</span>
           : null
         }
-        {displayDiscount && <span className="absolute right-1.5 top-1.5 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</span>}
-        {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold text-neutral-700 shadow">Coming Soon</span></span>}
+        {displayDiscount && <span className="absolute right-1.5 top-1.5 z-10 rounded px-2 py-0.5 text-[9px] font-bold shadow-sm" style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</span>}
+
         {isOrderable && (needsSelection || cartQty === 0) && (
           <button type="button" onClick={handleAdd} aria-label="Add to cart"
-            className={`absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}>
+            className={`absolute -bottom-2 -right-2 z-20 flex h-8 w-8 items-center justify-center rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}>
             {added ? <Check size={16} /> : <Plus size={18} />}
           </button>
         )}
@@ -229,9 +232,7 @@ function Card1({ product, onOpen }: ProductCardProps) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CARD-2  — portrait: large image top, name + description + price, ADD button
-// Matches: "Rainbow Cake" screenshot — badge top-left over image, uppercase
-// bold name, teal-blue price + pill "ADD" button on the same row.
+// CARD-2 — portrait: large image top, name + description + price, ADD button
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Card2({ product, onOpen }: ProductCardProps) {
@@ -257,10 +258,8 @@ function Card2({ product, onOpen }: ProductCardProps) {
       onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
       className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
     >
-      {/* Image top */}
       <div className="relative h-48 w-full overflow-hidden bg-neutral-100">
         <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
-        {/* Tag badge */}
         {product.tag && showStack
           ? <span className="absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold shadow" style={{ backgroundColor: stackTagBg || '#f2c14e', color: stackTagFg || '#000' }}>{product.tag}</span>
           : product.tag
@@ -271,7 +270,6 @@ function Card2({ product, onOpen }: ProductCardProps) {
         {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-neutral-700 shadow">Coming Soon</span></span>}
       </div>
 
-      {/* Content */}
       <div className="flex flex-1 flex-col p-4">
         <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
         {product.description && <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-neutral-500">{product.description}</p>}
@@ -279,7 +277,6 @@ function Card2({ product, onOpen }: ProductCardProps) {
           <p className="mt-1.5 text-[10px] font-medium text-amber-600">🕐 {product.dealMeta.timeWindow}</p>
         )}
 
-        {/* Price + Add row */}
         <div className="mt-3 flex items-center justify-between gap-2">
           <div className="flex items-baseline gap-1.5">
             {displayOriginal && <span className="text-xs text-neutral-400 line-through">Rs.{parseInt(displayOriginal, 10).toLocaleString()}</span>}
@@ -290,7 +287,6 @@ function Card2({ product, onOpen }: ProductCardProps) {
             )}
           </div>
 
-          {/* Cart controls */}
           {isOrderable && !needsSelection && cartQty > 0 ? (
             <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-1.5 rounded-full border-2 border-neutral-900 px-2 py-1">
               <button type="button" onClick={handleDecrease} className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-900/10"><Minus size={11} /></button>
@@ -315,9 +311,8 @@ function Card2({ product, onOpen }: ProductCardProps) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CARD-3  — portrait: full image background, name/description overlay bottom,
+// CARD-3 — portrait: full image background, name/description overlay bottom,
 // price + full-width "ADD TO CART" button at bottom
-// Matches: "Midnight Deal" screenshot — red full-width pill button.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Card3({ product, onOpen }: ProductCardProps) {
@@ -343,7 +338,6 @@ function Card3({ product, onOpen }: ProductCardProps) {
       onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
       className={`group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl ${onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900' : ''}`}
     >
-      {/* Full-card image area */}
       <div className="relative h-52 w-full overflow-hidden bg-neutral-100">
         <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
         {product.tag && showStack
@@ -356,7 +350,6 @@ function Card3({ product, onOpen }: ProductCardProps) {
         {!isOrderable && !product.dealMeta && <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]"><span className="rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-neutral-700 shadow">Coming Soon</span></span>}
       </div>
 
-      {/* Name + description + price */}
       <div className="flex flex-col gap-1 px-4 pt-4 pb-3">
         <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
         {product.description && <p className="text-xs leading-relaxed text-neutral-400 line-clamp-2">{product.description}</p>}
@@ -371,7 +364,6 @@ function Card3({ product, onOpen }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Full-width ADD TO CART / cart controls */}
       <div className="px-4 pb-4">
         {isOrderable && !needsSelection && cartQty > 0 ? (
           <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-3 rounded-full border-2 border-neutral-900 py-2">
@@ -395,7 +387,7 @@ function Card3({ product, onOpen }: ProductCardProps) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Main export — reads product_card_design from settings and renders accordingly
+// Main export
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ProductCard({ product, onOpen }: ProductCardProps) {

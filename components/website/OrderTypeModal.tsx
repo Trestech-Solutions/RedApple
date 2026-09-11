@@ -422,7 +422,7 @@ interface OrderTypeModalProps {
 
 export function OrderTypeModal({ onClose }: OrderTypeModalProps) {
   const { settings } = useStoreSettings()
-  const design = (settings.order_modal_design as string | undefined) ?? 'modal-2'
+  const design = (settings.order_modal_design as string | undefined) ?? 'modal-1'
 
   if (design === 'modal-2') return <Modal2 onClose={onClose} />
   return <Modal1 onClose={onClose} />

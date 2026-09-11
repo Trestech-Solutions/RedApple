@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
@@ -115,18 +115,36 @@ function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CATEGORY-3 — white/light bg, icon + label, active = colored underline tab
-// minimal, clean tab-bar style
+// minimal, clean tab-bar style.
+// On page scroll (past SCROLL_COLLAPSE_THRESHOLD) the icon block animates away
+// (height/opacity/margin → 0), leaving a compact label-only pill row.
 // ─────────────────────────────────────────────────────────────────────────────
+
+const SCROLL_COLLAPSE_THRESHOLD = 700
 
 function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
   const { settings } = useStoreSettings()
   const navBg = settings.category_navbar_background_color || '#000000'
   const isLight = navBg === '#ffffff' || navBg === 'white' || navBg.toLowerCase() === '#fff'
+  const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      setCollapsed(window.scrollY > SCROLL_COLLAPSE_THRESHOLD)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <nav className={`sticky top-0 z-30 border-b ${isLight ? 'border-neutral-200 shadow-sm' : 'border-white/10'}`}
+    <nav className={`sticky top-0 z-30 border-b transition-all duration-300 ${isLight ? 'border-neutral-200 shadow-sm' : 'border-white/10'}`}
       style={{ backgroundColor: navBg }}>
-      <div className="mx-auto flex max-w-[1400px] overflow-x-auto scrollbar-hide snap-x touch-pan-x">
+      <div
+        className={`mx-auto flex max-w-[1400px] overflow-x-auto scrollbar-hide snap-x touch-pan-x transition-all duration-300 ease-in-out ${
+          collapsed ? 'items-center gap-2 px-3 py-2.5 sm:gap-2.5 sm:px-4 sm:py-3' : 'items-stretch gap-0 px-0 py-0'
+        }`}
+      >
         {categories.map((cat) => {
           const isActive = cat.id === activeCategoryId
           const textColor = isLight
@@ -134,11 +152,35 @@ function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
             : isActive ? 'text-white' : 'text-white/60 hover:text-white'
           const borderColor = isActive ? 'border-b-2 border-[#cc1111]' : 'border-b-2 border-transparent'
 
+          if (collapsed) {
+            // ── Collapsed: compact pill row, no icon, no border-b tab look ──
+            return (
+              <button
+                key={cat.id}
+                onClick={() => onSelect(cat.id)}
+                className={`snap-start relative flex-shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-semibold transition-all duration-300 ease-in-out sm:px-5 sm:py-2 sm:text-xs md:text-sm ${
+                  isActive
+                    ? 'bg-[#cc1111] text-white shadow-md scale-105'
+                    : isLight
+                      ? 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {cat.badge && (
+                  <span className="absolute -right-1 -top-1 rounded-full bg-[#cc1111] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow">
+                    {cat.badge}
+                  </span>
+                )}
+                {cat.label}
+              </button>
+            )
+          }
+
           return (
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id)}
-              className={`snap-start relative flex min-w-[80px] flex-col items-center justify-center gap-1 px-3 py-3 text-[11px] font-semibold transition-all sm:min-w-[100px] sm:px-4 sm:py-4 sm:text-xs md:min-w-[120px] md:text-sm ${textColor} ${borderColor}`}
+              className={`snap-start relative flex min-w-[80px] flex-col items-center justify-center gap-1 px-3 py-3 text-[11px] font-semibold transition-all duration-300 ease-in-out sm:min-w-[100px] sm:px-4 sm:py-4 sm:text-xs md:min-w-[120px] md:text-sm ${textColor} ${borderColor}`}
             >
               {cat.badge && (
                 <span className="absolute right-1 top-1 rounded-full bg-[#cc1111] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow">
