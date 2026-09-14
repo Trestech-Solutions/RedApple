@@ -419,18 +419,22 @@ function transformMenu(menu: MenuResponse | undefined): {
           // addon_items: item is null, use addon_detail.name
           if (o.item === null && 'addon_detail' in o && o.addon_detail) {
             return {
-              id:     (o as { addon: number }).addon,  // use addon id as unique key
-              name:   o.addon_detail.name,
-              qty:    o.quantity,
-              maxQty: o.max_quantity,   // null = capped only by group's selectQty
+              id:        (o as { addon: number }).addon,
+              name:      o.addon_detail.name,
+              qty:       o.quantity,
+              maxQty:    o.max_quantity,
+              extraCost: undefined,   // addon_items options don't carry extra_cost in the current schema
             }
           }
           // normal_dish: use item_detail.name
           return {
-            id:     o.id,
-            name:   (o.item_detail as { name?: string } | null | undefined)?.name ?? `Item ${o.item}`,
-            qty:    o.quantity,
-            maxQty: o.max_quantity,     // null = capped only by group's selectQty
+            id:        o.id,
+            name:      (o.item_detail as { name?: string } | null | undefined)?.name ?? `Item ${o.item}`,
+            qty:       o.quantity,
+            maxQty:    o.max_quantity,
+            extraCost: (o as { extra_cost?: string }).extra_cost
+              ? Math.round(parseFloat((o as { extra_cost?: string }).extra_cost!))
+              : undefined,
           }
         }),
       }))

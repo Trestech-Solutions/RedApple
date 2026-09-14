@@ -74,7 +74,7 @@ export function PopupBannerModal({ banners }: Props) {
       aria-label="Promotional popup"
     >
       <div
-        className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl"
+        className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

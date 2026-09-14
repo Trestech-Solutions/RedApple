@@ -52,31 +52,51 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   const [sharing, setSharing]               = useState(false)
   const [added, setAdded]                   = useState(false)
 
-  // groupSelections: which option keys are ticked, per group
-  const [groupSelections, setGroupSelections] = useState<Record<string, boolean>>({})
+  // groupSelections: option key → selected quantity (0 = not selected, ≥1 = selected with qty)
+  const [groupSelections, setGroupSelections] = useState<Record<string, number>>({})
+
+  // itemQtys: per included-item quantity for extra_cost calculation (key = index)
+  const [itemQtys, setItemQtys] = useState<Record<number, number>>(() => {
+    const init: Record<number, number> = {}
+    ;(product.dealMeta?.includedItems ?? []).forEach((_, i) => { init[i] = 1 })
+    return init
+  })
 
   const isDeal   = !!product.dealType
   const isFixed  = product.dealType === 'fixed_deal'
   const isOnSpot = product.dealType === 'on_spot_deal'
   const dealMeta = product.dealMeta
 
+  // Total selected count for a group (sum of quantities)
   const groupTotal = (gi: number): number => {
     const g = dealMeta?.groups?.[gi]
     if (!g) return 0
     return g.options.reduce((sum, opt) => {
       const key = `${gi}-${opt.id ?? opt.name}`
-      return sum + (groupSelections[key] ? 1 : 0)
+      return sum + (groupSelections[key] ?? 0)
     }, 0)
   }
 
+  // Checkbox toggle (maxQty === null or ≤ 1): select/deselect as qty=1
   const toggleOption = (gi: number, optKey: string, selectQty: number) => {
     setGroupSelections((prev) => {
-      const isSelected = !!prev[optKey]
-      if (isSelected) {
-        return { ...prev, [optKey]: false }
-      }
-      if (groupTotal(gi) >= selectQty) return prev
-      return { ...prev, [optKey]: true }
+      const curQty = prev[optKey] ?? 0
+      if (curQty > 0) return { ...prev, [optKey]: 0 }           // deselect
+      if (groupTotal(gi) >= selectQty) return prev              // group cap reached
+      return { ...prev, [optKey]: 1 }                           // select
+    })
+  }
+
+  // Counter adjust (maxQty > 1): +1 / -1 within [0, maxQty] only.
+  // Counter-type options are capped purely by their own maxQty (e.g. 4 for
+  // Mix Kabab Rice), NOT by the group's selectQty — that cap is only
+  // meaningful for checkbox-type (single-select-per-slot) options.
+  const adjustOptionQty = (gi: number, optKey: string, delta: number, maxQty: number) => {
+    setGroupSelections((prev) => {
+      const cur  = prev[optKey] ?? 0
+      const next = cur + delta
+      if (next < 0 || next > maxQty) return prev
+      return { ...prev, [optKey]: next }
     })
   }
 
@@ -88,6 +108,26 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   const unitPrice = isDeal
     ? (Math.round(parseFloat(dealMeta?.finalPrice ?? product.price)) || 0)
     : (selectedSize ? selectedSize.price : (parseInt(product.price, 10) || 0))
+
+  // Sum of extra costs across included items (each multiplied by their per-item qty)
+  const extraCostTotal = isDeal
+    ? (dealMeta?.includedItems ?? []).reduce((sum, item, i) => {
+        if (!item.extraCost || item.extraCost <= 0) return sum
+        return sum + item.extraCost * (itemQtys[i] ?? 1)
+      }, 0)
+    : 0
+
+  // Sum of extra costs from selected group options — qty-aware (on-spot deals)
+  const groupExtraCostTotal = isOnSpot
+    ? (dealMeta?.groups ?? []).reduce((groupSum, group, gi) => {
+        return groupSum + group.options.reduce((optSum, opt) => {
+          if (!opt.extraCost || opt.extraCost <= 0) return optSum
+          const key = `${gi}-${opt.id ?? opt.name}`
+          const selQty = groupSelections[key] ?? 0
+          return optSum + opt.extraCost * selQty
+        }, 0)
+      }, 0)
+    : 0
 
   const displayOriginal = isDeal
     ? (parseFloat(product.price) > unitPrice ? parseInt(product.price, 10) : undefined)
@@ -134,7 +174,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     }
   }
 
-  const total = unitPrice * qty
+  const total = (unitPrice + extraCostTotal + groupExtraCostTotal) * qty
 
   const handleAdd = () => {
     if (!isOrderable) return
@@ -142,7 +182,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
       id: product.id,
       productId: product.productId,
       name: product.name,
-      price: unitPrice,
+      price: unitPrice + extraCostTotal + groupExtraCostTotal,
       image: product.image,
       selectedOption: selectedOption || undefined,
       variantId: selectedSize ? selectedSize.sizeId : undefined,
@@ -192,11 +232,16 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
             {hasPrice ? (
               <div className="flex items-baseline gap-3 flex-wrap">
                 <span className="text-3xl font-extrabold text-neutral-900 sm:text-4xl">
-                  Rs. {unitPrice.toLocaleString()}
+                  Rs. {(unitPrice + extraCostTotal + groupExtraCostTotal).toLocaleString()}
                 </span>
                 {displayOriginal != null && displayOriginal > unitPrice && (
                   <span className="text-base text-neutral-400 line-through sm:text-lg">
                     Rs. {displayOriginal.toLocaleString()}
+                  </span>
+                )}
+                {isDeal && (extraCostTotal + groupExtraCostTotal) > 0 && (
+                  <span className="text-sm text-amber-600 font-semibold">
+                    (incl. +Rs.{(extraCostTotal + groupExtraCostTotal).toLocaleString()} extras)
                   </span>
                 )}
               </div>
@@ -243,15 +288,40 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
               <div className="rounded-xl border border-neutral-100 bg-neutral-50 overflow-hidden divide-y divide-neutral-100">
                 {dealMeta.includedItems.map((item, i) => (
                   <div key={i} className="px-4 py-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-800 font-medium">{item.name}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-neutral-800 font-medium flex-1">{item.name}</span>
                       <div className="flex items-center gap-2 shrink-0">
-                        {item.extraCost != null && item.extraCost > 0 && (
-                          <span className="text-xs font-semibold text-amber-600">+Rs.{item.extraCost}</span>
+                        {item.extraCost != null && item.extraCost > 0 ? (
+                          // Show +/- counter when item has extra cost
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-amber-600 font-semibold">
+                              +Rs.{(item.extraCost * (itemQtys[i] ?? 1)).toLocaleString()}
+                            </span>
+                            <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setItemQtys((prev) => ({ ...prev, [i]: Math.max(0, (prev[i] ?? 1) - 1) }))}
+                                aria-label="Decrease"
+                                className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Minus size={10} />
+                              </button>
+                              <span className="w-4 text-center text-xs font-bold text-neutral-800">{itemQtys[i] ?? 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => setItemQtys((prev) => ({ ...prev, [i]: (prev[i] ?? 1) + 1 }))}
+                                aria-label="Increase"
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black transition-colors"
+                              >
+                                <Plus size={10} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
+                            × {item.qty}
+                          </span>
                         )}
-                        <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
-                          × {item.qty}
-                        </span>
                       </div>
                     </div>
                     {item.availableAddons && item.availableAddons.length > 0 && (
@@ -280,11 +350,42 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
               </p>
               <div className="rounded-xl border border-neutral-100 bg-neutral-50 overflow-hidden divide-y divide-neutral-100">
                 {dealMeta.includedItems.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-2.5">
-                    <span className="text-sm text-neutral-800 font-medium">{item.name}</span>
-                    <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
-                      × {item.qty}
-                    </span>
+                  <div key={i} className="px-4 py-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-neutral-800 font-medium flex-1">{item.name}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.extraCost != null && item.extraCost > 0 ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-amber-600 font-semibold">
+                              +Rs.{(item.extraCost * (itemQtys[i] ?? 1)).toLocaleString()}
+                            </span>
+                            <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setItemQtys((prev) => ({ ...prev, [i]: Math.max(0, (prev[i] ?? 1) - 1) }))}
+                                aria-label="Decrease"
+                                className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Minus size={10} />
+                              </button>
+                              <span className="w-4 text-center text-xs font-bold text-neutral-800">{itemQtys[i] ?? 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => setItemQtys((prev) => ({ ...prev, [i]: (prev[i] ?? 1) + 1 }))}
+                                aria-label="Increase"
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black transition-colors"
+                              >
+                                <Plus size={10} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
+                            × {item.qty}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -314,10 +415,63 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
                 <div className="rounded-xl border border-neutral-200 overflow-hidden divide-y divide-neutral-100">
                   {group.options.map((opt) => {
-                    const optKey     = `${gi}-${opt.id ?? opt.name}`
-                    const isSelected = !!groupSelections[optKey]
-                    const canToggle  = isSelected || total < group.selectQty
+                    const optKey    = `${gi}-${opt.id ?? opt.name}`
+                    const selQty    = groupSelections[optKey] ?? 0
+                    const isSelected = selQty > 0
+                    const useCounter = (opt.maxQty ?? 0) > 1   // counter mode when maxQty > 1
+                    const canAdd    = groupTotal(gi) < group.selectQty
 
+                    if (useCounter) {
+                      // ── Counter mode ──────────────────────────────────────
+                      // Bounded only by this option's own maxQty (e.g. 4),
+                      // independent of the group's selectQty.
+                      return (
+                        <div
+                          key={optKey}
+                          className={`flex w-full items-center gap-3 px-4 py-3 transition-colors ${
+                            isSelected ? 'bg-amber-50' : 'bg-white'
+                          }`}
+                        >
+                          <span className="flex-1 text-sm font-medium text-neutral-800">{opt.name}</span>
+
+                          {opt.extraCost != null && opt.extraCost > 0 && (
+                            <span className={`text-xs font-semibold whitespace-nowrap ${isSelected ? 'text-amber-600' : 'text-neutral-400'}`}>
+                              {selQty > 0 ? `+Rs.${(opt.extraCost * selQty).toLocaleString()}` : `+Rs.${opt.extraCost.toLocaleString()} each`}
+                            </span>
+                          )}
+
+                          {opt.qty > 1 && selQty === 0 && (
+                            <span className="text-[10px] font-semibold text-neutral-400 whitespace-nowrap">× {opt.qty} pcs</span>
+                          )}
+
+                          {/* +/- counter */}
+                          <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                            <button
+                              type="button"
+                              disabled={selQty <= 0}
+                              onClick={() => adjustOptionQty(gi, optKey, -1, opt.maxQty!)}
+                              aria-label="Decrease"
+                              className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 disabled:opacity-30 transition-colors"
+                            >
+                              <Minus size={11} />
+                            </button>
+                            <span className="w-5 text-center text-xs font-bold text-neutral-800">{selQty}</span>
+                            <button
+                              type="button"
+                              disabled={selQty >= opt.maxQty!}
+                              onClick={() => adjustOptionQty(gi, optKey, +1, opt.maxQty!)}
+                              aria-label="Increase"
+                              className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black disabled:opacity-30 transition-colors"
+                            >
+                              <Plus size={11} />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // ── Checkbox mode (maxQty null or ≤ 1) ──────────────────
+                    const canToggle = isSelected || canAdd
                     return (
                       <button
                         key={optKey}
@@ -335,6 +489,12 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                         </div>
 
                         <span className="flex-1 text-sm font-medium text-neutral-800">{opt.name}</span>
+
+                        {opt.extraCost != null && opt.extraCost > 0 && (
+                          <span className={`text-xs font-semibold whitespace-nowrap ${isSelected ? 'text-amber-600' : 'text-neutral-400'}`}>
+                            +Rs.{opt.extraCost.toLocaleString()}
+                          </span>
+                        )}
 
                         {opt.qty > 1 && (
                           <span className="text-[10px] font-semibold text-neutral-400 whitespace-nowrap">

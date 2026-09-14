@@ -45,6 +45,7 @@ export interface ProductData {
         name: string
         qty: number
         maxQty: number | null
+        extraCost?: number   // extra charge when this option is selected
       }[]
     }[]
   }
