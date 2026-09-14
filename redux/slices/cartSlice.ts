@@ -12,6 +12,7 @@ export interface CartItem {
   variantId?: number | null
   sizeFk?: number | null
   specialInstructions?: string
+  dealSummary?: string
 }
 
 interface CartState {
@@ -43,12 +44,17 @@ const cartSlice = createSlice({
           variantId?: number | null
           sizeFk?: number | null
           specialInstructions?: string
+          dealSummary?: string
         }
       >
     ) {
       const { quantity = 1, cartItemId = null, ...rest } = action.payload
       const existing = state.items.find(
-        (i) => i.id === rest.id && i.selectedOption === rest.selectedOption
+        (i) =>
+          i.id === rest.id &&
+          i.selectedOption === rest.selectedOption &&
+          (i.dealSummary ?? '') === (rest.dealSummary ?? '') &&
+          (i.specialInstructions ?? '') === (rest.specialInstructions ?? '')
       )
       if (existing) {
         existing.quantity += quantity
@@ -59,13 +65,19 @@ const cartSlice = createSlice({
 
     removeItem(
       state,
-      action: PayloadAction<{ id: string; selectedOption?: string }>
+      action: PayloadAction<{
+        id: string
+        selectedOption?: string
+        dealSummary?: string
+      }>
     ) {
+      const { id, selectedOption, dealSummary } = action.payload
       state.items = state.items.filter(
         (i) =>
           !(
-            i.id === action.payload.id &&
-            i.selectedOption === action.payload.selectedOption
+            i.id === id &&
+            i.selectedOption === selectedOption &&
+            (i.dealSummary ?? '') === (dealSummary ?? '')
           )
       )
     },
@@ -75,17 +87,26 @@ const cartSlice = createSlice({
       action: PayloadAction<{
         id: string
         selectedOption?: string
+        dealSummary?: string
         quantity: number
       }>
     ) {
-      const { id, selectedOption, quantity } = action.payload
+      const { id, selectedOption, dealSummary, quantity } = action.payload
       if (quantity <= 0) {
         state.items = state.items.filter(
-          (i) => !(i.id === id && i.selectedOption === selectedOption)
+          (i) =>
+            !(
+              i.id === id &&
+              i.selectedOption === selectedOption &&
+              (i.dealSummary ?? '') === (dealSummary ?? '')
+            )
         )
       } else {
         const item = state.items.find(
-          (i) => i.id === id && i.selectedOption === selectedOption
+          (i) =>
+            i.id === id &&
+            i.selectedOption === selectedOption &&
+            (i.dealSummary ?? '') === (dealSummary ?? '')
         )
         if (item) item.quantity = quantity
       }

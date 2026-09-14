@@ -35,8 +35,10 @@ import {
   closeLocationModal as reduxCloseLocationModal,
   type OrderType,
 } from '@/redux/slices/orderSlice'
-import { useGetSettings } from '@/api/client/browse'
+import { useGetSettings, useGetMenu } from '@/api/client/browse'
 import type { StoreSettings } from '@/api/types'
+import { useStoreLocation } from './useStoreLocation'
+import { useEffect } from 'react'
 
 export type { CartItem, AuthUser, OrderType }
 
@@ -74,6 +76,7 @@ interface CartContextType {
       variantId?: number | null
       sizeFk?: number | null
       specialInstructions?: string
+      dealSummary?: string
       quantity?: number
     }
   ) => void
@@ -388,6 +391,25 @@ function deriveSettings(raw: StoreSettings | undefined): StoreSettingsDerived {
 export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const { branchId, areaId } = useCart()
   const { data, isLoading } = useGetSettings({ branchId, areaId })
+  const menuQuery = useGetMenu({ branchId, areaId })
+  const { setBranchDetails } = useStoreLocation()
+
+  useEffect(() => {
+    const branch = menuQuery.data?.branch
+    if (branch) {
+      const bLocation = branch.location ?? ''
+      const bAddress = branch.address ?? bLocation
+      const bMap = branch.map_location ?? ''
+      const bPhone = branch.phone ?? ''
+      setBranchDetails({
+        branchLocation: bLocation,
+        branchAddress: bAddress,
+        branchMapLocation: bMap,
+        branchPhone: bPhone,
+      })
+    }
+  }, [menuQuery.data?.branch]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const derived = useMemo(() => deriveSettings(data), [data])
   const value = useMemo<StoreSettingsContextType>(
     () => ({ settings: derived, isLoading }),

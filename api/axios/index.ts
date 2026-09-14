@@ -57,9 +57,14 @@ axiosInstance.interceptors.response.use(
     switch (status) {
       case 401:
         if (typeof window !== "undefined") {
+          // Admin / Staff session
           localStorage.removeItem("trestech_token");
           localStorage.removeItem("trestech_refresh_token");
           localStorage.removeItem("trestech_user");
+          // Storefront Customer session
+          localStorage.removeItem("trestech_customer_token");
+          localStorage.removeItem("trestech_customer_refresh_token");
+          localStorage.removeItem("trestech_customer_user");
           document.cookie = "user=; path=/; max-age=0";
         }
         break;

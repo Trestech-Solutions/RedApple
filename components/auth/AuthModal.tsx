@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect as reactUseEffect } from 'react'
+import { useState, useEffect as reactUseEffect, useMemo } from 'react'
 import Image from 'next/image'
 import { X, AlertCircle, Eye, EyeOff } from 'lucide-react'
-import { useCart } from '@/lib/hooks/useCart'
+import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
 import type { RegisterPayload, CustomerLoginResponse } from '@/api/types'
@@ -22,18 +22,36 @@ interface AuthModalProps {
   onGuestContinue: () => void
 }
 
-const TOKEN_KEY = 'trestech_token'
-const REFRESH_KEY = 'trestech_refresh_token'
-const USER_KEY = 'trestech_user'
+// ⚠️ Storefront CUSTOMER tokens use SEPARATE keys from Admin/Staff JWT.
+// The axios interceptor attaches trestech_customer_token to /storefront/ calls,
+// and trestech_token to Admin API calls. If we use the wrong key here,
+// customer endpoints (add address etc.) get 403 "Authentication credentials were not provided".
+const CUSTOMER_TOKEN_KEY   = 'trestech_customer_token'
+const CUSTOMER_REFRESH_KEY = 'trestech_customer_refresh_token'
+const CUSTOMER_USER_KEY    = 'trestech_customer_user'
+
+const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? ''
+function resolveImg(path?: string | null): string | null {
+  if (!path?.trim()) return null
+  if (path.startsWith('http')) return path
+  if (path.startsWith('/')) {
+    const base = MEDIA_BASE.replace(/\/+$/, '').replace(/\/api$/i, '')
+    return base ? `${base}${path}` : null
+  }
+  return null
+}
+
+const FALLBACK_LOGO =
+  'https://assets.indolj.io/upload/1776252259-1652698752-uk-1.jpg'
 
 function persistTokens(data: CustomerLoginResponse) {
   if (typeof window === 'undefined') return
-  localStorage.setItem(TOKEN_KEY, data.access)
-  localStorage.setItem(REFRESH_KEY, data.refresh)
+  localStorage.setItem(CUSTOMER_TOKEN_KEY, data.access)
+  if (data.refresh) localStorage.setItem(CUSTOMER_REFRESH_KEY, data.refresh)
   // Backend returns `customer` on storefront auth; fallback to `user` for compatibility
   const c = data.customer ?? data.user
   if (!c) return
-  localStorage.setItem(USER_KEY, JSON.stringify({
+  localStorage.setItem(CUSTOMER_USER_KEY, JSON.stringify({
     id: c.id,
     name: (data.customer?.name) ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
     phone: c.phone,
@@ -52,6 +70,12 @@ function normalizePhone(raw: string): string {
 
 export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const { setUser } = useCart()
+  const { settings } = useStoreSettings()
+
+  const brandLogoSrc = useMemo(
+    () => resolveImg(settings.merchant_logo) ?? FALLBACK_LOGO,
+    [settings.merchant_logo],
+  )
 
   const [step, setStep]           = useState<Step>('login')
   const [countryCode, setCC]      = useState('+92')
@@ -176,8 +200,8 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
           <div className="flex flex-col items-center mb-5">
             <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#000000] bg-white shadow-md overflow-hidden sm:h-16 sm:w-16 mb-3">
               <Image
-                src="https://assets.indolj.io/upload/1776252259-1652698752-uk-1.jpg"
-                alt="United King"
+                src={brandLogoSrc}
+                alt="Brand Logo"
                 width={64}
                 height={64}
                 className="h-full w-full object-contain"

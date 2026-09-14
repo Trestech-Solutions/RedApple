@@ -10,14 +10,15 @@ import {
   DEFAULT_DELIVERY_FEE,
   type CartItem,
 } from '@/lib/hooks/useCart'
-import { UK_BRANCHES } from '@/components/website/OrderTypeModal'
+import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
+import { FALLBACK_BRANCHES } from '@/components/website/OrderTypeModal'
 import { useCheckout, buildCheckoutPayload } from '@/api/client/checkout'
 import { useGetAddresses, useAddAddress } from '@/api/client/customer'
 import { PaymentSection } from '@/components/checkout/PaymentSection'
 import type { CheckoutFormValues } from '@/components/checkout/types'
 import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderStatusTimeline'
 
-const UK_PHONE = '021-111-022-022'
+const FALLBACK_PHONE = '021-111-022-022'
 
 const inputClass =
   'w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder:text-neutral-400'
@@ -55,6 +56,9 @@ export default function CheckoutPage() {
     items, orderType, user, addAddress: addLocalAddress,
     branch, branchId, areaId, location, subtotal, clearCart, cartToken: liveCartToken,
   } = useCart()
+  const {
+    branchName, branchAddress, branchLocation, branchMapLocation, branchPhone,
+  } = useStoreLocation()
 
   // ─── form ──────────────────────────────────────────────────────────────────
   const { register, control, handleSubmit, watch, setValue, getValues } =
@@ -282,11 +286,16 @@ export default function CheckoutPage() {
   // ─── receipt ──────────────────────────────────────────────────────────────
   if (order) return <OrderReceipt order={order} onPlaceAnother={() => { router.push('/') }} />
 
-  // ─── branch info ──────────────────────────────────────────────────────────
-  const currentBranch =
-    UK_BRANCHES.find((b) => b.id === branch) ?? UK_BRANCHES[0] ?? {
-      id: '1', name: 'United King', address: '', mapsUrl: '#',
-    }
+  // ─── branch info (prefer Redux/combine-menu data, fall back to static list ──
+  const fallbackBranch =
+    FALLBACK_BRANCHES.find((b) => b.id === branch) ?? FALLBACK_BRANCHES[0]
+
+  const displayBranchName = branchName || fallbackBranch?.name || 'United King'
+  const displayBranchAddr =
+    (branchAddress || branchLocation || fallbackBranch?.address || '').trim()
+  const displayMapsUrl =
+    (branchMapLocation || fallbackBranch?.mapsUrl || '#').trim()
+  const displayPhone = (branchPhone || FALLBACK_PHONE).trim()
 
   // ─── render ────────────────────────────────────────────────────────────────
   return (
@@ -310,17 +319,19 @@ export default function CheckoutPage() {
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 space-y-1.5">
                 <p className="text-sm font-bold text-neutral-900 uppercase">Takeaway Order 📦</p>
                 <p className="text-sm text-neutral-600">
-                  Collect from <span className="font-semibold">{currentBranch.name}</span>
+                  Collect from <span className="font-semibold">{displayBranchName}</span>
                 </p>
-                <p className="text-xs text-neutral-500">{currentBranch.address}</p>
+                {displayBranchAddr && (
+                  <p className="text-xs text-neutral-500">{displayBranchAddr}</p>
+                )}
                 <div className="flex items-center gap-4 pt-1">
-                  <a href={currentBranch.mapsUrl} target="_blank" rel="noopener noreferrer"
+                  <a href={displayMapsUrl} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
                     <Navigation size={11} /> View on Maps
                   </a>
-                  <a href={`tel:${UK_PHONE.replace(/-/g, '')}`}
+                  <a href={`tel:${displayPhone.replace(/\D/g, '')}`}
                     className="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                    📞 {UK_PHONE}
+                    📞 {displayPhone}
                   </a>
                 </div>
               </div>
