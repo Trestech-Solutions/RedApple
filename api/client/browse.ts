@@ -16,6 +16,7 @@ import type {
   OnSpotDealListParams,
   StoreSettings,
   BranchByCity,
+  StorefrontPopupBanner,
 } from '../types';
 import { useEffect as reactUseEffect } from 'react';
 
@@ -117,6 +118,33 @@ export function useGetBranchesByCity(options: {
   }, [query.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return query;
+}
+
+// ─── Popup Banners (storefront public) ───────────────────────────────────────
+// GET /storefront/popup-banners/?restaurant=<id>
+// Returns active popup banners for the restaurant, each with is_available_now.
+
+export function useGetPopupBanners(options?: {
+  restaurantId?: string | number;
+}) {
+  const restaurantId = options?.restaurantId ?? getRestaurantId();
+
+  return useQuery<StorefrontPopupBanner[], ApiError>({
+    queryKey: ['storefront-popup-banners', restaurantId],
+    queryFn: () =>
+      api
+        .get<StorefrontPopupBanner[] | { results?: StorefrontPopupBanner[] }>(
+          API_ENDPOINTS.StorefrontBrowse.getPopupBanners,
+          { params: { restaurant: restaurantId } }
+        )
+        .then((r) => {
+          const data = r.data as StorefrontPopupBanner[] | { results?: StorefrontPopupBanner[] };
+          return Array.isArray(data) ? data : data.results ?? [];
+        }),
+    enabled: !!restaurantId,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 30,
+  });
 }
 
 // ─── Cities — filtered by branch_id (NEW correct flow) ───────────────────────

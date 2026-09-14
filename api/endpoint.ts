@@ -8,6 +8,7 @@ const API_ENDPOINTS = {
     getMenu:        '/storefront/menu/',        // ?branch=<id>&area=<id optional>
     getSettings:    '/storefront/settings/',    // ?restaurant=<id>
     locate:         '/storefront/locate/',      // ?lat=<lat>&lng=<lng>&restaurant=<id optional>
+    getPopupBanners: '/storefront/popup-banners/', // ?restaurant=<id>
   },
 
   StorefrontDeals: {

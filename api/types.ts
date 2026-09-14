@@ -704,6 +704,18 @@ export type MenuBanner = {
   is_available_now: boolean;
 };
 
+/** Popup banner as returned by GET /storefront/popup-banners/?restaurant=<id> */
+export type StorefrontPopupBanner = {
+  id: number;
+  restaurant: number;
+  banner_image: string | null;
+  start_time: string | null;   // "HH:MM:SS"
+  end_time: string | null;     // "HH:MM:SS"
+  days: string[];              // [] = every day
+  status: boolean;
+  is_available_now: boolean;   // server-computed
+};
+
 /** Shape of a Fixed Deal as returned inside the menu endpoint response. */
 export type MenuFixedDeal = {
   id: number;

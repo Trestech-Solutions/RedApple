@@ -13,8 +13,10 @@ import { CategoryNav } from '@/components/website/CategoryNav'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { ProductDetailModal } from '@/components/product/ProductDetailModal'
+import { PopupBannerModal } from '@/components/website/PopupBannerModal'
 import { CATEGORIES as FALLBACK_CATS, ALL_PRODUCTS as FALLBACK_PRODS, type Category } from '@/lib/data/website-products'
 import { useGetMenu } from '@/api/client/browse'
+import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
 import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
 import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner } from '@/api/types'
@@ -777,6 +779,9 @@ export default function HomePage() {
     areaId: numericArea,
   })
 
+  // Popup banners — fetched once per restaurant; shown after menu loads
+  const { data: popupBanners = [] } = useGetPopupBanners()
+
   // ── Hero slides priority: 1) menu.banners, 2) settings.slide_image_N (empty = hide hero) ──
   const HERO_SLIDES = useMemo(
     () => buildHeroSlides(settings, menu?.banners),
@@ -863,6 +868,11 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen font-sans text-neutral-800">
+      {/* Popup banner — shown once per session after menu loads */}
+      {!isLoading && popupBanners.length > 0 && (
+        <PopupBannerModal banners={popupBanners} />
+      )}
+
       {/* Hero carousel — only rendered when banners or legacy slides are available */}
       {heroActive && (
         <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8" style={{
