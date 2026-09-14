@@ -19,7 +19,7 @@
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
-        "date_updated": "2026-09-11T12:00:02.878637Z",
+        "date_updated": "2026-09-14T10:30:16.806665Z",
         "merchant_logo": "/media/settings/merchant_logo/logo_ch6FD0l.webp",
         "menu_header": "default",
         "phone_icon_type": "call",
@@ -59,9 +59,9 @@
         "android_app_link": "https://unitedking.trestechsolutions.com/",
         "ios_icon": "/media/settings/app_icons/hello.webp",
         "ios_app_link": "https://unitedking.trestechsolutions.com/",
-        "foreground_color": "#00FF00",
+        "foreground_color": "#FAFAFA",
         "background_color": "#FAFAFA",
-        "menu_page_background_color": "#00FF00",
+        "menu_page_background_color": "#FFFFFF",
         "menu_page_background_image": "/media/settings/backgrounds/1786973821_855c8816d21f6e41.jpg",
         "menu_font_family": "Poppins",
         "item_price_background": "#F5F5F5",
@@ -71,8 +71,8 @@
         "show_cart_icon": true,
         "show_stack_tag_on_item": true,
         "stack_tag_background_color": "#00FF00",
-        "stack_tag_color": "#000000",
-        "discount_background_color": "#FF0000",
+        "stack_tag_color": "#FFFFFF",
+        "discount_background_color": "#f70945",
         "discount_text_color": "#FFFFFF",
         "category_navbar_background_color": "#000000",
         "enable_user_login": true,
@@ -508,7 +508,69 @@
             "is_available_now": true
         }
     ],
+    "popup_banners": [],
     "offers": [
+        {
+            "id": 4,
+            "restaurant": 1,
+            "branch": 1,
+            "branch_name": "DHA Branch",
+            "banner_image": "/media/offers/banners/jinko-1000x1000.jpg_FdPDQOs.webp",
+            "show_percentage_text": false,
+            "amount": "0.00",
+            "discount_type": "percentage",
+            "included_categories": [],
+            "included_categories_detail": [],
+            "orders_over": "0.00",
+            "discount_text": "Flat",
+            "discount_message": "",
+            "valid_from_date": null,
+            "valid_to_date": null,
+            "start_time": null,
+            "end_time": null,
+            "days": [
+                "mon"
+            ],
+            "status": true,
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-09-10T20:36:18.895269Z",
+            "date_updated": "2026-09-10T20:36:18.895313Z",
+            "is_available_now": true
+        },
+        {
+            "id": 3,
+            "restaurant": 1,
+            "branch": 1,
+            "branch_name": "DHA Branch",
+            "banner_image": null,
+            "show_percentage_text": false,
+            "amount": "21.88",
+            "discount_type": "percentage",
+            "included_categories": [],
+            "included_categories_detail": [],
+            "orders_over": "0.00",
+            "discount_text": "Flat",
+            "discount_message": "",
+            "valid_from_date": null,
+            "valid_to_date": null,
+            "start_time": null,
+            "end_time": null,
+            "days": [
+                "mon",
+                "tue"
+            ],
+            "status": true,
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-09-10T20:16:08.968000Z",
+            "date_updated": "2026-09-10T20:16:08.968025Z",
+            "is_available_now": true
+        },
         {
             "id": 2,
             "restaurant": 1,
@@ -649,6 +711,7 @@
                         "end_time": null,
                         "status": 1,
                         "feature_image": "/media/items/feature_images/1786621881-ChickenTikka.webp",
+                        "is_popular": false,
                         "product_background_color": "#df2020",
                         "product_title_color": "#0400f0",
                         "product_description_color": "#c6b815",
@@ -754,7 +817,10 @@
                         "date_added": "2026-08-19T09:23:13.675106Z",
                         "date_updated": "2026-08-21T14:11:37.434216Z"
                     },
-                    "quantity": 1
+                    "quantity": 1,
+                    "extra_cost": "0.00",
+                    "available_addons": [],
+                    "available_addons_detail": []
                 }
             ],
             "branch_prices": [
@@ -991,6 +1057,7 @@
                                 "end_time": null,
                                 "status": 1,
                                 "feature_image": "/media/items/feature_images/1786621881-ChickenTikka.webp",
+                                "is_popular": false,
                                 "product_background_color": "#df2020",
                                 "product_title_color": "#0400f0",
                                 "product_description_color": "#c6b815",
@@ -1097,7 +1164,10 @@
                                 "date_updated": "2026-08-21T14:11:37.434216Z"
                             },
                             "quantity": 4,
-                            "max_quantity": null
+                            "max_quantity": null,
+                            "extra_cost": "0.00",
+                            "available_addons": [],
+                            "available_addons_detail": []
                         },
                         {
                             "id": 41,
@@ -1113,6 +1183,7 @@
                                 "end_time": null,
                                 "status": 1,
                                 "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll.webp",
+                                "is_popular": true,
                                 "product_background_color": "#ffffff",
                                 "product_title_color": "#22c55e",
                                 "product_description_color": "#6b7280",
@@ -1190,7 +1261,7 @@
                                 ],
                                 "item_discount": "5.00",
                                 "item_discount_type": "percentage",
-                                "show_discount_tag": false,
+                                "show_discount_tag": true,
                                 "front_price": "600.00",
                                 "branch_prices": [],
                                 "size_prices": [
@@ -1216,10 +1287,13 @@
                                 "updated_by": 4,
                                 "updated_by_username": "admin",
                                 "date_added": "2026-08-21T11:31:07.379205Z",
-                                "date_updated": "2026-08-30T20:48:07.556233Z"
+                                "date_updated": "2026-09-14T10:30:06.867245Z"
                             },
                             "quantity": 1,
-                            "max_quantity": null
+                            "max_quantity": null,
+                            "extra_cost": "0.00",
+                            "available_addons": [],
+                            "available_addons_detail": []
                         }
                     ]
                 }
@@ -1364,6 +1438,7 @@
                                 "end_time": null,
                                 "status": 1,
                                 "feature_image": "/media/items/feature_images/1786621881-ChickenTikka.webp",
+                                "is_popular": false,
                                 "product_background_color": "#df2020",
                                 "product_title_color": "#0400f0",
                                 "product_description_color": "#c6b815",
@@ -1470,7 +1545,10 @@
                                 "date_updated": "2026-08-21T14:11:37.434216Z"
                             },
                             "quantity": 1,
-                            "max_quantity": null
+                            "max_quantity": null,
+                            "extra_cost": "0.00",
+                            "available_addons": [],
+                            "available_addons_detail": []
                         }
                     ]
                 }
@@ -1489,6 +1567,591 @@
             "date_updated": "2026-08-28T18:51:21.297142Z",
             "price_at_branch": "269.8380",
             "is_available_now": false
+        }
+    ],
+    "popular_items": [
+        {
+            "id": 9,
+            "restaurant": 1,
+            "item_sku": "Beed Bihari",
+            "name": "Beed Bihari",
+            "description": "Tender beef marinated in aromatic spices and yogurt,",
+            "time_duration": "",
+            "start_time": "12:22:00",
+            "end_time": "11:11:00",
+            "status": 1,
+            "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll_eqoh7cy.webp",
+            "is_popular": true,
+            "product_background_color": "#ffffff",
+            "product_title_color": "#22c55e",
+            "product_description_color": "#6b7280",
+            "food_category": [
+                6,
+                7,
+                8
+            ],
+            "food_category_detail": [
+                {
+                    "id": 6,
+                    "restaurant": 1,
+                    "name": "Rolls",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
+                    "banner": "/media/food_categories/banners/1787061771-11.webp",
+                    "icon": "/media/food_categories/icons/b2.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-18T18:36:01.284910Z",
+                    "date_updated": "2026-08-21T09:34:50.474618Z"
+                },
+                {
+                    "id": 7,
+                    "restaurant": 1,
+                    "name": "Starter",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
+                    "banner": "/media/food_categories/banners/1787061880-07.webp",
+                    "icon": "/media/food_categories/icons/ee.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-18T18:37:08.811541Z",
+                    "date_updated": "2026-08-21T09:36:37.558722Z"
+                },
+                {
+                    "id": 8,
+                    "restaurant": 1,
+                    "name": "Traditional",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
+                    "banner": "/media/food_categories/banners/1787061801-09.webp",
+                    "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-18T18:37:54.257232Z",
+                    "date_updated": "2026-08-21T09:35:32.223915Z"
+                }
+            ],
+            "item_discount": "5.00",
+            "item_discount_type": "percentage",
+            "show_discount_tag": true,
+            "front_price": "6.49",
+            "branch_prices": [
+                {
+                    "id": 1,
+                    "branch": 1,
+                    "branch_name": "DHA Branch",
+                    "price": "10.00",
+                    "status": true
+                },
+                {
+                    "id": 2,
+                    "branch": 3,
+                    "branch_name": "North Nazimabad",
+                    "price": "20.00",
+                    "status": true
+                },
+                {
+                    "id": 3,
+                    "branch": 4,
+                    "branch_name": "gulshan branch",
+                    "price": "30.00",
+                    "status": true
+                }
+            ],
+            "size_prices": [],
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-08-21T11:38:27.950460Z",
+            "date_updated": "2026-09-14T10:29:58.803676Z",
+            "is_available_now": false,
+            "price_at_branch": "10.00"
+        },
+        {
+            "id": 8,
+            "restaurant": 1,
+            "item_sku": "Beef Bihari Rolls",
+            "name": "Beef Bihari Rolls",
+            "description": "Tender beef marinated in aromatic spices and yogurt.",
+            "time_duration": "",
+            "start_time": null,
+            "end_time": null,
+            "status": 1,
+            "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll.webp",
+            "is_popular": true,
+            "product_background_color": "#ffffff",
+            "product_title_color": "#22c55e",
+            "product_description_color": "#6b7280",
+            "food_category": [
+                6
+            ],
+            "food_category_detail": [
+                {
+                    "id": 6,
+                    "restaurant": 1,
+                    "name": "Rolls",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
+                    "banner": "/media/food_categories/banners/1787061771-11.webp",
+                    "icon": "/media/food_categories/icons/b2.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-18T18:36:01.284910Z",
+                    "date_updated": "2026-08-21T09:34:50.474618Z"
+                }
+            ],
+            "item_discount": "5.00",
+            "item_discount_type": "percentage",
+            "show_discount_tag": true,
+            "front_price": "600.00",
+            "branch_prices": [],
+            "size_prices": [
+                {
+                    "id": 5,
+                    "size": 6,
+                    "size_name": "Large",
+                    "price": "600.00",
+                    "discount": "0.00",
+                    "discount_type": "fixed"
+                },
+                {
+                    "id": 6,
+                    "size": 4,
+                    "size_name": "Small",
+                    "price": "200.00",
+                    "discount": "0.00",
+                    "discount_type": "fixed"
+                }
+            ],
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-08-21T11:31:07.379205Z",
+            "date_updated": "2026-09-14T10:30:06.867245Z",
+            "is_available_now": true,
+            "price_at_branch": "600.00"
+        },
+        {
+            "id": 14,
+            "restaurant": 1,
+            "item_sku": "Tikka-001",
+            "name": "Chicken Tikka",
+            "description": "1 Roti , 1 Chest Piece with raita",
+            "time_duration": "",
+            "start_time": null,
+            "end_time": null,
+            "status": 1,
+            "feature_image": "/media/items/feature_images/1786142219-tIKKAPARATHADEAL.webp",
+            "is_popular": true,
+            "product_background_color": "#ffffff",
+            "product_title_color": "#22c55e",
+            "product_description_color": "#6b7280",
+            "food_category": [
+                9
+            ],
+            "food_category_detail": [
+                {
+                    "id": 9,
+                    "restaurant": 1,
+                    "name": "Wow Deals",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Wow Deals",
+                    "banner": "/media/food_categories/banners/1787061667-10.webp",
+                    "icon": "/media/food_categories/icons/1787034029-WhatsApp-Image-2026-08-18-at-11-17-18-AM--1-.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "12:22"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-21T19:51:03.674291Z",
+                    "date_updated": "2026-08-21T19:51:03.674310Z"
+                }
+            ],
+            "item_discount": "5.00",
+            "item_discount_type": "percentage",
+            "show_discount_tag": false,
+            "front_price": "200.00",
+            "branch_prices": [],
+            "size_prices": [],
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-08-21T19:53:03.743937Z",
+            "date_updated": "2026-09-14T10:30:33.722089Z",
+            "is_available_now": true,
+            "price_at_branch": "200.00"
+        },
+        {
+            "id": 5,
+            "restaurant": 1,
+            "item_sku": "Mix Kabab Rice",
+            "name": "Mix Kabab Rice",
+            "description": "Tender beef marinated in aromatic spices and yogurt.",
+            "time_duration": "",
+            "start_time": null,
+            "end_time": null,
+            "status": 1,
+            "feature_image": "/media/items/feature_images/1786626606-MixKababRice.webp",
+            "is_popular": true,
+            "product_background_color": "#ffffff",
+            "product_title_color": "#22c55e",
+            "product_description_color": "#6b7280",
+            "food_category": [
+                4
+            ],
+            "food_category_detail": [
+                {
+                    "id": 4,
+                    "restaurant": 1,
+                    "name": "BarBque",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Smoked to Perfection, Served with Passion.",
+                    "banner": "/media/food_categories/banners/1787061829-02.webp",
+                    "icon": "/media/food_categories/icons/bb1.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "gallery",
+                    "created_by": 4,
+                    "created_by_username": "admin",
+                    "updated_by": 4,
+                    "updated_by_username": "admin",
+                    "date_added": "2026-08-18T18:34:15.037873Z",
+                    "date_updated": "2026-08-21T09:31:07.574855Z"
+                }
+            ],
+            "item_discount": "5.00",
+            "item_discount_type": "percentage",
+            "show_discount_tag": true,
+            "front_price": "3999.00",
+            "branch_prices": [],
+            "size_prices": [],
+            "created_by": 4,
+            "created_by_username": "admin",
+            "updated_by": 4,
+            "updated_by_username": "admin",
+            "date_added": "2026-08-21T11:25:40.011946Z",
+            "date_updated": "2026-09-14T10:30:27.250423Z",
+            "is_available_now": true,
+            "price_at_branch": "3999.00"
         }
     ],
     "menu": [
@@ -1570,6 +2233,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786621881-ChickenTikka.webp",
+                    "is_popular": false,
                     "product_background_color": "#df2020",
                     "product_title_color": "#0400f0",
                     "product_description_color": "#c6b815",
@@ -1688,6 +2352,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786626606-MixKababRice.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -1765,7 +2430,7 @@
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
-                    "show_discount_tag": false,
+                    "show_discount_tag": true,
                     "front_price": "3999.00",
                     "branch_prices": [],
                     "size_prices": [],
@@ -1774,7 +2439,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:25:40.011946Z",
-                    "date_updated": "2026-08-21T12:49:04.691663Z",
+                    "date_updated": "2026-09-14T10:30:27.250423Z",
                     "is_available_now": true,
                     "price_at_branch": "3999.00"
                 }
@@ -1858,6 +2523,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786622329-ChickenBihari.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -1959,6 +2625,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786626590-ChickenBihariRice.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2060,6 +2727,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786626419-DaalChawal.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2230,6 +2898,7 @@
                     "end_time": "11:11:00",
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll_eqoh7cy.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2444,7 +3113,7 @@
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
-                    "front_price": "700.00",
+                    "front_price": "6.49",
                     "branch_prices": [
                         {
                             "id": 1,
@@ -2474,7 +3143,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-10T19:49:17.473555Z",
+                    "date_updated": "2026-09-14T10:29:58.803676Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -2489,6 +3158,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2566,7 +3236,7 @@
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
-                    "show_discount_tag": false,
+                    "show_discount_tag": true,
                     "front_price": "600.00",
                     "branch_prices": [],
                     "size_prices": [
@@ -2592,7 +3262,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:31:07.379205Z",
-                    "date_updated": "2026-08-30T20:48:07.556233Z",
+                    "date_updated": "2026-09-14T10:30:06.867245Z",
                     "is_available_now": true,
                     "price_at_branch": "600.00"
                 },
@@ -2607,6 +3277,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786628560-BeefDhaggaKababRoll.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2777,6 +3448,7 @@
                     "end_time": "11:11:00",
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll_eqoh7cy.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -2991,7 +3663,7 @@
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
-                    "front_price": "700.00",
+                    "front_price": "6.49",
                     "branch_prices": [
                         {
                             "id": 1,
@@ -3021,7 +3693,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-10T19:49:17.473555Z",
+                    "date_updated": "2026-09-14T10:29:58.803676Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -3036,6 +3708,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629812-PaneerReshmiHandi.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3206,6 +3879,7 @@
                     "end_time": "11:11:00",
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786628414-BeefBihariRoll_eqoh7cy.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3420,7 +4094,7 @@
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
-                    "front_price": "700.00",
+                    "front_price": "6.49",
                     "branch_prices": [
                         {
                             "id": 1,
@@ -3450,7 +4124,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-10T19:49:17.473555Z",
+                    "date_updated": "2026-09-14T10:29:58.803676Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -3465,6 +4139,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629768-BeefKababHandi.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3566,6 +4241,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629749-ChickenKababHandi.webp",
+                    "is_popular": false,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3736,6 +4412,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786142219-tIKKAPARATHADEAL.webp",
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3813,7 +4490,7 @@
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
-                    "show_discount_tag": true,
+                    "show_discount_tag": false,
                     "front_price": "200.00",
                     "branch_prices": [],
                     "size_prices": [],
@@ -3822,7 +4499,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T19:53:03.743937Z",
-                    "date_updated": "2026-08-21T19:53:45.339162Z",
+                    "date_updated": "2026-09-14T10:30:33.722089Z",
                     "is_available_now": true,
                     "price_at_branch": "200.00"
                 }

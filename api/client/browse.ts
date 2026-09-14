@@ -15,6 +15,7 @@ import type {
   OnSpotDeal,
   OnSpotDealListParams,
   StoreSettings,
+  BranchByCity,
 } from '../types';
 import { useEffect as reactUseEffect } from 'react';
 
@@ -60,6 +61,47 @@ export function useGetBranches(options?: {
         }),
     staleTime: 1000 * 60 * 30,
     gcTime: 1000 * 60 * 60,
+  });
+
+  reactUseEffect(() => {
+    if (query.data && options?.onSuccess) options.onSuccess(query.data);
+  }, [query.data]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  reactUseEffect(() => {
+    if (query.error) {
+      const msg = (query.error as ApiError)?.detail || 'Failed to load branches';
+      toast.error(msg);
+      options?.onError?.(msg);
+    }
+  }, [query.error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return query;
+}
+
+// ─── Branches by City ─────────────────────────────────────────────────────────
+// GET /storefront/branches/by-city/?cityId=<id>
+// Returns [{branchId, name}] for pickup branch selection after city is chosen.
+
+export function useGetBranchesByCity(options: {
+  cityId: string | number | null;
+  onSuccess?: (data: BranchByCity[]) => void;
+  onError?: (message: string) => void;
+}) {
+  const query = useQuery<BranchByCity[], ApiError>({
+    queryKey: ['storefront-branches-by-city', options.cityId],
+    queryFn: () =>
+      api
+        .get<BranchByCity[] | { results?: BranchByCity[] }>(
+          API_ENDPOINTS.StorefrontBrowse.getBranchesByCity,
+          { params: { cityId: options.cityId } }
+        )
+        .then((r) => {
+          const data = r.data as BranchByCity[] | { results?: BranchByCity[] };
+          return Array.isArray(data) ? data : data.results ?? [];
+        }),
+    enabled: !!options.cityId,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 30,
   });
 
   reactUseEffect(() => {

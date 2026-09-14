@@ -242,11 +242,31 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
               </p>
               <div className="rounded-xl border border-neutral-100 bg-neutral-50 overflow-hidden divide-y divide-neutral-100">
                 {dealMeta.includedItems.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-2.5">
-                    <span className="text-sm text-neutral-800 font-medium">{item.name}</span>
-                    <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
-                      × {item.qty}
-                    </span>
+                  <div key={i} className="px-4 py-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-neutral-800 font-medium">{item.name}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.extraCost != null && item.extraCost > 0 && (
+                          <span className="text-xs font-semibold text-amber-600">+Rs.{item.extraCost}</span>
+                        )}
+                        <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
+                          × {item.qty}
+                        </span>
+                      </div>
+                    </div>
+                    {item.availableAddons && item.availableAddons.length > 0 && (
+                      <div className="mt-1.5 ml-2 space-y-0.5">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Add-ons available</p>
+                        {item.availableAddons.map((addon) => (
+                          <div key={addon.id} className="flex items-center justify-between text-xs text-neutral-500">
+                            <span>+ {addon.name}</span>
+                            {parseFloat(addon.price) > 0 && (
+                              <span className="font-medium text-neutral-700">Rs.{Math.round(parseFloat(addon.price))}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

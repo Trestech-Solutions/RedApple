@@ -1,6 +1,7 @@
 const API_ENDPOINTS = {
   StorefrontBrowse: {
-    getBranches:    '/storefront/branches/',    // ?restaurant=<id>
+    getBranches:       '/storefront/branches/',          // ?restaurant=<id>
+    getBranchesByCity: '/storefront/branches/by-city/',  // ?cityId=<id>
     getCities:      '/storefront/cities/',      // ?branch=<branch_id> OR ?restaurant=<id>
     getAreas:       '/storefront/areas/',       // ?city=<city_id>
     getAreaDetail:  (id: number | string) => `/storefront/areas/${id}/`,

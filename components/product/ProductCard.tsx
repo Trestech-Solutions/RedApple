@@ -35,7 +35,7 @@ export interface ProductData {
     finalPrice: string
     timeWindow?: string | null
     isAvailableNow?: boolean
-    includedItems?: { name: string; qty: number }[]
+    includedItems?: { name: string; qty: number; extraCost?: number; availableAddons?: { id: number; name: string; price: string }[] }[]
     groups?: {
       name: string
       isRequired: boolean

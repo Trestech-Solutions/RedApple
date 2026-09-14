@@ -3,7 +3,7 @@
 import { useState, useEffect as reactUseEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import {
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, Minus, Plus, Check,
 } from 'lucide-react'
 import {
   useCart, useRegisterProductId, useStoreSettings,
@@ -12,10 +12,11 @@ import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { CategoryNav } from '@/components/website/CategoryNav'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
+import { ProductDetailModal } from '@/components/product/ProductDetailModal'
 import { CATEGORIES as FALLBACK_CATS, ALL_PRODUCTS as FALLBACK_PRODS, type Category } from '@/lib/data/website-products'
 import { useGetMenu } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
-import type { ProductData } from '@/components/product/ProductCard'
+import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
 import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner } from '@/api/types'
 
 const DEFAULT_ICON = 'solar:cup-hot-bold-duotone'
@@ -209,7 +210,7 @@ function itemToProduct(
     originalPrice: combinedOriginal,
     fromLabel:     Boolean(item._from_label),
     options:       hasSizes ? sizes.map((s) => s.sizeName) : [],
-    tag:           item._dish_tag || undefined,
+    tag:           item.is_popular ? '🔥 Popular' : (item._dish_tag || undefined),
     discount:      combinedDiscount,
     image:         resolvedImage,
     sizes:         hasSizes ? sizes : undefined,
@@ -220,6 +221,7 @@ function transformMenu(menu: MenuResponse | undefined): {
   categories: ResolvedCategory[]
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[]
   idPairs: Array<{ clientId: string; numericId: number }>
+  popularProducts: ProductData[]
 } {
   const menuArr = menu?.menu ?? menu?.categories ?? []
 
@@ -227,7 +229,7 @@ function transformMenu(menu: MenuResponse | undefined): {
     const idPairs        = FALLBACK_PRODS.map((p, i) => ({ clientId: p.id, numericId: p.productId ?? i + 1 }))
     const productsWithId = FALLBACK_PRODS.map((p, i) => ({ ...p, productId: p.productId ?? i + 1 }))
     const categories: ResolvedCategory[] = FALLBACK_CATS.map((c) => ({ ...c, icon: resolveIcon(c.icon) }))
-    return { categories, products: productsWithId, idPairs }
+    return { categories, products: productsWithId, idPairs, popularProducts: [] }
   }
 
   const products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[] = []
@@ -352,8 +354,12 @@ function transformMenu(menu: MenuResponse | undefined): {
 
       // Build included items list from items_detail
       const includedItems = (deal.items_detail ?? []).map((di) => ({
-        name: di.item_detail?.name ?? `Item ${di.item}`,
-        qty:  di.quantity,
+        name:            di.item_detail?.name ?? `Item ${di.item}`,
+        qty:             di.quantity,
+        extraCost:       di.extra_cost ? Math.round(parseFloat(di.extra_cost)) : undefined,
+        availableAddons: di.available_addons_detail && di.available_addons_detail.length > 0
+          ? di.available_addons_detail.map((a) => ({ id: a.id, name: a.name, price: a.price }))
+          : undefined,
       }))
 
       // Build description from items if none provided
@@ -429,8 +435,12 @@ function transformMenu(menu: MenuResponse | undefined): {
 
       // Build included fixed items
       const includedItems = (deal.items_detail ?? []).map((di) => ({
-        name: di.item_detail?.name ?? `Item ${di.item}`,
-        qty:  di.quantity,
+        name:            di.item_detail?.name ?? `Item ${di.item}`,
+        qty:             di.quantity,
+        extraCost:       di.extra_cost ? Math.round(parseFloat(di.extra_cost)) : undefined,
+        availableAddons: di.available_addons_detail && di.available_addons_detail.length > 0
+          ? di.available_addons_detail.map((a) => ({ id: a.id, name: a.name, price: a.price }))
+          : undefined,
       }))
 
       products.push({
@@ -459,7 +469,169 @@ function transformMenu(menu: MenuResponse | undefined): {
       })
     })
 
-  return { categories, products, idPairs }
+  // ── Build popularProducts from menu.popular_items (server-filtered, max 4) ──
+  const popularProducts: ProductData[] = (menu?.popular_items ?? []).map((item) => {
+    const rawSizes = (item.size_prices ?? []).filter(
+      (sp) => sp && typeof sp.size_name === 'string' && sp.size_name.length > 0
+    )
+    const hasSizes = rawSizes.length > 0
+    const rawPrice = item.price_at_branch || item.front_price || '0'
+    const priceInt = hasSizes
+      ? (Math.round(parseFloat(rawSizes[0]!.price || '0')) || 0)
+      : (Math.round(parseFloat(rawPrice)) || 0)
+
+    const sizeMetas: SizeMeta[] = rawSizes.map((sp) => {
+      const p = Math.round(parseFloat(sp.price || '0')) || 0
+      const dv = parseFloat(String(sp.discount ?? ''))
+      const hasDv = !isNaN(dv) && dv > 0
+      const dt = normalizeDiscountType(sp.discount_type)
+      let origPrice: number | undefined
+      let discLabel: string | undefined
+      let hasTag = false
+      if (hasDv) {
+        if (dt === 'fixed') {
+          const orig = Math.round(dv)
+          if (orig > p && p > 0) { origPrice = orig; discLabel = `${Math.round(((orig - p) / orig) * 100)}% OFF`; hasTag = true }
+        } else if (dt === 'percent') {
+          const orig = Math.round(p / Math.max(0.0001, 1 - dv / 100))
+          origPrice = orig; discLabel = `${Math.round(dv)}% OFF`; hasTag = true
+        }
+      }
+      return { sizeId: Number(sp.id), sizeFk: Number(sp.size), sizeName: sp.size_name, price: p, originalPrice: origPrice, discountLabel: discLabel, hasDiscountTag: hasTag }
+    })
+
+    return {
+      id:           String(item.id),   // numeric string — same as regular menu items so addItem check passes
+      productId:    item.id,
+      name:         item.name,
+      description:  item.description || '',
+      timeDuration: item.time_duration || undefined,
+      price:        String(priceInt),
+      image:        resolveMediaUrl(item.feature_image) || PLACEHOLDER_IMAGE,
+      options:      hasSizes ? sizeMetas.map((s) => s.sizeName) : [],
+      sizes:        hasSizes ? sizeMetas : undefined,
+      tag:          '🔥 Popular',
+      fromLabel:    false,
+    } satisfies ProductData
+  })
+
+  return { categories, products, idPairs, popularProducts }
+}
+
+/** Wrapper for the popular grid that owns the modal state. */
+function PopularSection({ products }: { products: ProductData[] }) {
+  const [selected, setSelected] = useState<ProductData | null>(null)
+  return (
+    <>
+<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:gap-5">
+        {products.map((product) => (
+          <PopularItemCard key={product.id} product={product} onOpen={setSelected} />
+        ))}
+      </div>
+      {selected && <ProductDetailModal product={selected} onClose={() => setSelected(null)} />}
+    </>
+  )
+}
+
+/** Self-contained popular item card — portrait, image top, name + price below, dark + button. */
+function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
+  const { addItem, items, updateQuantity, removeItem } = useCart()
+  const [added, setAdded] = useState(false)
+
+  const hasSizes      = !!product.sizes && product.sizes.length > 0
+  const defaultSize   = hasSizes ? product.sizes![0]! : undefined
+  const priceNum      = defaultSize ? defaultSize.price : (parseInt(product.price, 10) || 0)
+  const origPriceStr  = defaultSize
+    ? (defaultSize.originalPrice != null ? String(defaultSize.originalPrice) : undefined)
+    : product.originalPrice
+  const hasOrig       = !!origPriceStr && parseInt(origPriceStr, 10) > priceNum
+
+  const needsSelection = hasSizes && product.sizes!.length > 1
+  const isOrderable    = priceNum > 0 && product.productId != null
+
+  const cartItem = items.find((i) =>
+    hasSizes ? i.id === product.id && i.variantId === defaultSize!.sizeId : i.id === product.id
+  )
+  const cartQty = cartItem?.quantity ?? 0
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!isOrderable) return
+    if (needsSelection) { onOpen(product); return }
+    addItem({
+      id: product.id, productId: product.productId, name: product.name,
+      price: priceNum, image: product.image,
+      variantId: defaultSize?.sizeId, sizeFk: defaultSize?.sizeFk,
+    })
+    setAdded(true)
+    setTimeout(() => setAdded(false), 1200)
+  }
+  const handleIncrease = (e: React.MouseEvent) => { e.stopPropagation(); if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1) }
+  const handleDecrease = (e: React.MouseEvent) => { e.stopPropagation(); if (!cartItem) return; if (cartItem.quantity <= 1) removeItem(cartItem); else updateQuantity(cartItem, cartItem.quantity - 1) }
+
+  return (
+    <div
+      className="group relative flex flex-col overflow-visible rounded-2xl bg-transparent  transition-shadow duration-300  cursor-pointer"
+      onClick={() => onOpen(product)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(product) } }}
+    >
+      {/* Image */}
+<div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 640px) 50vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+
+        {/* Dark + button — bottom-right, partially overlapping the card edge */}
+        {isOrderable && (
+          cartQty > 0 && !needsSelection ? (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900 px-1.5 py-1 shadow-lg"
+            >
+              <button type="button" onClick={handleDecrease} aria-label="Decrease"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
+                <Minus size={12} />
+              </button>
+              <span className="w-5 text-center text-xs font-bold text-white">{cartQty}</span>
+          <button type="button" onClick={handleIncrease} aria-label="Increase"
+  className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
+  <Plus size={12} />
+</button>
+            </div>
+          ) : (
+    <button
+  type="button"
+  onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
+  aria-label="Add to cart"
+  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
+>
+  {added ? <Check size={16} /> : <Plus size={18} />}
+</button>
+          )
+        )}
+      </div>
+
+      {/* Text */}
+      <div className="px-1 pt-2.5 pb-3">
+        <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
+        <div className="mt-1 flex items-baseline gap-1.5">
+          {hasOrig && (
+            <span className="text-xs text-neutral-400 line-through">
+              Rs.{parseInt(origPriceStr!, 10).toLocaleString()}
+            </span>
+          )}
+          <span className="text-sm font-extrabold text-neutral-900">
+            Rs. {priceNum.toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 /** Skeleton for the hero carousel while the menu (and branch/area context) is loading. */
@@ -613,7 +785,7 @@ export default function HomePage() {
 
   const heroActive = HERO_SLIDES.length > 0
 
-  const { categories, products, idPairs } = useMemo(() => transformMenu(menu), [menu])
+  const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu), [menu])
 
   // Register product IDs after render — never during render
   reactUseEffect(() => {
@@ -827,6 +999,25 @@ export default function HomePage() {
       ) : (
         // ── Browse mode: show each category section with banner → products → repeat ──
         <div>
+          {/* ── Popular Items section (from server, max 4, only when available) ── */}
+          {popularProducts.length > 0 && (
+            <section
+              id="category-popular"
+              className="mx-auto max-w-[1400px] px-4 pt-8 pb-2 md:px-8 scroll-mt-28"
+            >
+              {/* Header — plain, no coloured box */}
+              <div className="mb-5">
+                <h2 className="flex items-center gap-2 text-xl font-extrabold text-neutral-900 sm:text-2xl">
+                  🔥 Popular Items
+                </h2>
+                <p className="mt-0.5 text-sm text-neutral-500">Most ordered right now</p>
+              </div>
+
+              {/* Card row — fixed 4-column grid, horizontal scroll on mobile */}
+              <PopularSection products={popularProducts} />
+            </section>
+          )}
+
           {categories.map((cat) => {
             const catProducts = filteredProducts.filter((p) => p.categoryId === cat.id)
             if (catProducts.length === 0) return null

@@ -416,6 +416,12 @@ export type Area = {
   updated_at?: string;    // legacy
 };
 
+/** Shape returned by GET /storefront/branches/by-city/?cityId=<id> */
+export type BranchByCity = {
+  branchId: number;
+  name: string;
+};
+
 export type LocateResponse = {
   success: boolean;
   city_id?: number;
@@ -460,6 +466,7 @@ export type MenuItem = {
   item_discount?: string | null;
   item_discount_type?: string | null;
   show_discount_tag?: boolean;
+  is_popular?: boolean;           // flagged as popular item (max 4 per restaurant)
   branch_prices?: unknown[];
   size_prices?: SizePrice[];
   date_added?: string;
@@ -586,6 +593,8 @@ export type MenuResponse = {
   // Deals — injected at top-level alongside menu
   fixed_deals?:    MenuFixedDeal[];
   on_spot_deals?:  MenuOnSpotDeal[];
+  // Popular items (up to 4, flagged with is_popular=true, branch-filtered)
+  popular_items?:  MenuItem[];
   // Branch-wise promotional banners (shown in hero carousel)
   banners?:        MenuBanner[];
   // Social media links
@@ -606,11 +615,26 @@ export type MenuResponse = {
 
 // ─── Storefront Deal types (as returned inside menu response) ─────────────────
 
+/** Shape of a single FoodAddon as returned in available_addons_detail[]. */
+export type MenuAddonDetail = {
+  id: number;
+  addon_category: number;
+  addon_category_name: string;
+  name: string;
+  description?: string;
+  price: string;
+  photo?: string | null;
+  status: boolean;
+};
+
 export type MenuDealItemDetail = {
   id: number;
   item: number;
   item_detail?: MenuItem;
   quantity: number;
+  extra_cost?: string;                    // decimal — extra charge on top of deal price
+  available_addons?: number[];            // write: list of addon IDs
+  available_addons_detail?: MenuAddonDetail[]; // read: expanded addon objects
 };
 
 /** An add-on option within an addon_items group. */
@@ -640,6 +664,9 @@ export type MenuOnSpotDealGroupItemOption = {
   item_detail?: MenuItem;
   quantity: number;       // per-pick quantity
   max_quantity: number | null;
+  extra_cost?: string;                    // decimal — extra charge on top of deal price
+  available_addons?: number[];            // write: list of addon IDs
+  available_addons_detail?: MenuAddonDetail[]; // read: expanded addon objects
 };
 
 export type MenuOnSpotDealGroupOption =

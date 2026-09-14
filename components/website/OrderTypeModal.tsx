@@ -9,11 +9,12 @@ import {
   useGetCities,
   useGetAreasByCity,
   useGetAreaDetail,
+  useGetBranchesByCity,
   fetchAreaDetail,
   resolveBranchId,
   locate,
 } from '@/api/client/browse'
-import type { Area, City } from '@/api/types'
+import type { Area, City, BranchByCity } from '@/api/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,10 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 
 // ─── Shared logic hook ────────────────────────────────────────────────────────
 
+// Static area id to always pass alongside the selected branch for pickup.
+// Matches the hard-coded ?area=11 requirement.
+const PICKUP_STATIC_AREA_ID = 11
+
 function useModalLogic(onClose: () => void) {
   const { orderType, setOrderType, setLocation, setBranch, setAreaId } = useCart()
   const { setStoreLocation } = useStoreLocation()
@@ -72,30 +77,50 @@ function useModalLogic(onClose: () => void) {
   const cityList: City[] = cities ?? []
   const sortedCities = [...cityList].sort((a, b) => a.name.localeCompare(b.name))
 
-  const [selectedCityId, setSelectedCityId] = useState<string>('')
-  const [selectedAreaId, setSelectedAreaId] = useState<string>('')
-  const [geoLoading,     setGeoLoading]     = useState(false)
-  const [geoError,       setGeoError]       = useState('')
-  const [confirming,     setConfirming]     = useState(false)
+  const [selectedCityId,    setSelectedCityId]    = useState<string>('')
+  const [selectedAreaId,    setSelectedAreaId]     = useState<string>('')
+  const [selectedBranchId,  setSelectedBranchId]  = useState<string>('')  // pickup only
+  const [geoLoading,        setGeoLoading]         = useState(false)
+  const [geoError,          setGeoError]           = useState('')
+  const [confirming,        setConfirming]         = useState(false)
 
   const selectedCityObj = sortedCities.find((c) => String(c.id) === selectedCityId)
 
+  // ── Delivery: area list by city ───────────────────────────────────────────
   const { data: cityAreas, isLoading: loadingCityAreas } = useGetAreasByCity({ cityId: selectedCityId || null })
   const areaList: Area[] = cityAreas ?? []
-  const selectedAreaObj = areaList.find((a) => String(a.id) === selectedAreaId)
-
+  const selectedAreaObj  = areaList.find((a) => String(a.id) === selectedAreaId)
   const { data: areaDetail, isLoading: loadingAreaDetail } = useGetAreaDetail(selectedAreaId || null)
 
+  // ── Pickup: branch list by city ───────────────────────────────────────────
+  const { data: cityBranches, isLoading: loadingCityBranches } = useGetBranchesByCity({
+    cityId: orderType === 'pickup' ? (selectedCityId || null) : null,
+  })
+  const branchList: BranchByCity[] = cityBranches ?? []
+  const selectedBranchObj = branchList.find((b) => String(b.branchId) === selectedBranchId)
+
+  // Auto-select first city on load
   useEffect(() => {
     if (sortedCities.length > 0 && !selectedCityId) {
       setSelectedCityId(String(sortedCities[0].id))
     }
   }, [sortedCities.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Reset selections when city or order type changes
   useEffect(() => {
     setSelectedAreaId('')
-    if (areaList.length > 0) setSelectedAreaId(String(areaList[0].id))
-  }, [selectedCityId, areaList.length]) // eslint-disable-line react-hooks/exhaustive-deps
+    setSelectedBranchId('')
+    if (orderType === 'delivery' && areaList.length > 0) {
+      setSelectedAreaId(String(areaList[0].id))
+    }
+  }, [selectedCityId, orderType, areaList.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-select first branch when branch list loads (pickup)
+  useEffect(() => {
+    if (orderType === 'pickup' && branchList.length > 0 && !selectedBranchId) {
+      setSelectedBranchId(String(branchList[0].branchId))
+    }
+  }, [branchList.length, orderType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) { setGeoError('Geolocation is not supported.'); return }
@@ -133,9 +158,33 @@ function useModalLogic(onClose: () => void) {
   }
 
   async function handleConfirm() {
-    if (!selectedCityId || !selectedAreaId || !selectedAreaObj) return
     setConfirming(true); setGeoError('')
     try {
+      // ── Pickup: use selected branch directly ──────────────────────────────
+      if (orderType === 'pickup') {
+        if (!selectedBranchObj) { setGeoError('Please select a branch.'); return }
+        const branchIdNum  = selectedBranchObj.branchId
+        const branchName   = selectedBranchObj.name
+        const cityName     = selectedCityObj?.name ?? ''
+        const displayLabel = `${branchName}${cityName ? `, ${cityName}` : ''}`
+        setStoreLocation({
+          branchId:     branchIdNum,
+          branchName,
+          cityId:       selectedCityObj?.id ?? Number(selectedCityId),
+          cityName,
+          areaId:       PICKUP_STATIC_AREA_ID,
+          areaName:     '',
+          displayLabel,
+        })
+        setLocation(displayLabel)
+        setBranch(branchIdNum)
+        setAreaId(PICKUP_STATIC_AREA_ID)
+        onClose()
+        return
+      }
+
+      // ── Delivery: resolve branch from area detail ─────────────────────────
+      if (!selectedCityId || !selectedAreaId || !selectedAreaObj) return
       const detail = await fetchAreaDetail(selectedAreaId)
       const resolvedBranchId = resolveBranchId(detail)
       if (resolvedBranchId === undefined) { setGeoError('Could not determine branch. Please try again.'); return }
@@ -144,23 +193,28 @@ function useModalLogic(onClose: () => void) {
       const cityName     = (detail as any).city_name  ?? selectedCityObj?.name ?? ''
       const branchName   = (detail as any).branch_name ?? ''
       const areaName     = detail.name
-      const displayLabel = orderType === 'pickup'
-        ? branchName || `${areaName}, ${cityName}`
-        : `${areaName}, ${cityName}`
+      const displayLabel = `${areaName}, ${cityName}`
       setStoreLocation({ branchId: branchIdNum, branchName, cityId: selectedCityObj?.id ?? Number(selectedCityId), cityName, areaId: areaIdNum, areaName, displayLabel })
       setLocation(displayLabel); setAreaId(areaIdNum); setBranch(branchIdNum)
       onClose()
-    } catch (_) { setGeoError('Failed to load area details. Please try again.') }
+    } catch (_) { setGeoError('Failed to confirm. Please try again.') }
     finally { setConfirming(false) }
   }
+
+  // canConfirm depends on mode
+  const canConfirm = orderType === 'pickup'
+    ? !!selectedBranchObj && !confirming
+    : !!selectedCityId && !!selectedAreaId && !!selectedAreaObj && !confirming
 
   return {
     orderType, setOrderType, geoLoading, geoError, setGeoError, confirming,
     sortedCities, loadingCities, selectedCityId, setSelectedCityId,
+    // delivery
     areaList, loadingCityAreas, selectedAreaId, setSelectedAreaId,
     selectedCityObj, selectedAreaObj, areaDetail, loadingAreaDetail,
-    handleUseCurrentLocation, handleConfirm,
-    canConfirm: !!selectedCityId && !!selectedAreaId && !!selectedAreaObj && !confirming,
+    // pickup
+    branchList, loadingCityBranches, selectedBranchId, setSelectedBranchId, selectedBranchObj,
+    handleUseCurrentLocation, handleConfirm, canConfirm,
   }
 }
 
@@ -174,6 +228,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
     sortedCities, loadingCities, selectedCityId, setSelectedCityId,
     areaList, loadingCityAreas, selectedAreaId, setSelectedAreaId,
     selectedCityObj, selectedAreaObj, areaDetail, loadingAreaDetail,
+    branchList, loadingCityBranches, selectedBranchId, setSelectedBranchId,
     handleUseCurrentLocation, handleConfirm, canConfirm,
   } = useModalLogic(onClose)
 
@@ -209,7 +264,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
           {geoError && <p className="mb-3 text-center text-xs text-red-600">{geoError}</p>}
 
           <p className="mb-3 text-center text-sm font-medium text-neutral-600">
-            {orderType === 'pickup' ? 'Select your city and area to find the nearest outlet' : 'Please select your delivery location'}
+            {orderType === 'pickup' ? 'Select your city to find nearby outlets' : 'Please select your delivery location'}
           </p>
 
           <div className="mb-3.5 flex justify-center sm:mb-4">
@@ -220,11 +275,11 @@ function Modal1({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
-          {/* City dropdown */}
+          {/* City dropdown — shared for both modes */}
           <div className="relative mb-2.5 sm:mb-3">
             {loadingCities
               ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
-              : <select value={selectedCityId} onChange={(e) => { setSelectedCityId(e.target.value); setSelectedAreaId('') }}
+              : <select value={selectedCityId} onChange={(e) => { setSelectedCityId(e.target.value) }}
                   className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none sm:px-4 sm:py-3 sm:text-sm">
                   <option value="">Select City</option>
                   {sortedCities.map((c) => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
@@ -233,35 +288,60 @@ function Modal1({ onClose }: { onClose: () => void }) {
             <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           </div>
 
-          {/* Area dropdown */}
-          <div className="relative mb-2.5 sm:mb-3">
-            {!selectedCityId
-              ? <div className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">Select a city first</div>
-              : loadingCityAreas
-              ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
-              : <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
-                  disabled={!selectedCityId || areaList.length === 0}
-                  className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">
-                  <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
-                  {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-                </select>
-            }
-            <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-          </div>
+          {/* PICKUP: branch dropdown */}
+          {orderType === 'pickup' && (
+            <div className="relative mb-2.5 sm:mb-3">
+              {!selectedCityId
+                ? <div className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">Select a city first</div>
+                : loadingCityBranches
+                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
+                : <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)}
+                    disabled={!selectedCityId || branchList.length === 0}
+                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">
+                    <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
+                    {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
+                  </select>
+              }
+              <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            </div>
+          )}
 
-          {/* Branch preview */}
-          {selectedAreaObj && (
+          {/* DELIVERY: area dropdown */}
+          {orderType === 'delivery' && (
+            <div className="relative mb-2.5 sm:mb-3">
+              {!selectedCityId
+                ? <div className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">Select a city first</div>
+                : loadingCityAreas
+                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
+                : <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
+                    disabled={!selectedCityId || areaList.length === 0}
+                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">
+                    <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
+                    {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
+                  </select>
+              }
+              <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            </div>
+          )}
+
+          {/* Branch/area preview */}
+          {orderType === 'pickup' && selectedBranchId && (
+            <div className="mb-5 rounded-lg bg-neutral-50 px-3 py-3 space-y-1 border border-neutral-100">
+              <p className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold sm:text-xs">Selected Branch</p>
+              <p className="text-sm font-bold text-neutral-800">{branchList.find((b) => String(b.branchId) === selectedBranchId)?.name ?? '—'}</p>
+              {selectedCityObj && <p className="text-[11px] sm:text-xs text-neutral-500">{selectedCityObj.name}</p>}
+            </div>
+          )}
+          {orderType === 'delivery' && selectedAreaObj && (
             <div className="mb-5 rounded-lg bg-neutral-50 px-3 py-3 space-y-1 border border-neutral-100">
               <p className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold sm:text-xs">Assigned Outlet</p>
               {loadingAreaDetail
                 ? <div className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /><span className="text-xs text-neutral-500">Loading…</span></div>
                 : <p className="text-sm font-bold text-neutral-800">{(areaDetail ?? selectedAreaObj)?.branch_name || '—'}</p>
               }
-              {orderType === 'delivery' && (
-                <p className="text-[11px] sm:text-xs text-neutral-500">
-                  {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
-                </p>
-              )}
+              <p className="text-[11px] sm:text-xs text-neutral-500">
+                {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
+              </p>
             </div>
           )}
 
@@ -285,7 +365,10 @@ function Modal2({ onClose }: { onClose: () => void }) {
     orderType, setOrderType, geoLoading, geoError, setGeoError, confirming,
     sortedCities, loadingCities, selectedCityId, setSelectedCityId,
     areaList, loadingCityAreas, selectedAreaId, setSelectedAreaId,
-    selectedAreaObj, handleUseCurrentLocation, handleConfirm, canConfirm,
+    selectedAreaObj,
+    branchList, loadingCityBranches, selectedBranchId, setSelectedBranchId,
+    selectedCityObj,
+    handleUseCurrentLocation, handleConfirm, canConfirm,
   } = useModalLogic(onClose)
 
   return (
@@ -380,24 +463,47 @@ function Modal2({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Area dropdown — shown after city selected */}
+          {/* Location dropdown — branch list for pickup, area list for delivery */}
           {selectedCityId && (
             <div className="mb-5">
-              <p className="mb-2 text-sm font-bold text-neutral-800">Please select your location</p>
+              <p className="mb-2 text-sm font-bold text-neutral-800">
+                {orderType === 'pickup' ? 'Select a branch' : 'Please select your location'}
+              </p>
               <div className="relative">
-                {loadingCityAreas
-                  ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-[#f5c518]" /></div>
-                  : (
-                    <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
-                      disabled={areaList.length === 0}
-                      className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:border-[#f5c518] focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400">
-                      <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
-                      {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
-                    </select>
-                  )
-                }
+                {orderType === 'pickup' ? (
+                  loadingCityBranches
+                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-[#f5c518]" /></div>
+                    : (
+                      <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)}
+                        disabled={branchList.length === 0}
+                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:border-[#f5c518] focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400">
+                        <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
+                        {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
+                      </select>
+                    )
+                ) : (
+                  loadingCityAreas
+                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-[#f5c518]" /></div>
+                    : (
+                      <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
+                        disabled={areaList.length === 0}
+                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:border-[#f5c518] focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400">
+                        <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
+                        {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
+                      </select>
+                    )
+                )}
                 <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400" />
               </div>
+
+              {/* Branch preview for pickup */}
+              {orderType === 'pickup' && selectedBranchId && (
+                <div className="mt-3 rounded-xl bg-neutral-50 px-4 py-3 border border-neutral-100">
+                  <p className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold mb-0.5">Selected Branch</p>
+                  <p className="text-sm font-bold text-neutral-800">{branchList.find((b) => String(b.branchId) === selectedBranchId)?.name ?? '—'}</p>
+                  {selectedCityObj && <p className="text-xs text-neutral-500 mt-0.5">{selectedCityObj.name}</p>}
+                </div>
+              )}
             </div>
           )}
 
