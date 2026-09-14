@@ -342,9 +342,11 @@ export function useGetMenu(params: {
   const rawBranch = typeof params.branchId === 'number' && isNaN(params.branchId) ? null : params.branchId;
   const rawArea   = typeof params.areaId   === 'number' && isNaN(params.areaId)   ? null : params.areaId;
 
-  // Use fallbacks when branch is unavailable
+  // Use fallbacks when branch is unavailable.
+  // Area: only fall back when rawArea is undefined (not set at all).
+  // null means "no area" (e.g. pickup mode) — pass through as-is.
   const resolvedBranch = rawBranch ?? FALLBACK_BRANCH;
-  const resolvedArea   = rawArea   ?? FALLBACK_AREA;
+  const resolvedArea   = rawArea === undefined ? FALLBACK_AREA : rawArea;
 
   const enabled = true; // always fetch — we always have a resolved branch
 

@@ -66,8 +66,8 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 // ─── Shared logic hook ────────────────────────────────────────────────────────
 
 // Static area id to always pass alongside the selected branch for pickup.
-// Matches the hard-coded ?area=11 requirement.
-const PICKUP_STATIC_AREA_ID = 11
+// Pickup mode uses branch only — no area param in the menu URL.
+const PICKUP_STATIC_AREA_ID = null
 
 function useModalLogic(onClose: () => void) {
   const { orderType, setOrderType, setLocation, setBranch, setAreaId } = useCart()
