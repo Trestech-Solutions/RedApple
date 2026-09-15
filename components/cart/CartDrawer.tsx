@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { X, Plus, Minus, Trash2, ArrowRight, ChevronLeft, ChevronRight, Plus as PlusIcon, ShoppingBag } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { X, Plus, Minus, Trash2, ArrowRight, ChevronLeft, ChevronRight, Plus as PlusIcon, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -169,6 +169,34 @@ export function CartDrawer() {
                   <span className="font-semibold text-neutral-800">Subtotal</span>
                   <span className="font-semibold text-neutral-800">Rs. {subtotal.toLocaleString()}</span>
                 </div>
+
+                {/* Free-delivery progress — only for delivery when a finite threshold is set */}
+                {orderType === 'delivery' && settings.freeDeliveryAboveSubtotal < Infinity && (() => {
+                  const threshold = settings.freeDeliveryAboveSubtotal
+                  const unlocked  = subtotal >= threshold
+                  const progress  = unlocked ? 100 : Math.round((subtotal / threshold) * 100)
+                  const remaining = Math.max(0, threshold - subtotal)
+                  return (
+                    <div className="py-1 space-y-1.5">
+                      {unlocked ? (
+                        <p className="text-[11px] font-semibold text-emerald-600">
+                          🎉 You&apos;ve unlocked free delivery!
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-neutral-500">
+                          Add <span className="font-semibold text-neutral-700">Rs. {remaining.toLocaleString()}</span> more for <span className="font-semibold text-emerald-600">FREE delivery</span>
+                        </p>
+                      )}
+                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-neutral-700'}`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })()}
+
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-600">Tax</span>
                   <span className="text-neutral-600">Rs. {tax.toLocaleString()}</span>
@@ -176,9 +204,31 @@ export function CartDrawer() {
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-600">Delivery Fee</span>
                   <span className="text-neutral-600">
-                    {orderType === 'pickup' ? '—' : `Rs. ${deliveryFee.toLocaleString()}`}
+                    {orderType === 'pickup'
+                      ? '—'
+                      : deliveryFee === 0
+                        ? <span className="font-bold text-emerald-600">FREE</span>
+                        : `Rs. ${deliveryFee.toLocaleString()}`}
                   </span>
                 </div>
+
+                {/* Total discount savings */}
+                {(() => {
+                  const totalSavings = items.reduce((sum, item) => {
+                    if (item.originalPrice != null && item.originalPrice > item.price) {
+                      return sum + (item.originalPrice - item.price) * item.quantity
+                    }
+                    return sum
+                  }, 0)
+                  if (totalSavings <= 0) return null
+                  return (
+                    <div className="flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2 -mx-1">
+                      <span className="text-emerald-700 font-semibold text-[12px]">🏷️ Total Savings</span>
+                      <span className="text-emerald-700 font-bold text-[12px]">− Rs. {Math.round(totalSavings).toLocaleString()}</span>
+                    </div>
+                  )
+                })()}
+
                 <div className="border-t border-neutral-200 pt-2 mt-2">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-neutral-900">Grand Total</span>
@@ -253,42 +303,106 @@ interface CartItemRowProps {
 }
 
 function CartItemRow({ item, onRemove, onIncrease, onDecrease }: CartItemRowProps) {
+  const hasAddons = item.selectedAddons && item.selectedAddons.length > 0
+  const [addonsOpen, setAddonsOpen] = useState(false)
+
+  // Group the selectedAddons by groupName for clean display
+  const groupedAddons = hasAddons
+    ? item.selectedAddons!.reduce<{ groupName?: string; entries: { name: string; qty: number; extraCost?: number }[] }[]>(
+        (acc, addon) => {
+          const last = acc[acc.length - 1]
+          if (last && last.groupName === addon.groupName) {
+            last.entries.push({ name: addon.name, qty: addon.qty, extraCost: addon.extraCost })
+          } else {
+            acc.push({ groupName: addon.groupName, entries: [{ name: addon.name, qty: addon.qty, extraCost: addon.extraCost }] })
+          }
+          return acc
+        },
+        []
+      )
+    : []
+
   return (
-    <div className="flex items-center gap-3 py-3 first:pt-2">
-      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-neutral-100 bg-neutral-50">
-        {item.image ? (
-          <Image src={item.image} alt={item.name} fill className="object-cover" />
-        ) : (
-          <div className="h-full w-full bg-neutral-100 flex items-center justify-center text-neutral-300 text-xs">
-            No img
+    <div className="py-3 first:pt-2 border-b border-neutral-100 last:border-b-0">
+      <div className="flex items-center gap-3">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-neutral-100 bg-neutral-50">
+          {item.image ? (
+            <Image src={item.image} alt={item.name} fill className="object-cover" />
+          ) : (
+            <div className="h-full w-full bg-neutral-100 flex items-center justify-center text-neutral-300 text-xs">
+              No img
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-1 items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-neutral-900 leading-tight truncate">
+              {item.name}{item.selectedOption ? ` (${item.selectedOption})` : ''}
+            </p>
+            <p className="mt-1 text-sm font-bold text-neutral-900">
+              Rs. {(item.price * item.quantity).toLocaleString()}
+            </p>
           </div>
-        )}
-      </div>
 
-      <div className="flex flex-1 items-center justify-between gap-2">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-neutral-900 leading-tight truncate">
-            {item.name}{item.selectedOption ? ` (${item.selectedOption})` : ''}
-          </p>
-          <p className="mt-1 text-sm font-bold text-neutral-900">
-            Rs. {(item.price * item.quantity).toLocaleString()}
-          </p>
-        </div>
-
-        <div className="flex items-center shrink-0 rounded-md border border-[#000000] overflow-hidden">
-          <button onClick={onDecrease} aria-label="Decrease or remove"
-            className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
-            {item.quantity <= 1 ? <Trash2 size={13} /> : <Minus size={13} strokeWidth={3} />}
-          </button>
-          <span className="w-7 text-center text-sm font-semibold text-neutral-900 bg-white">
-            {item.quantity}
-          </span>
-          <button onClick={onIncrease} aria-label="Increase quantity"
-            className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
-            <Plus size={13} strokeWidth={3} />
-          </button>
+          <div className="flex items-center shrink-0 rounded-md border border-[#000000] overflow-hidden">
+            <button onClick={onDecrease} aria-label="Decrease or remove"
+              className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
+              {item.quantity <= 1 ? <Trash2 size={13} /> : <Minus size={13} strokeWidth={3} />}
+            </button>
+            <span className="w-7 text-center text-sm font-semibold text-neutral-900 bg-white">
+              {item.quantity}
+            </span>
+            <button onClick={onIncrease} aria-label="Increase quantity"
+              className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
+              <Plus size={13} strokeWidth={3} />
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* ── Add-ons toggle ── */}
+      {hasAddons && (
+        <div className="mt-2 ml-[76px]">
+          <button
+            type="button"
+            onClick={() => setAddonsOpen((v) => !v)}
+            className="flex items-center gap-1 text-[12px] font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
+          >
+            {addonsOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            {addonsOpen ? 'Hide Add-ons' : 'View Add-ons'}
+          </button>
+
+          {addonsOpen && (
+            <div className="mt-2 space-y-2">
+              {groupedAddons.map((group, gi) => (
+                <div key={gi}>
+                  {group.groupName && (
+                    <p className="text-[11px] font-bold text-neutral-500 uppercase tracking-wide mb-1">
+                      ● {group.groupName}
+                    </p>
+                  )}
+                  <div className="space-y-0.5 pl-3 border-l-2 border-neutral-200">
+                    {group.entries.map((entry, ei) => (
+                      <div key={ei} className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-neutral-700">
+                          <span className="font-semibold text-neutral-500">{entry.qty}x</span>
+                          {'  '}{entry.name}
+                        </span>
+                        {entry.extraCost != null && entry.extraCost > 0 && (
+                          <span className="text-[11px] font-semibold text-amber-600 shrink-0">
+                            +Rs.{entry.extraCost.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -236,6 +236,7 @@ function transformMenu(menu: MenuResponse | undefined): {
 
   const products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[] = []
   const idPairs: Array<{ clientId: string; numericId: number }> = []
+  const popularRawItems: MenuItem[] = []
 
   const categories: ResolvedCategory[] = menuArr
     .filter((cat) => cat.status !== false && cat.hide_category !== true)
@@ -249,7 +250,10 @@ function transformMenu(menu: MenuResponse | undefined): {
       if (itemRecords.length > 0) {
         itemRecords
           .filter((it) => it.status !== false && (it.status as unknown) !== 0)
-          .forEach((it) => itemToProduct(it, catId, idPairs, products))
+          .forEach((it) => {
+            itemToProduct(it, catId, idPairs, products)
+            if (it.is_popular) popularRawItems.push(it)
+          })
 
         return {
           id:            catId,
@@ -412,6 +416,7 @@ function transformMenu(menu: MenuResponse | undefined): {
 
       // Build groups with full option objects for modal rendering
       const groups = (deal.groups_detail ?? []).map((g) => ({
+        id:         g.id,
         name:       g.name,
         isRequired: g.is_required,
         selectQty:  g.select_quantity,

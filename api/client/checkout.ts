@@ -77,7 +77,7 @@ export function buildOrderPayload(params: {
     variantId?: number | null;
     sizeFk?: number | null;
     specialInstructions?: string;
-    // deal group selections (on_spot_deal only)
+    // deal group selections (on_spot_deal) — now populated from CartItem.groupSelections
     groupSelections?: { group: number; options: number[] }[];
   }[];
 }): OrderCreatePayload {
@@ -103,7 +103,11 @@ export function buildOrderPayload(params: {
           deal:       dealId,
           quantity:   cartItem.quantity,
           notes:      cartItem.specialInstructions || '',
-          selections: cartItem.groupSelections ?? [],
+          // Pass the saved group selections from the cart item
+          selections: (cartItem.groupSelections ?? []).map((gs) => ({
+            group:   gs.group,
+            options: gs.options,
+          })),
         };
       }
 

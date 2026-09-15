@@ -16,7 +16,7 @@ import { useCheckout, buildCheckoutPayload } from '@/api/client/checkout'
 import { useGetAddresses, useAddAddress } from '@/api/client/customer'
 import { PaymentSection } from '@/components/checkout/PaymentSection'
 import type { CheckoutFormValues } from '@/components/checkout/types'
-import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderStatusTimeline'
+import { appendOrderIdToCookie } from '@/lib/hooks/useRecentOrders'
 
 const FALLBACK_PHONE = '021-111-022-022'
 
@@ -33,22 +33,6 @@ function toNullableNum(v: string | number | null | undefined): number | null {
   return Number.isFinite(n) && n > 0 ? n : null
 }
 
-// ─── Order snapshot shown on receipt ──────────────────────────────────────────
-
-interface OrderSnapshot {
-  orderId: number
-  orderType: string
-  status: string
-  placedAt: string
-  customerName: string
-  customerPhone: string
-  customerAddress: string
-  branchName: string
-  subtotal: string
-  deliveryCharge: string
-  grandTotal: string
-  items: CartItem[]
-}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -96,7 +80,6 @@ export default function CheckoutPage() {
 
   // ─── local state ──────────────────────────────────────────────────────────
   const [showAddrForm, setShowAddrForm] = useState(false)
-  const [order, setOrder]               = useState<OrderSnapshot | null>(null)
   const [errorMsg, setErrorMsg]         = useState('')
 
   // auto-select first API address
@@ -216,21 +199,9 @@ export default function CheckoutPage() {
   // ─── checkout ──────────────────────────────────────────────────────────────
   const checkoutMutation = useCheckout({
     onSuccess(res) {
-      setOrder({
-        orderId:       res.id,
-        orderType:     res.order_type,
-        status:        res.status,
-        placedAt:      (res as any).created_at ?? new Date().toISOString(),
-        customerName:  res.customer_name,
-        customerPhone: res.customer_phone,
-        customerAddress: res.customer_address || '',
-        branchName:    res.branch_name || 'United King',
-        subtotal:      res.subtotal,
-        deliveryCharge: res.delivery_charge,
-        grandTotal:    res.grand_total,
-        items:         [...items],
-      })
+      appendOrderIdToCookie(res.id)
       clearCart()
+      router.push(`/website/checkout/confirmation?id=${res.id}`)
     },
     onError(msg) { setErrorMsg(msg || 'Failed to place order') },
   })
@@ -284,7 +255,7 @@ export default function CheckoutPage() {
   }
 
   // ─── receipt ──────────────────────────────────────────────────────────────
-  if (order) return <OrderReceipt order={order} onPlaceAnother={() => { router.push('/') }} />
+  // After successful checkout the user is redirected to /website/checkout/confirmation?id=<orderId>
 
   // ─── branch info (prefer Redux/combine-menu data, fall back to static list ──
   const fallbackBranch =
@@ -571,13 +542,59 @@ export default function CheckoutPage() {
                 <p className="py-4 text-center text-sm text-neutral-400">Your cart is empty</p>
               ) : (
                 items.map((item) => (
-                  <div key={`${item.id}-${item.selectedOption}`}
-                    className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-neutral-700">
-                      {item.quantity} × {item.name}
-                      {item.selectedOption ? ` (${item.selectedOption})` : ''}
-                    </span>
-                    <span className="font-semibold">Rs. {(item.price * item.quantity).toLocaleString()}</span>
+                  <div key={`${item.id}-${item.selectedOption}-${JSON.stringify(item.selectedAddons)}`}
+                    className="py-3 text-sm">
+                    {/* Item name + price row */}
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-neutral-700 leading-snug">
+                        {item.quantity} × {item.name}
+                        {item.selectedOption ? ` (${item.selectedOption})` : ''}
+                      </span>
+                      <span className="font-semibold shrink-0">Rs. {(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+
+                    {/* Selected add-ons / group options */}
+                    {item.selectedAddons && item.selectedAddons.length > 0 && (() => {
+                      // Group by groupName for clean rendering
+                      const grouped = item.selectedAddons.reduce<
+                        { groupName?: string; entries: { name: string; qty: number; extraCost?: number }[] }[]
+                      >((acc, addon) => {
+                        const last = acc[acc.length - 1]
+                        if (last && last.groupName === addon.groupName) {
+                          last.entries.push(addon)
+                        } else {
+                          acc.push({ groupName: addon.groupName, entries: [addon] })
+                        }
+                        return acc
+                      }, [])
+                      return (
+                        <div className="mt-1.5 ml-4 space-y-1.5">
+                          {grouped.map((group, gi) => (
+                            <div key={gi}>
+                              {group.groupName && (
+                                <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-400 mb-0.5">
+                                  ● {group.groupName}
+                                </p>
+                              )}
+                              <div className="space-y-0.5 pl-3 border-l-2 border-neutral-100">
+                                {group.entries.map((entry, ei) => (
+                                  <div key={ei} className="flex items-center justify-between gap-2">
+                                    <span className="text-[11px] text-neutral-500">
+                                      <span className="font-semibold">{entry.qty}×</span> {entry.name}
+                                    </span>
+                                    {entry.extraCost != null && entry.extraCost > 0 && (
+                                      <span className="text-[11px] font-semibold text-amber-600 shrink-0">
+                                        +Rs.{entry.extraCost.toLocaleString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
                   </div>
                 ))
               )}
@@ -587,24 +604,45 @@ export default function CheckoutPage() {
             <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3">
               <h2 className="font-bold text-neutral-800">Order Summary</h2>
               <PriceRow label="Subtotal"  value={`Rs. ${subtotal.toLocaleString()}`} />
+
+              {/* Free-delivery progress bar — delivery mode + finite threshold */}
+              {orderType === 'delivery' && settings.freeDeliveryAboveSubtotal < Infinity && (() => {
+                const threshold = settings.freeDeliveryAboveSubtotal
+                const unlocked  = subtotal >= threshold
+                const progress  = unlocked ? 100 : Math.round((subtotal / threshold) * 100)
+                const remaining = Math.max(0, threshold - subtotal)
+                return (
+                  <div className="space-y-1.5 py-0.5">
+                    {unlocked ? (
+                      <p className="text-[11px] font-semibold text-emerald-600">
+                        🎉 You&apos;ve unlocked free delivery!
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-neutral-500">
+                        Add <span className="font-semibold text-neutral-700">Rs. {remaining.toLocaleString()}</span> more for{' '}
+                        <span className="font-semibold text-emerald-600">FREE delivery</span>
+                      </p>
+                    )}
+                    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-neutral-700'}`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })()}
+
               <PriceRow label="Tax 18%"   value={`Rs. ${tax.toLocaleString()}`} />
               {orderType === 'delivery' && (
-                effectiveDeliveryFee > 0 ? (
-                  <PriceRow label="Delivery Fee" value={`Rs. ${effectiveDeliveryFee.toLocaleString()}`} />
-                ) : (
-                  <PriceRow
-                    label={
-                      subtotal >= settings.freeDeliveryAboveSubtotal
-                        ? 'Delivery Fee'
-                        : 'Delivery Fee'
-                    }
-                    value={
-                      subtotal >= settings.freeDeliveryAboveSubtotal
-                        ? <span className="text-black font-bold">FREE</span>
-                        : `Rs. ${effectiveDeliveryFee.toLocaleString()}`
-                    }
-                  />
-                )
+                <PriceRow
+                  label="Delivery Fee"
+                  value={
+                    effectiveDeliveryFee === 0
+                      ? <span className="font-bold text-emerald-600">FREE</span>
+                      : `Rs. ${effectiveDeliveryFee.toLocaleString()}`
+                  }
+                />
               )}
               {packagingFee > 0 && (
                 <PriceRow label="Packaging Charge" value={`Rs. ${packagingFee.toLocaleString()}`} />
@@ -612,13 +650,6 @@ export default function CheckoutPage() {
               {convenience > 0 && (
                 <PriceRow label="Convenience Fee" value={`Rs. ${convenience.toLocaleString()}`} />
               )}
-              {orderType === 'delivery' &&
-               settings.freeDeliveryAboveSubtotal < Infinity &&
-               subtotal < settings.freeDeliveryAboveSubtotal && (
-                 <p className="text-[11px] text-neutral-500 pt-1 -mt-1">
-                   Add Rs. {(settings.freeDeliveryAboveSubtotal - subtotal).toLocaleString()} more for FREE delivery
-                 </p>
-               )}
               <div className="border-t border-neutral-200 pt-3 flex items-center justify-between font-bold text-neutral-900 text-sm">
                 <span>Grand Total</span>
                 <span>Rs. {grandTotal.toLocaleString()}</span>
@@ -655,107 +686,4 @@ function PriceRow({ label, value, valueClass = 'font-semibold' }: {
   )
 }
 
-// ─── Order receipt ─────────────────────────────────────────────────────────────
 
-function OrderReceipt({ order, onPlaceAnother }: {
-  order: OrderSnapshot; onPlaceAnother: () => void
-}) {
-  const gt = parseFloat(order.grandTotal) || 0
-  return (
-    <div className="min-h-screen bg-neutral-50 py-10 px-4">
-      <div className="mx-auto max-w-[1100px] w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
-
-          {/* ── LEFT COLUMN: Order Details ── */}
-          <div className="space-y-5 min-w-0">
-            {/* Grand total header */}
-            <div className="rounded-2xl bg-[#000000] px-6 py-6 text-center text-white shadow">
-              <p className="text-xs uppercase tracking-wider text-neutral-400 mb-1">
-                Order #{order.orderId} · Grand Total
-              </p>
-              <p className="text-3xl md:text-4xl font-extrabold tracking-tight">
-                Rs. {isNaN(gt) ? order.grandTotal : gt.toLocaleString()}
-              </p>
-            </div>
-
-            {/* Order details section */}
-            <div className="space-y-3">
-              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight pt-2">
-                Order details
-              </h2>
-
-              <div className="rounded-2xl bg-white p-6 shadow-sm space-y-3 text-sm">
-                <DetailRow label="Customer"    value={order.customerName} />
-                <DetailRow label="Phone"       value={order.customerPhone} />
-                <DetailRow label="Order Type"  value={order.orderType} />
-                <DetailRow label="Branch"      value={order.branchName} />
-                {order.customerAddress && <DetailRow label="Address" value={order.customerAddress} />}
-                <DetailRow label="Status"      value={order.status} />
-              </div>
-
-              <div className="rounded-2xl bg-white p-6 shadow-sm divide-y divide-neutral-100">
-                <h3 className="pb-3 font-bold text-neutral-800">Products</h3>
-                {order.items.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between py-2.5 text-sm">
-                    <span className="text-neutral-700">
-                      {item.quantity} × {item.name}
-                      {item.selectedOption ? ` (${item.selectedOption})` : ''}
-                    </span>
-                    <span className="font-semibold">
-                      Rs. {(item.price * item.quantity).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-2xl bg-white p-6 shadow-sm space-y-2 text-sm">
-                <PriceRow label="Subtotal"         value={`Rs. ${parseFloat(order.subtotal).toLocaleString()}`} />
-                {parseFloat(order.deliveryCharge) > 0 && (
-                  <PriceRow label="Delivery Charge" value={`Rs. ${parseFloat(order.deliveryCharge).toLocaleString()}`} />
-                )}
-                <div className="border-t border-neutral-200 pt-3 flex items-center justify-between font-bold text-neutral-900">
-                  <span>Grand Total</span>
-                  <span>Rs. {gt.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-
-            <button onClick={onPlaceAnother}
-              className="w-full rounded-xl bg-black py-4 text-sm font-bold text-[#ffffff] hover:bg-[#1f1f1f] transition-colors">
-              Place Another Order
-            </button>
-          </div>
-
-          {/* ── RIGHT COLUMN: Sticky Approval Status ── */}
-          <div className="space-y-5 lg:sticky lg:top-6 lg:self-start">
-            {/* Approval status timeline */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <OrderStatusTimeline
-                status={order.status}
-                createdAt={order.placedAt}
-                updatedAt={order.placedAt}
-              />
-            </div>
-
-            {/* Good news / status banner */}
-            <ApprovalBanner
-              status={order.status}
-              orderNo={order.orderId}
-              orderHref="/website/profile/myOrders"
-            />
-          </div>
-
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="text-neutral-500 shrink-0">{label}</span>
-      <span className="font-semibold text-neutral-800 text-right">{value}</span>
-    </div>
-  )
-}

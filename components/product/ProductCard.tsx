@@ -37,6 +37,7 @@ export interface ProductData {
     isAvailableNow?: boolean
     includedItems?: { name: string; qty: number; extraCost?: number; availableAddons?: { id: number; name: string; price: string }[] }[]
     groups?: {
+      id: number      // OnSpotDealGroup.id — needed for order payload
       name: string
       isRequired: boolean
       selectQty: number
@@ -106,6 +107,10 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
     addItem({
       id: product.id, productId: product.productId, name: product.name,
       price: displayPriceNum, image: product.image,
+      originalPrice: (() => {
+        const orig = displayOriginal ? parseInt(displayOriginal, 10) : undefined
+        return orig != null && !isNaN(orig) && orig > displayPriceNum ? orig : undefined
+      })(),
       selectedOption: defaultOption || undefined,
       variantId: defaultSize ? defaultSize.sizeId : undefined,
       sizeFk:    defaultSize ? defaultSize.sizeFk  : undefined,

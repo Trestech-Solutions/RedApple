@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { UserDropdown } from '@/components/website/UserDropdown'
+import { RecentOrdersDropdown } from '@/components/website/RecentOrdersDropdown'
 
 const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? ''
 const FALLBACK_LOGO = '/web/logo.webp'
@@ -198,6 +199,9 @@ export function WebsiteNavbar({
               <UserDropdown onLoginClick={onLoginClick} />
             </div>
           )}
+
+          {/* Recent Orders — only renders when cookie has order IDs */}
+          <RecentOrdersDropdown navFg={navFg} iconTextColor={iconTextColor} />
 
           {showCartIcon && (
             <button

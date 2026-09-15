@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check } from 'lucide-react'
 import { useCart } from '@/lib/hooks/useCart'
 import type { ProductData } from '../product/ProductCard'
+import type { SelectedAddon, CartGroupSelection } from '@/redux/slices/cartSlice'
 
 interface ProductDetailModalProps {
   product: ProductData
@@ -178,17 +179,84 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
   const handleAdd = () => {
     if (!isOrderable) return
+
+    // ── Build selectedAddons for display ──────────────────────────────────────
+    // Section 1: included items (fixed_deal & on_spot_deal)
+    const includedRows: SelectedAddon[] =
+      isDeal
+        ? (dealMeta?.includedItems ?? []).map((item, i) => ({
+            name:      item.name,
+            qty:       itemQtys[i] ?? item.qty,
+            extraCost: item.extraCost && item.extraCost > 0
+              ? item.extraCost * (itemQtys[i] ?? 1)
+              : undefined,
+          }))
+        : []
+
+    // Section 2: on_spot_deal group selections
+    const groupRows: SelectedAddon[] = isOnSpot
+      ? (dealMeta?.groups ?? []).flatMap((group, gi) =>
+          group.options
+            .filter((opt) => (groupSelections[`${gi}-${opt.id ?? opt.name}`] ?? 0) > 0)
+            .map((opt) => {
+              const selQty = groupSelections[`${gi}-${opt.id ?? opt.name}`] ?? 1
+              return {
+                groupName: group.name,
+                name:      opt.name,
+                qty:       selQty,
+                extraCost: opt.extraCost && opt.extraCost > 0
+                  ? opt.extraCost * selQty
+                  : undefined,
+              }
+            })
+        )
+      : []
+
+    const selectedAddons = [...includedRows, ...groupRows]
+
+    // ── Build groupSelections for on_spot_deal order payload ──────────────────
+    const payloadGroupSelections: CartGroupSelection[] =
+      isOnSpot
+        ? (dealMeta?.groups ?? []).reduce(
+            (acc, group, gi) => {
+              const selectedOptionIds = group.options
+                .filter((opt) => (groupSelections[`${gi}-${opt.id ?? opt.name}`] ?? 0) > 0)
+                .flatMap((opt) => {
+                  const selQty = groupSelections[`${gi}-${opt.id ?? opt.name}`] ?? 1
+                  // Repeat the option ID by its quantity for counter-type options
+                  return opt.id != null
+                    ? Array.from({ length: selQty }, () => opt.id as number)
+                    : []
+                })
+              if (selectedOptionIds.length > 0) {
+                acc.push({ group: group.id, options: selectedOptionIds })
+              }
+              return acc
+            },
+            [] as CartGroupSelection[]
+          )
+        : []
+
     addItem({
       id: product.id,
       productId: product.productId,
       name: product.name,
       price: unitPrice + extraCostTotal + groupExtraCostTotal,
+      originalPrice: (() => {
+        // Only meaningful for regular (non-deal) items that have a higher original price
+        if (isDeal) return undefined
+        const orig = displayOriginal
+        if (orig != null && orig > unitPrice) return orig
+        return undefined
+      })(),
       image: product.image,
-      selectedOption: selectedOption || undefined,
-      variantId: selectedSize ? selectedSize.sizeId : undefined,
-      sizeFk:      selectedSize ? selectedSize.sizeFk : undefined,
+      selectedOption:      selectedOption || undefined,
+      variantId:           selectedSize ? selectedSize.sizeId : undefined,
+      sizeFk:              selectedSize ? selectedSize.sizeFk : undefined,
       specialInstructions: instructions || undefined,
-      quantity: qty,
+      quantity:            qty,
+      selectedAddons:      selectedAddons.length > 0 ? selectedAddons : undefined,
+      groupSelections:     payloadGroupSelections.length > 0 ? payloadGroupSelections : undefined,
     })
     setAdded(true)
     setTimeout(() => { setAdded(false); onClose() }, 900)
