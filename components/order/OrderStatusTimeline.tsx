@@ -3,14 +3,7 @@
 import { useMemo } from 'react'
 import { Check, Clock, XCircle, Loader2, ChefHat, Bike, PackageCheck } from 'lucide-react'
 
-type OrderStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'preparing'
-  | 'out_for_delivery'
-  | 'completed'
-  | 'cancelled'
-  | string
+type OrderStatus = string
 
 export interface TimelineStep {
   key: string
@@ -32,6 +25,35 @@ export interface OrderStatusTimelineProps {
   className?: string
 }
 
+type StepKey = 'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'completed'
+
+/**
+ * Backend status enum (Django model, exact values):
+ * pending | confirmed | preparing | out_for_delivery | completed | cancelled
+ * Trimmed/lowercased for safety, but these are the only values the API sends.
+ */
+function normalizeStatus(raw: OrderStatus): StepKey | 'cancelled' {
+  const s = (raw || '').toLowerCase().trim()
+
+  switch (s) {
+    case 'cancelled':
+    case 'cancel':
+      return 'cancelled'
+    case 'pending':
+      return 'pending'
+    case 'confirmed':
+      return 'confirmed'
+    case 'preparing':
+      return 'preparing'
+    case 'out_for_delivery':
+      return 'out_for_delivery'
+    case 'completed':
+      return 'completed'
+    default:
+      return 'pending'
+  }
+}
+
 /**
  * Maps an order status to a vertical timeline of approval + lifecycle steps.
  * Steps match: Waiting for Approval → Order Approved → Preparing → Out for Delivery → Completed
@@ -42,21 +64,21 @@ function getStepsFromStatus(
   createdAt?: string,
   updatedAt?: string,
 ): TimelineStep[] {
-  const order: OrderStatus[] = [
+  const order: StepKey[] = [
     'pending',
     'confirmed',
     'preparing',
     'out_for_delivery',
     'completed',
   ]
-  const labels: Record<string, string> = {
+  const labels: Record<StepKey, string> = {
     pending:          'Waiting for Approval...',
     confirmed:        'The order has been approved',
     preparing:        'Preparing your order',
     out_for_delivery: 'Out for delivery',
     completed:        'Order completed',
   }
-  const icons: Record<string, TimelineStep['icon']> = {
+  const icons: Record<StepKey, TimelineStep['icon']> = {
     pending:          'clock',
     confirmed:        'check',
     preparing:        'chef',
@@ -64,30 +86,11 @@ function getStepsFromStatus(
     completed:        'package',
   }
 
-  const isCancelled = status === 'cancelled'
-  const normalized = isCancelled ? 'pending' : status
-  const activeIdx = Math.max(0, order.indexOf(normalized as any))
-
-  const baseSteps: TimelineStep[] = order.map((s, i) => {
-    const activeAtCurrent = !isCancelled && i === activeIdx
-    const done = isCancelled ? i < activeIdx : i < activeIdx
-
-    let dateTime: string | undefined
-    if (i === 0)        dateTime = createdAt
-    else if (activeAtCurrent || (i === order.length - 1 && done)) dateTime = updatedAt ?? createdAt
-
-    return {
-      key:      s,
-      label:    labels[s] ?? s,
-      dateTime,
-      done,
-      active:   activeAtCurrent,
-      icon:     icons[s],
-    }
-  })
+  const normalized = normalizeStatus(status)
+  const isCancelled = normalized === 'cancelled'
 
   if (isCancelled) {
-    baseSteps.push({
+    return [{
       key:       'cancelled',
       label:     'Order cancelled',
       dateTime:  updatedAt ?? createdAt,
@@ -95,8 +98,28 @@ function getStepsFromStatus(
       active:    true,
       cancelled: true,
       icon:      'x',
-    })
+    }]
   }
+
+  const activeIdx = Math.max(0, order.indexOf(normalized))
+
+  const baseSteps: TimelineStep[] = order.map((s, i) => {
+    const activeAtCurrent = i === activeIdx
+    const done = i < activeIdx
+
+    let dateTime: string | undefined
+    if (i === 0)        dateTime = createdAt
+    else if (activeAtCurrent || (i === order.length - 1 && done)) dateTime = updatedAt ?? createdAt
+
+    return {
+      key:      s,
+      label:    labels[s],
+      dateTime,
+      done,
+      active:   activeAtCurrent,
+      icon:     icons[s],
+    }
+  })
 
   return baseSteps
 }
@@ -154,6 +177,15 @@ export default function OrderStatusTimeline({
         )}
       </div>
 
+      <style>{`
+        @keyframes timelinePump {
+          0%, 100% { transform: scale(1); }
+          25% { transform: scale(1.18); }
+          45% { transform: scale(1); }
+          65% { transform: scale(1.1); }
+        }
+      `}</style>
+
       <ol className="space-y-0">
         {steps.map((step, i) => {
           const tone: 'done' | 'active' | 'pending' | 'cancelled' = step.cancelled
@@ -166,16 +198,28 @@ export default function OrderStatusTimeline({
 
           const isLast = i === steps.length - 1
 
+          // active-step color depends on which stage it is:
+          // pending -> yellow, confirmed (approved) -> green, cancelled -> red, rest -> blue
+          const activeColorClass =
+            step.key === 'pending'   ? 'bg-yellow-400 text-white ring-4 ring-yellow-100'
+            : step.key === 'confirmed' ? 'bg-green-500 text-white ring-4 ring-green-100'
+            :                            'bg-blue-500 text-white ring-4 ring-blue-100'
+
           const dotClass =
             tone === 'cancelled' ? 'bg-red-500 text-white ring-4 ring-red-100'
             : tone === 'done'      ? 'bg-black text-white ring-4 ring-neutral-200'
-            : tone === 'active'    ? 'bg-black text-white ring-4 ring-neutral-100 shadow-[0_0_0_6px_rgba(0,0,0,0.08)]'
+            : tone === 'active'    ? `${activeColorClass} animate-[timelinePump_1.4s_ease-in-out_infinite]`
             :                        'bg-neutral-300 text-white ring-4 ring-neutral-100'
+
+          const activeLabelColorClass =
+            step.key === 'pending'   ? 'text-yellow-600'
+            : step.key === 'confirmed' ? 'text-green-600'
+            :                            'text-blue-600'
 
           const labelClass =
             tone === 'cancelled' ? 'text-red-600 font-semibold'
             : tone === 'done'      ? 'text-neutral-900 font-medium'
-            : tone === 'active'    ? 'text-black font-bold'
+            : tone === 'active'    ? `${activeLabelColorClass} font-bold`
             :                        'text-neutral-400 font-medium'
 
           return (
@@ -211,17 +255,18 @@ export default function OrderStatusTimeline({
 export function ApprovalBanner({
   status, orderNo, orderHref,
 }: { status: OrderStatus; orderNo?: string | number; orderHref?: string }) {
-  if (status === 'pending' || status === 'cancelled') return null
+  const normalized = normalizeStatus(status)
+  if (normalized === 'pending' || normalized === 'cancelled') return null
 
   const heading =
-    status === 'confirmed'        ? 'Good news!'
-    : status === 'preparing'        ? 'Your order is being prepared'
-    : status === 'out_for_delivery' ? 'Your order is on its way!'
-    : status === 'completed'       ? 'Order completed'
+    normalized === 'confirmed'        ? 'Good news!'
+    : normalized === 'preparing'        ? 'Your order is being prepared'
+    : normalized === 'out_for_delivery' ? 'Your order is on its way!'
+    : normalized === 'completed'       ? 'Order completed'
     : 'Order update'
 
   const body =
-    status === 'confirmed' ? (
+    normalized === 'confirmed' ? (
       <>
         Your{' '}
         {orderHref ? (
@@ -238,11 +283,11 @@ export function ApprovalBanner({
         )}{' '}
         has been approved!
       </>
-    ) : status === 'preparing' ? (
+    ) : normalized === 'preparing' ? (
       <>Our kitchen is currently preparing your delicious order.</>
-    ) : status === 'out_for_delivery' ? (
+    ) : normalized === 'out_for_delivery' ? (
       <>Your rider is on the way. Get ready to enjoy your meal!</>
-    ) : status === 'completed' ? (
+    ) : normalized === 'completed' ? (
       <>
         Thank you for ordering! Your{' '}
         {orderHref ? (
