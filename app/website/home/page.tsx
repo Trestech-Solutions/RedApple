@@ -1027,7 +1027,7 @@ export default function HomePage() {
               {/* Header — plain, no coloured box */}
               <div className="mb-5">
                 <h2 className="flex items-center gap-2 text-xl font-extrabold text-neutral-900 sm:text-2xl">
-                  🔥 Popular Items
+                  🔥 Popular 
                 </h2>
                 <p className="mt-0.5 text-sm text-neutral-500">Most ordered right now</p>
               </div>
