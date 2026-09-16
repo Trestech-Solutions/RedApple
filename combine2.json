@@ -10,7 +10,12 @@
         "pickup_status": true,
         "delivery_status": true
     },
-    "area": null,
+    "area": {
+        "id": 11,
+        "name": "Bahadurabaddd",
+        "status": true,
+        "branch_id": 1
+    },
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
