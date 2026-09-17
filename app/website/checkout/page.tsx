@@ -21,7 +21,7 @@ import { appendOrderIdToCookie } from '@/lib/hooks/useRecentOrders'
 const FALLBACK_PHONE = '021-111-022-022'
 
 const inputClass =
-  'w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder:text-neutral-400'
+  'w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] placeholder:text-neutral-400'
 const labelClass = 'mb-2 block text-sm font-semibold text-neutral-700'
 
 const TITLE_OPTIONS = ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.']
@@ -281,7 +281,7 @@ export default function CheckoutPage() {
 
             {user && (
               <p className="text-sm text-neutral-600">
-                Hello, <span className="font-bold text-[#000000] uppercase">{user.name}</span>
+                Hello, <span className="font-bold text-[var(--color-primary)] uppercase">{user.name}</span>
               </p>
             )}
 
@@ -364,9 +364,9 @@ export default function CheckoutPage() {
 
             {/* Per-order-type message + estimated time + instruction */}
             {(typeMessage || estMins || instructionMessage) && (
-              <div className="rounded-lg border border-neutral-200 bg-black/[0.02] px-4 py-3 text-sm text-neutral-700 space-y-1">
+              <div className="rounded-lg border border-neutral-200 [background-color:color-mix(in_srgb,var(--color-primary),transparent_98%)] px-4 py-3 text-sm text-neutral-700 space-y-1">
                 {estMins && (
-                  <p className="font-bold text-black mb-0.5">
+                  <p className="font-bold text-[var(--color-primary)] mb-0.5">
                     Estimated{' '}
                     {orderTypeStr === 'pickup' ? 'pickup' : orderTypeStr === 'dinein' ? 'prep' : 'delivery'}{' '}
                     time: {estMins} min
@@ -374,7 +374,7 @@ export default function CheckoutPage() {
                 )}
                 {typeMessage && <p>{typeMessage}</p>}
                 {instructionMessage && (
-                  <p className="pt-1 border-t border-black/5 mt-1 text-neutral-600">
+                  <p className="pt-1 border-t [border-color:color-mix(in_srgb,var(--color-primary),transparent_95%)] mt-1 text-neutral-600">
                     <span className="font-semibold text-neutral-800">Instructions:</span> {instructionMessage}
                   </p>
                 )}
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-sm font-semibold text-neutral-700">Full Name</label>
-                      <span className="text-xs font-bold text-[#000000]">*Required</span>
+                      <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
                     <input {...register('guestFullName')} placeholder="Full Name" className={inputClass} />
                   </div>
@@ -404,7 +404,7 @@ export default function CheckoutPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-sm font-semibold text-neutral-700">Mobile</label>
-                      <span className="text-xs font-bold text-[#000000]">*Required</span>
+                      <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
                     <input {...register('guestMobile')} placeholder="03xx-xxxxxxx" className={inputClass} />
                   </div>
@@ -421,7 +421,7 @@ export default function CheckoutPage() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <label className="text-sm font-semibold text-neutral-700">Delivery Address</label>
-                        <span className="text-xs font-bold text-[#000000]">*Required</span>
+                        <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                       </div>
                       <input {...register('guestAddress')} placeholder="Enter your complete address" className={inputClass} />
                     </div>
@@ -459,7 +459,7 @@ export default function CheckoutPage() {
                       <p className="text-sm font-semibold text-neutral-700">Select Delivery Address</p>
                       {!showAddrForm && (
                         <button type="button" onClick={() => setShowAddrForm(true)}
-                          className="inline-flex items-center gap-1 text-sm font-semibold text-[#000000] hover:text-red-700">
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] hover:text-red-700">
                           <Plus size={14} /> Add New
                         </button>
                       )}
@@ -467,7 +467,7 @@ export default function CheckoutPage() {
 
                     {loadingAddresses && (
                       <div className="flex items-center gap-2 text-sm text-neutral-500">
-                        <Loader2 size={13} className="animate-spin text-[#000000]" /> Loading addresses…
+                        <Loader2 size={13} className="animate-spin text-[var(--color-primary)]" /> Loading addresses…
                       </div>
                     )}
 
@@ -478,7 +478,7 @@ export default function CheckoutPage() {
                           <button key={addr.id} type="button"
                             onClick={() => setValue('selectedAddressId', String(addr.id))}
                             className={`w-full flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
-                              sel ? 'border-black bg-neutral-50 text-black'
+                              sel ? 'border-[var(--color-primary)] bg-neutral-50 text-[var(--color-primary)]'
                                   : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                             }`}>
                             <div>
@@ -486,7 +486,7 @@ export default function CheckoutPage() {
                               {addr.city && <span className="text-neutral-400">, {addr.city}</span>}
                             </div>
                             {sel
-                              ? <CheckCircle size={18} className="shrink-0 text-black" />
+                              ? <CheckCircle size={18} className="shrink-0 text-[var(--color-primary)]" />
                               : <Circle size={18} className="shrink-0 text-neutral-300" />}
                           </button>
                         )
@@ -499,10 +499,10 @@ export default function CheckoutPage() {
                     {showAddrForm && (
                       <div className="space-y-2 rounded-lg border border-dashed border-neutral-300 p-4">
                         <input {...register('newAddrLine')} placeholder="Street address, area, landmark"
-                          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000]" />
+                          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" />
                         {settings.enable_city_on_checkout && (
                           <select {...register('newAddrCity')}
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000]">
+                            className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]">
                             {['Karachi','Lahore','Islamabad','Rawalpindi','Faisalabad'].map((c) => (
                               <option key={c}>{c}</option>
                             ))}
@@ -510,7 +510,7 @@ export default function CheckoutPage() {
                         )}
                         <div className="flex gap-2">
                           <button type="button" onClick={handleAddAddress} disabled={apiAddrAdder.isPending}
-                            className="flex-1 rounded-lg bg-black py-2 text-xs font-bold text-[#ffffff] hover:bg-red-700 disabled:opacity-50">
+                            className="flex-1 rounded-lg bg-[var(--color-primary)] py-2 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-50">
                             {apiAddrAdder.isPending ? 'Saving…' : 'Save Address'}
                           </button>
                           <button type="button" onClick={() => setShowAddrForm(false)}
@@ -625,7 +625,7 @@ export default function CheckoutPage() {
                     )}
                     <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-neutral-700'}`}
+                        className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -657,7 +657,7 @@ export default function CheckoutPage() {
             </div>
 
             <button type="submit" disabled={!canPlace || isPlacing}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#000000] py-4 text-sm font-bold text-[#ffffff] shadow-md transition-all hover:bg-[#1f1f1f] disabled:cursor-not-allowed disabled:opacity-50">
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-4 text-sm font-bold text-[var(--color-secondary)] shadow-md transition-all hover:brightness-90 disabled:cursor-not-allowed disabled:opacity-50">
               {isPlacing
                 ? <><Loader2 size={16} className="animate-spin" />Placing Order…</>
                 : 'Place Order'}

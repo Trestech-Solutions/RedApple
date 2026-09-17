@@ -83,7 +83,7 @@ export function CartDrawer() {
         <div className="flex items-center justify-between px-5 py-4">
           <h2 className="text-lg font-bold text-neutral-900">Your Cart</h2>
           <button onClick={closeCart} aria-label="Close cart"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#000000] text-white hover:bg-[#1f1f1f] transition-colors shadow-sm">
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-secondary)] hover:brightness-90 transition-colors shadow-sm">
             <X size={18} strokeWidth={3} />
           </button>
         </div>
@@ -114,11 +114,11 @@ export function CartDrawer() {
                 </div>
                 <div className="flex gap-1.5 pt-0.5">
                   <button onClick={() => scrollPopular('left')} aria-label="Scroll left"
-                    className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:border-[#000000] hover:text-[#000000] transition-colors">
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
                     <ChevronLeft size={14} />
                   </button>
                   <button onClick={() => scrollPopular('right')} aria-label="Scroll right"
-                    className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:border-[#000000] hover:text-[#000000] transition-colors">
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
                     <ChevronRight size={14} />
                   </button>
                 </div>
@@ -146,7 +146,7 @@ export function CartDrawer() {
                             image:     imageUrl,
                           })}
                           aria-label={`Add ${prod.name}`}
-                          className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#000000] shadow-md hover:bg-[#000000] hover:text-white transition-colors border border-neutral-200"
+                          className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-md hover:bg-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors border border-neutral-200"
                         >
                           <PlusIcon size={14} strokeWidth={3} />
                         </button>
@@ -189,7 +189,7 @@ export function CartDrawer() {
                       )}
                       <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-neutral-700'}`}
+                          className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -245,10 +245,10 @@ export function CartDrawer() {
             <Link
               href="/website/checkout"
               onClick={closeCart}
-              className="flex w-full items-center justify-between rounded-xl bg-[#000000] px-6 py-3.5 text-sm font-bold text-white hover:bg-[#1f1f1f] transition-colors shadow-md"
+              className="flex w-full items-center justify-between rounded-xl bg-[var(--color-primary)] px-6 py-3.5 text-sm font-bold text-[var(--color-secondary)] hover:brightness-90 transition-colors shadow-md"
             >
               <span className="pl-2">Checkout</span>
-              <ArrowRight size={18} className="text-[#ffffff]" />
+              <ArrowRight size={18} className="text-[var(--color-secondary)]" />
             </Link>
 
             {orderType === 'delivery' && (
@@ -278,16 +278,16 @@ function EmptyCart() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-5 text-center px-6 py-8">
-      <ShoppingBag size={100} strokeWidth={1.2} className="text-[#000000]" />
+      <ShoppingBag size={100} strokeWidth={1.2} className="text-[var(--color-primary)]" />
       <div className="space-y-2">
-        <h3 className="text-2xl font-bold text-[#000000]">Your Cart is Empty</h3>
+        <h3 className="text-2xl font-bold text-[var(--color-primary)]">Your Cart is Empty</h3>
         <p className="mx-auto max-w-[260px] text-sm leading-relaxed text-neutral-500">
           Looks like you haven&apos;t added anything yet. Browse the menu to get started!
         </p>
       </div>
       <button
         onClick={handleStart}
-        className="mt-2 rounded-md bg-[#000000] px-6 py-2.5 text-sm font-semibold text-[#ffffff] hover:bg-[#1f1f1f] transition-colors shadow-sm"
+        className="mt-2 rounded-md bg-[var(--color-primary)] px-6 py-2.5 text-sm font-semibold text-[var(--color-secondary)] hover:brightness-90 transition-colors shadow-sm"
       >
         Browse Menu
       </button>
@@ -322,10 +322,23 @@ function CartItemRow({ item, onRemove, onIncrease, onDecrease }: CartItemRowProp
       )
     : []
 
+  // cart_style visual treatment
+  const style = item.cartStyle?.toLowerCase().trim() ?? ''
+  const isHighlight = style === 'highlight'
+  const isCompact   = style === 'compact'
+
   return (
-    <div className="py-3 first:pt-2 border-b border-neutral-100 last:border-b-0">
+    <div className={`border-b border-neutral-100 last:border-b-0 ${
+      isHighlight
+        ? 'border-l-[3px] border-l-amber-400 bg-amber-50/60 px-2 py-2.5 first:pt-2 rounded-r-lg'
+        : isCompact
+        ? 'py-2 first:pt-1.5'
+        : 'py-3 first:pt-2'
+    }`}>
       <div className="flex items-center gap-3">
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-neutral-100 bg-neutral-50">
+        <div className={`relative shrink-0 overflow-hidden rounded-lg border border-neutral-100 bg-neutral-50 ${
+          isCompact ? 'h-12 w-12' : 'h-16 w-16'
+        }`}>
           {item.image ? (
             <Image src={item.image} alt={item.name} fill className="object-cover" />
           ) : (
@@ -337,24 +350,24 @@ function CartItemRow({ item, onRemove, onIncrease, onDecrease }: CartItemRowProp
 
         <div className="flex flex-1 items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-neutral-900 leading-tight truncate">
+            <p className={`font-semibold text-neutral-900 leading-tight truncate ${isCompact ? 'text-xs' : 'text-sm'}`}>
               {item.name}{item.selectedOption ? ` (${item.selectedOption})` : ''}
             </p>
-            <p className="mt-1 text-sm font-bold text-neutral-900">
+            <p className={`mt-1 font-bold text-neutral-900 ${isCompact ? 'text-xs' : 'text-sm'}`}>
               Rs. {(item.price * item.quantity).toLocaleString()}
             </p>
           </div>
 
-          <div className="flex items-center shrink-0 rounded-md border border-[#000000] overflow-hidden">
+          <div className="flex items-center shrink-0 rounded-md border border-[var(--color-primary)] overflow-hidden">
             <button onClick={onDecrease} aria-label="Decrease or remove"
-              className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
+              className="flex h-7 w-7 items-center justify-center bg-white text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors">
               {item.quantity <= 1 ? <Trash2 size={13} /> : <Minus size={13} strokeWidth={3} />}
             </button>
             <span className="w-7 text-center text-sm font-semibold text-neutral-900 bg-white">
               {item.quantity}
             </span>
             <button onClick={onIncrease} aria-label="Increase quantity"
-              className="flex h-7 w-7 items-center justify-center bg-white text-[#000000] hover:bg-[#000000] hover:text-white transition-colors">
+              className="flex h-7 w-7 items-center justify-center bg-white text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors">
               <Plus size={13} strokeWidth={3} />
             </button>
           </div>
@@ -363,7 +376,7 @@ function CartItemRow({ item, onRemove, onIncrease, onDecrease }: CartItemRowProp
 
       {/* ── Add-ons toggle ── */}
       {hasAddons && (
-        <div className="mt-2 ml-[76px]">
+        <div className={`mt-2 ${isCompact ? 'ml-[60px]' : 'ml-[76px]'}`}>
           <button
             type="button"
             onClick={() => setAddonsOpen((v) => !v)}

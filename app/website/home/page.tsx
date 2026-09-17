@@ -216,6 +216,8 @@ function itemToProduct(
     discount:      combinedDiscount,
     image:         resolvedImage,
     sizes:         hasSizes ? sizes : undefined,
+    textButtonColor: item.text_button_color || undefined,
+    cartStyle:       item.cart_style       || undefined,
   })
 }
 
@@ -261,6 +263,8 @@ function transformMenu(menu: MenuResponse | undefined): {
           icon,
           banner,
           badge:         cat.badge || undefined,
+          cartStyle:     cat.cart_style   || undefined,
+          headerStyle:   cat.header_style || undefined,
           subCategories: [{ id: catId, label: 'All Items' }],
         }
       }
@@ -308,6 +312,8 @@ function transformMenu(menu: MenuResponse | undefined): {
           icon,
           banner,
           badge:         cat.badge || undefined,
+          cartStyle:     cat.cart_style   || undefined,
+          headerStyle:   cat.header_style || undefined,
           subCategories: [{ id: catId, label: 'All Items' }],
         }
       }
@@ -341,6 +347,8 @@ function transformMenu(menu: MenuResponse | undefined): {
         icon,
         banner,
         badge:         cat.badge || undefined,
+        cartStyle:     cat.cart_style   || undefined,
+        headerStyle:   cat.header_style || undefined,
         subCategories: subCats.length > 0 ? subCats : [{ id: `${catId}-all`, label: 'All Items' }],
       }
     })

@@ -117,7 +117,7 @@ export default function OrderConfirmationPage() {
           <p className="text-neutral-700 font-semibold">{errorMsg || 'Order not found.'}</p>
           <Link
             href="/website/home"
-            className="inline-block rounded-xl bg-black text-white text-sm font-bold px-6 py-3 hover:bg-neutral-800 transition-colors"
+            className="inline-block rounded-xl bg-[var(--color-primary)] text-[var(--color-secondary)] text-sm font-bold px-6 py-3 hover:brightness-90 transition-colors"
           >
             Back to Home
           </Link>
@@ -138,8 +138,8 @@ export default function OrderConfirmationPage() {
           <div className="space-y-5 min-w-0">
 
             {/* Grand-total header */}
-            <div className="rounded-2xl bg-[#000000] px-6 py-6 text-center text-white shadow">
-              <p className="text-xs uppercase tracking-wider text-neutral-400 mb-1">
+            <div className="rounded-2xl bg-[var(--color-primary)] px-6 py-6 text-center text-[var(--color-secondary)] shadow">
+              <p className="text-xs uppercase tracking-wider [color:color-mix(in_srgb,var(--color-secondary),transparent_40%)] mb-1">
                 Order #{order.id} · Grand Total
               </p>
               <p className="text-3xl md:text-4xl font-extrabold tracking-tight">
@@ -281,7 +281,7 @@ export default function OrderConfirmationPage() {
 
             <button
               onClick={() => router.push('/website/home')}
-              className="w-full rounded-xl bg-black py-4 text-sm font-bold text-white hover:bg-neutral-800 transition-colors"
+              className="w-full rounded-xl bg-[var(--color-primary)] py-4 text-sm font-bold text-[var(--color-secondary)] hover:brightness-90 transition-colors"
             >
               Place Another Order
             </button>

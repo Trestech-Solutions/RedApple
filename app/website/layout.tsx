@@ -60,6 +60,14 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const bgImage = resolveMediaUrl(settings.menu_page_background_image) || DEFAULT_PATTERN_URL
   const bgColor = settings.background_color || ''
 
+  // Brand colours exposed as CSS custom properties so any component can use
+  // var(--color-primary) / var(--color-secondary) / var(--color-tertiary)
+  // without extra prop-drilling. Empty values fall back to sensible defaults
+  // (black / white / white) so the UI never breaks.
+  const primaryColor   = settings.primary_color   || '#000000'
+  const secondaryColor = settings.secondary_color || '#FFFFFF'
+  const tertiaryColor  = settings.tertiary_color  || '#FFFFFF'
+
   return (
     <div
       style={{
@@ -69,7 +77,10 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         backgroundSize: 'auto',
         backgroundAttachment: 'fixed',
         minHeight: '100vh',
-      }}
+        '--color-primary':   primaryColor,
+        '--color-secondary': secondaryColor,
+        '--color-tertiary':  tertiaryColor,
+      } as React.CSSProperties}
     >
       {settings.close_store && settings.close_message && (
         <div className="sticky top-0 z-40 bg-red-600 text-white text-center text-xs sm:text-sm py-2 px-3 font-semibold">

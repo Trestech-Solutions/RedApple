@@ -37,7 +37,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
 
       {/* Drawer — slides in from right */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-64 flex-col bg-[#000000] shadow-2xl transition-transform duration-300 sm:w-72 ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-64 flex-col bg-[var(--color-primary)] shadow-2xl transition-transform duration-300 sm:w-72 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -60,7 +60,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="rounded-lg bg-[#ffffff] px-4 py-3 text-sm font-bold text-neutral-900 hover:bg-yellow-400 transition-colors sm:px-5 sm:py-3.5"
+              className="rounded-lg [background-color:color-mix(in_srgb,var(--color-primary),white_12%)] px-4 py-3 text-sm font-bold text-white hover:[background-color:color-mix(in_srgb,var(--color-primary),white_25%)] transition-colors sm:px-5 sm:py-3.5"
             >
               {item.label}
             </a>

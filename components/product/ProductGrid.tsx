@@ -16,11 +16,11 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
   const { settings } = useStoreSettings()
   const design = (settings.product_card_design as string | undefined) ?? 'card-1'
 
-  // card-1 = horizontal list (1→2→3 cols)
-  // card-2/card-3 = portrait grid (2→4 cols, no intermediate 3-col step)
+  // card-1 = horizontal list (1→2→3→4 cols as width grows)
+  // card-2/card-3 = portrait grid (2→3→4→5→6 cols, denser since cards are smaller)
   const gridClass = design === 'card-1'
-    ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'
-    : 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4'
+    ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:grid-cols-3 xl:gap-6'
+    : 'grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-5 xl:gap-6 2xl:grid-cols-6'
 
   useEffect(() => {
     if (!selected) return
@@ -36,10 +36,11 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center sm:py-20">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 sm:mb-4 sm:h-16 sm:w-16">
-          <ShoppingBag size={22} className="text-neutral-400 sm:hidden" />
-          <ShoppingBag size={28} className="text-neutral-400 hidden sm:block" />
+      <div className="flex flex-col items-center justify-center py-10 text-center sm:py-16 md:py-20">
+        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-neutral-100 sm:mb-4 sm:h-14 sm:w-14 md:h-16 md:w-16">
+          <ShoppingBag size={20} className="text-neutral-400 sm:hidden" />
+          <ShoppingBag size={24} className="text-neutral-400 hidden sm:block md:hidden" />
+          <ShoppingBag size={28} className="text-neutral-400 hidden md:block" />
         </div>
         <p className="font-semibold text-neutral-700 text-sm sm:text-base">No products found</p>
         <p className="mt-1 text-xs text-neutral-400 sm:text-sm">

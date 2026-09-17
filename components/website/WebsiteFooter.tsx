@@ -130,7 +130,7 @@ export function WebsiteFooter() {
     Object.values(social).some((v) => typeof v === 'string' && v.trim() !== '')
 
   return (
-    <footer className="bg-white">
+    <footer className="bg-[var(--color-tertiary)]">
       {/* SEO content */}
       <div className="mx-auto max-w-[1400px] px-4 pt-10 sm:px-5 sm:pt-14 md:px-8">
         <h2 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl md:text-[28px]">
@@ -171,7 +171,7 @@ export function WebsiteFooter() {
       <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[#C1531B]/25 to-transparent sm:mt-14" />
 
       {/* Main footer band */}
-      <div className="bg-white">
+      <div className="bg-[var(--color-tertiary)]">
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-5 sm:py-14 md:px-8">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_0.8fr_1fr]">
 

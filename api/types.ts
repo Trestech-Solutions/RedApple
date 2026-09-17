@@ -188,6 +188,12 @@ export type StoreSettings = {
   logo_link?: string
   location_link?: string
   navbar_color?: string
+  /** Brand primary colour — used as CSS var(--primary) across the storefront */
+  primary_color?: string
+  /** Brand secondary colour — used as CSS var(--secondary) across the storefront */
+  secondary_color?: string
+  /** Brand tertiary colour — used as CSS var(--tertiary) across the storefront */
+  tertiary_color?: string
   merchant_header_background?: string
   foreground_color?: string
   background_color?: string
@@ -467,6 +473,10 @@ export type MenuItem = {
   item_discount_type?: string | null;
   show_discount_tag?: boolean;
   is_popular?: boolean;           // flagged as popular item (max 4 per restaurant)
+  /** Per-item button/price text colour override (hex). Falls back to global item_price_text_color. */
+  text_button_color?: string | null;
+  /** Cart-row style identifier for this item (e.g. 'highlight', 'compact'). */
+  cart_style?: string | null;
   branch_prices?: unknown[];
   size_prices?: SizePrice[];
   date_added?: string;
@@ -523,6 +533,10 @@ export type MenuCategory = {
   hide_category_from_navbar?: boolean;
   hide_category_display_name_menu?: boolean;
   layout?: string;
+  /** Cart-section style identifier for items belonging to this category (e.g. 'highlight') */
+  cart_style?: string;
+  /** Category header style identifier (e.g. 'banner', 'minimal') */
+  header_style?: string;
   date_added?: string;
   date_updated?: string;
 };

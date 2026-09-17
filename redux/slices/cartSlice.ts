@@ -37,6 +37,8 @@ export interface CartItem {
   selectedAddons?: SelectedAddon[]
   /** Machine-readable group selections for on_spot_deal order payload */
   groupSelections?: CartGroupSelection[]
+  /** Cart-row style identifier (e.g. 'highlight', 'compact') — from item.cart_style */
+  cartStyle?: string
 }
 
 interface CartState {
@@ -72,6 +74,7 @@ const cartSlice = createSlice({
           selectedAddons?: SelectedAddon[]
           groupSelections?: CartGroupSelection[]
           originalPrice?: number
+          cartStyle?: string
         }
       >
     ) {

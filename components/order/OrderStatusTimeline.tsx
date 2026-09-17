@@ -166,7 +166,7 @@ export default function OrderStatusTimeline({
   return (
     <div className={`space-y-5 ${className}`.trim()}>
       <div className="flex items-start justify-between">
-        <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">
+        <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-primary)] tracking-tight">
           Approval Status
         </h2>
         {firstFmted && (

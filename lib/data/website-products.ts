@@ -12,6 +12,10 @@ export interface Category {
   label: string
   icon: string          // iconify icon key
   badge?: string
+  /** Cart-section style identifier for items from this category (e.g. 'highlight'). */
+  cartStyle?: string
+  /** Category header style identifier (e.g. 'banner', 'minimal'). */
+  headerStyle?: string
   subCategories: SubCategory[]
 }
 
