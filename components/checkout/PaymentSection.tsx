@@ -1,6 +1,5 @@
 'use client'
 
-import { Gift } from 'lucide-react'
 import { Controller, useWatch } from 'react-hook-form'
 import type { Control, UseFormRegister } from 'react-hook-form'
 import type { CheckoutFormValues } from '@/components/checkout/types'
@@ -57,25 +56,6 @@ export function PaymentSection({ control, register, orderType }: PaymentSectionP
           />
         </div>
       )}
-
-      <Controller
-        name="isGift"
-        control={control}
-        render={({ field }) => (
-          <button
-            type="button"
-            onClick={() => field.onChange(!field.value)}
-            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${
-              field.value
-                ? 'border-[#ffffff] bg-[#ffffff]/10 text-neutral-800'
-                : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
-            }`}
-          >
-            <Gift size={15} />
-            This order is a gift 🎁
-          </button>
-        )}
-      />
     </div>
   )
 }

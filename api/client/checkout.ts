@@ -70,6 +70,8 @@ export function buildOrderPayload(params: {
   customer_address?: string;
   customer_landmark?: string;
   customer_instructions?: string;
+  is_gift?: boolean;
+  send_gift?: { receipt_name: string; gift_message: string; receipt_number: string };
   cartItems: {
     id: string;
     productId: number | null;
@@ -134,6 +136,10 @@ export function buildOrderPayload(params: {
     customer_address:       params.customer_address,
     customer_landmark:      params.customer_landmark,
     customer_instructions:  params.customer_instructions,
+    ...(params.is_gift ? {
+      is_gift:   true,
+      send_gift: params.send_gift,
+    } : {}),
     items:                  lines,
   };
 }

@@ -287,6 +287,10 @@ export type StoreSettings = {
   branch_wise_settings?: boolean
   packaging_incremental?: boolean
   do_not_apply_tax_to_delivery_charges?: boolean
+  /** Tax percentage applied on cash/COD payments (e.g. "18.00" = 18%). 0 or absent = no cash tax. */
+  cash_tax?: string | number | null
+  /** Tax percentage applied on card/online payments (e.g. "18.00" = 18%). 0 or absent = no card tax. */
+  card_tax?: string | number | null
 
   if_item_not_available?: 'hide' | 'show_disabled' | string
 
@@ -866,6 +870,14 @@ export type OrderCreatePayload = {
   customer_address?: string;
   customer_landmark?: string;
   customer_instructions?: string;
+  /** True when the order is a gift */
+  is_gift?: boolean;
+  /** Gift recipient details — only sent when is_gift is true */
+  send_gift?: {
+    receipt_name: string;
+    gift_message: string;
+    receipt_number: string;
+  };
   items: OrderCreateLine[];
 };
 

@@ -14,4 +14,8 @@ export interface CheckoutFormValues {
   selectedAddressId: string
   newAddrLine: string
   newAddrCity: string
+  // Gift recipient fields — only sent when isGift is true
+  giftReceiptName: string
+  giftMessage: string
+  giftReceiptNumber: string
 }

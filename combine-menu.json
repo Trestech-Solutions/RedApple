@@ -14,14 +14,15 @@
         "id": 11,
         "name": "Bahadurabaddd",
         "status": true,
-        "branch_id": 1
+        "branch_id": 1,
+        "delivery_charge": "0.00"
     },
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
-        "date_updated": "2026-09-17T16:20:32.268807Z",
+        "date_updated": "2026-09-18T15:15:42.969142Z",
         "merchant_logo": "/media/settings/merchant_logo/logo_ch6FD0l.webp",
-        "menu_header": "image_slides",
+        "menu_header": "default",
         "phone_icon_type": "whatsapp",
         "logo_left_align": false,
         "hide_phone_from_header": false,
@@ -29,13 +30,14 @@
         "logo_fit_to_navbar": false,
         "logo_link": "https://example.com",
         "location_link": "https://maps.google.com/?q=...",
-        "navbar_color": "#FF0000",
-        "primary_color": "",
-        "secondary_color": "",
-        "tertiary_color": "",
-        "product_card_design": "card-1",
-        "category_design": "category-2",
+        "navbar_color": "#000000",
+        "primary_color": "#000000",
+        "secondary_color": "#D4A43C",
+        "product_card_design": "card-3",
+        "category_design": "category-3",
         "order_modal_design": "modal-1",
+        "card_tax": "8.00",
+        "cash_tax": "18.00",
         "slide_image_1": null,
         "heading_text_1": "Weekend Special",
         "heading_color_1": "#FFFFFF",
@@ -60,19 +62,19 @@
         "description_text_4": "",
         "description_color_4": "",
         "slide_link_4": "",
-        "merchant_header_background": "#111111",
+        "merchant_header_background": "#000000",
         "android_icon": "/media/settings/app_icons/badge-google-play-and-app-store-button-download-free-png.webp",
         "android_app_link": "https://unitedking.trestechsolutions.com/",
         "ios_icon": "/media/settings/app_icons/hello.webp",
         "ios_app_link": "https://unitedking.trestechsolutions.com/",
-        "foreground_color": "#000000",
+        "foreground_color": "#FFFFFF",
         "background_color": "#FFFFFF",
-        "menu_page_background_color": "#FAFAFA",
+        "menu_page_background_color": "#000000",
         "menu_page_background_image": "/media/settings/backgrounds/1786973821_855c8816d21f6e41.jpg",
         "menu_font_family": "Poppins",
-        "item_price_background": "#F5F5F5",
-        "item_price_text_color": "#111111",
-        "item_price_border_color": "#DDDDDD",
+        "item_price_background": "#111111",
+        "item_price_text_color": "#FFFFFF",
+        "item_price_border_color": "#111111",
         "price_rounder_center": true,
         "show_cart_icon": true,
         "show_stack_tag_on_item": true,
@@ -80,7 +82,7 @@
         "stack_tag_color": "#000000",
         "discount_background_color": "#FF0000",
         "discount_text_color": "#FFFFFF",
-        "category_navbar_background_color": "#FFFFFF",
+        "category_navbar_background_color": "#000000",
         "enable_user_login": true,
         "price_inclusive_tax": false,
         "sum_discount_in_minimum_order_amount": false,
@@ -127,7 +129,7 @@
         "packaging_charge": "0",
         "packaging_incremental": false,
         "delivery_charges": "100",
-        "do_not_apply_tax_to_delivery_charges": true,
+        "do_not_apply_tax_to_delivery_charges": false,
         "delivery_time": "30-45 mins",
         "message_for_delivery": "Delivered fresh and fast",
         "dinein_time": "15 mins",
@@ -895,7 +897,7 @@
                         "updated_by": 4,
                         "updated_by_username": "admin",
                         "date_added": "2026-08-21T11:31:07.379205Z",
-                        "date_updated": "2026-09-14T10:30:06.867245Z"
+                        "date_updated": "2026-09-18T15:33:10.117786Z"
                     },
                     "quantity": 1,
                     "extra_cost": "20.00",
@@ -1026,7 +1028,7 @@
                     "item_detail": {
                         "id": 9,
                         "restaurant": 1,
-                        "item_sku": "Beed Bihari",
+                        "item_sku": "Beef Bihari",
                         "name": "Beed Bihari",
                         "description": "Tender beef marinated in aromatic spices and yogurt,",
                         "time_duration": "",
@@ -1287,7 +1289,7 @@
                         "updated_by": 4,
                         "updated_by_username": "admin",
                         "date_added": "2026-08-21T11:38:27.950460Z",
-                        "date_updated": "2026-09-17T15:44:20.154659Z"
+                        "date_updated": "2026-09-18T15:33:04.265436Z"
                     },
                     "quantity": 1,
                     "extra_cost": "0.00",
@@ -1652,7 +1654,7 @@
                                 "updated_by": 4,
                                 "updated_by_username": "admin",
                                 "date_added": "2026-08-21T11:31:07.379205Z",
-                                "date_updated": "2026-09-14T10:30:06.867245Z"
+                                "date_updated": "2026-09-18T15:33:10.117786Z"
                             },
                             "quantity": 1,
                             "max_quantity": null,
@@ -2163,7 +2165,7 @@
         {
             "id": 9,
             "restaurant": 1,
-            "item_sku": "Beed Bihari",
+            "item_sku": "Beef Bihari",
             "name": "Beed Bihari",
             "description": "Tender beef marinated in aromatic spices and yogurt,",
             "time_duration": "",
@@ -2424,7 +2426,7 @@
             "updated_by": 4,
             "updated_by_username": "admin",
             "date_added": "2026-08-21T11:38:27.950460Z",
-            "date_updated": "2026-09-17T15:44:20.154659Z",
+            "date_updated": "2026-09-18T15:33:04.265436Z",
             "is_available_now": false,
             "price_at_branch": "10.00"
         },
@@ -2547,21 +2549,21 @@
             "updated_by": 4,
             "updated_by_username": "admin",
             "date_added": "2026-08-21T11:31:07.379205Z",
-            "date_updated": "2026-09-14T10:30:06.867245Z",
+            "date_updated": "2026-09-18T15:33:10.117786Z",
             "is_available_now": true,
             "price_at_branch": "600.00"
         },
         {
-            "id": 14,
+            "id": 12,
             "restaurant": 1,
-            "item_sku": "Tikka-001",
-            "name": "Chicken Tikka",
-            "description": "1 Roti , 1 Chest Piece with raita",
+            "item_sku": "Chicken Beef Handi",
+            "name": "Chicken Beef Handi",
+            "description": "Tender beef marinated in aromatic spices and yogurt,",
             "time_duration": "",
             "start_time": null,
             "end_time": null,
             "status": 1,
-            "feature_image": "/media/items/feature_images/1786142219-tIKKAPARATHADEAL.webp",
+            "feature_image": "/media/items/feature_images/1786629768-BeefKababHandi.webp",
             "is_popular": true,
             "product_background_color": "#ffffff",
             "product_title_color": "#22c55e",
@@ -2569,18 +2571,18 @@
             "text_button_color": "",
             "cart_style": "",
             "food_category": [
-                9
+                8
             ],
             "food_category_detail": [
                 {
-                    "id": 9,
+                    "id": 8,
                     "restaurant": 1,
-                    "name": "Wow Deals",
+                    "name": "Traditional",
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
-                    "description": "Wow Deals",
-                    "banner": "/media/food_categories/banners/1787061667-10.webp",
-                    "icon": "/media/food_categories/icons/1787034029-WhatsApp-Image-2026-08-18-at-11-17-18-AM--1-.jpeg",
+                    "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
+                    "banner": "/media/food_categories/banners/1787061801-09.webp",
+                    "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                     "dish": [],
                     "dish_detail": [],
                     "status": true,
@@ -2594,7 +2596,7 @@
                         "mon": {
                             "is_open": true,
                             "open_time": "09:00",
-                            "close_time": "12:22"
+                            "close_time": "22:00"
                         },
                         "sat": {
                             "is_open": false,
@@ -2607,7 +2609,7 @@
                             "close_time": "22:00"
                         },
                         "thu": {
-                            "is_open": false,
+                            "is_open": true,
                             "open_time": "09:00",
                             "close_time": "22:00"
                         },
@@ -2638,36 +2640,36 @@
                     "created_by_username": "admin",
                     "updated_by": 4,
                     "updated_by_username": "admin",
-                    "date_added": "2026-08-21T19:51:03.674291Z",
-                    "date_updated": "2026-08-21T19:51:03.674310Z"
+                    "date_added": "2026-08-18T18:37:54.257232Z",
+                    "date_updated": "2026-08-21T09:35:32.223915Z"
                 }
             ],
-            "item_discount": "5.00",
+            "item_discount": "2.00",
             "item_discount_type": "percentage",
-            "show_discount_tag": false,
-            "front_price": "200.00",
+            "show_discount_tag": true,
+            "front_price": "700.00",
             "branch_prices": [],
             "size_prices": [],
             "created_by": 4,
             "created_by_username": "admin",
             "updated_by": 4,
             "updated_by_username": "admin",
-            "date_added": "2026-08-21T19:53:03.743937Z",
-            "date_updated": "2026-09-14T10:30:33.722089Z",
+            "date_added": "2026-08-21T11:42:16.971295Z",
+            "date_updated": "2026-09-18T15:33:16.140636Z",
             "is_available_now": true,
-            "price_at_branch": "200.00"
+            "price_at_branch": "700.00"
         },
         {
-            "id": 5,
+            "id": 3,
             "restaurant": 1,
-            "item_sku": "Mix Kabab Rice",
-            "name": "Mix Kabab Rice",
+            "item_sku": "Chicken Bihari",
+            "name": "Chicken Bihari",
             "description": "Tender beef marinated in aromatic spices and yogurt.",
             "time_duration": "",
             "start_time": null,
             "end_time": null,
             "status": 1,
-            "feature_image": "/media/items/feature_images/1786626606-MixKababRice.webp",
+            "feature_image": "/media/items/feature_images/1786622329-ChickenBihari.webp",
             "is_popular": true,
             "product_background_color": "#ffffff",
             "product_title_color": "#22c55e",
@@ -2675,25 +2677,25 @@
             "text_button_color": "",
             "cart_style": "",
             "food_category": [
-                4
+                5
             ],
             "food_category_detail": [
                 {
-                    "id": 4,
+                    "id": 5,
                     "restaurant": 1,
-                    "name": "BarBque",
+                    "name": "CHEF'S SPECIAL",
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
-                    "description": "Smoked to Perfection, Served with Passion.",
-                    "banner": "/media/food_categories/banners/1787061829-02.webp",
-                    "icon": "/media/food_categories/icons/bb1.jpeg",
+                    "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
+                    "banner": "/media/food_categories/banners/1787061815-04.webp",
+                    "icon": "/media/food_categories/icons/b3.jpeg",
                     "dish": [],
                     "dish_detail": [],
                     "status": true,
                     "schedule": false,
                     "schedule_days_times": {
                         "fri": {
-                            "is_open": false,
+                            "is_open": true,
                             "open_time": "09:00",
                             "close_time": "22:00"
                         },
@@ -2703,17 +2705,17 @@
                             "close_time": "22:00"
                         },
                         "sat": {
-                            "is_open": false,
+                            "is_open": true,
                             "open_time": "09:00",
                             "close_time": "22:00"
                         },
                         "sun": {
-                            "is_open": false,
+                            "is_open": true,
                             "open_time": "09:00",
                             "close_time": "22:00"
                         },
                         "thu": {
-                            "is_open": false,
+                            "is_open": true,
                             "open_time": "09:00",
                             "close_time": "22:00"
                         },
@@ -2737,31 +2739,31 @@
                     "discount_on_cards_online_payment": false,
                     "secret_key": "",
                     "after_schedule": "show_closed",
-                    "layout": "list-circle",
-                    "cart_style": "compact",
-                    "header_style": "minimal",
+                    "layout": "gallery",
+                    "cart_style": "",
+                    "header_style": "",
                     "created_by": 4,
                     "created_by_username": "admin",
                     "updated_by": 4,
                     "updated_by_username": "admin",
-                    "date_added": "2026-08-18T18:34:15.037873Z",
-                    "date_updated": "2026-09-17T15:54:15.779095Z"
+                    "date_added": "2026-08-18T18:35:06.257313Z",
+                    "date_updated": "2026-08-21T09:37:59.824949Z"
                 }
             ],
-            "item_discount": "5.00",
+            "item_discount": "100.00",
             "item_discount_type": "percentage",
             "show_discount_tag": true,
-            "front_price": "3999.00",
+            "front_price": "200.00",
             "branch_prices": [],
             "size_prices": [],
             "created_by": 4,
             "created_by_username": "admin",
             "updated_by": 4,
             "updated_by_username": "admin",
-            "date_added": "2026-08-21T11:25:40.011946Z",
-            "date_updated": "2026-09-14T10:30:27.250423Z",
+            "date_added": "2026-08-21T11:13:13.536909Z",
+            "date_updated": "2026-09-18T15:31:16.461350Z",
             "is_available_now": true,
-            "price_at_branch": "3999.00"
+            "price_at_branch": "200.00"
         }
     ],
     "menu": [
@@ -3145,7 +3147,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786622329-ChickenBihari.webp",
-                    "is_popular": false,
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3227,7 +3229,7 @@
                     ],
                     "item_discount": "100.00",
                     "item_discount_type": "percentage",
-                    "show_discount_tag": false,
+                    "show_discount_tag": true,
                     "front_price": "200.00",
                     "branch_prices": [],
                     "size_prices": [],
@@ -3236,7 +3238,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:13:13.536909Z",
-                    "date_updated": "2026-08-21T12:48:19.517990Z",
+                    "date_updated": "2026-09-18T15:31:16.461350Z",
                     "is_available_now": true,
                     "price_at_branch": "200.00"
                 },
@@ -3251,7 +3253,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786626590-ChickenBihariRice.webp",
-                    "is_popular": false,
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -3342,7 +3344,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:24:42.355413Z",
-                    "date_updated": "2026-08-21T12:48:25.371262Z",
+                    "date_updated": "2026-09-18T15:33:27.076373Z",
                     "is_available_now": true,
                     "price_at_branch": "2000.00"
                 },
@@ -3526,7 +3528,7 @@
                 {
                     "id": 9,
                     "restaurant": 1,
-                    "item_sku": "Beed Bihari",
+                    "item_sku": "Beef Bihari",
                     "name": "Beed Bihari",
                     "description": "Tender beef marinated in aromatic spices and yogurt,",
                     "time_duration": "",
@@ -3787,7 +3789,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-17T15:44:20.154659Z",
+                    "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -3910,7 +3912,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:31:07.379205Z",
-                    "date_updated": "2026-09-14T10:30:06.867245Z",
+                    "date_updated": "2026-09-18T15:33:10.117786Z",
                     "is_available_now": true,
                     "price_at_branch": "600.00"
                 },
@@ -4094,7 +4096,7 @@
                 {
                     "id": 9,
                     "restaurant": 1,
-                    "item_sku": "Beed Bihari",
+                    "item_sku": "Beef Bihari",
                     "name": "Beed Bihari",
                     "description": "Tender beef marinated in aromatic spices and yogurt,",
                     "time_duration": "",
@@ -4355,7 +4357,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-17T15:44:20.154659Z",
+                    "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -4370,7 +4372,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629812-PaneerReshmiHandi.webp",
-                    "is_popular": false,
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -4461,7 +4463,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:42:58.226559Z",
-                    "date_updated": "2026-08-21T12:49:10.706412Z",
+                    "date_updated": "2026-09-18T10:01:18.422822Z",
                     "is_available_now": true,
                     "price_at_branch": "800.00"
                 }
@@ -4539,7 +4541,7 @@
                 {
                     "id": 9,
                     "restaurant": 1,
-                    "item_sku": "Beed Bihari",
+                    "item_sku": "Beef Bihari",
                     "name": "Beed Bihari",
                     "description": "Tender beef marinated in aromatic spices and yogurt,",
                     "time_duration": "",
@@ -4800,7 +4802,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:38:27.950460Z",
-                    "date_updated": "2026-09-17T15:44:20.154659Z",
+                    "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
                     "price_at_branch": "10.00"
                 },
@@ -4815,7 +4817,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629768-BeefKababHandi.webp",
-                    "is_popular": false,
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -4897,7 +4899,7 @@
                     ],
                     "item_discount": "2.00",
                     "item_discount_type": "percentage",
-                    "show_discount_tag": false,
+                    "show_discount_tag": true,
                     "front_price": "700.00",
                     "branch_prices": [],
                     "size_prices": [],
@@ -4906,7 +4908,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:42:16.971295Z",
-                    "date_updated": "2026-08-21T12:48:12.468609Z",
+                    "date_updated": "2026-09-18T15:33:16.140636Z",
                     "is_available_now": true,
                     "price_at_branch": "700.00"
                 },
@@ -4921,7 +4923,7 @@
                     "end_time": null,
                     "status": 1,
                     "feature_image": "/media/items/feature_images/1786629749-ChickenKababHandi.webp",
-                    "is_popular": false,
+                    "is_popular": true,
                     "product_background_color": "#ffffff",
                     "product_title_color": "#22c55e",
                     "product_description_color": "#6b7280",
@@ -5012,7 +5014,7 @@
                     "updated_by": 4,
                     "updated_by_username": "admin",
                     "date_added": "2026-08-21T11:41:48.165851Z",
-                    "date_updated": "2026-08-21T12:48:33.083900Z",
+                    "date_updated": "2026-09-18T15:33:36.832286Z",
                     "is_available_now": true,
                     "price_at_branch": "600.00"
                 }

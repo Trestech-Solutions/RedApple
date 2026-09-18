@@ -295,6 +295,10 @@ export interface StoreSettingsDerived extends StoreSettings {
   /** Tax PERCENTAGE rate parsed from `tax_number` field (e.g. "18" → 0.18).
    *  Falls back to DEFAULT_TAX_RATE when field is empty/invalid. */
   taxPercentageRate: number
+  /** Tax rate for cash/COD orders as a multiplier (e.g. 0.18 for 18%). 0 = no cash tax. */
+  cashTaxRate: number
+  /** Tax rate for card/online orders as a multiplier (e.g. 0.18 for 18%). 0 = no card tax. */
+  cardTaxRate: number
   /** delivery_time parsed as number (minutes) — global/legacy */
   deliveryTimeMinutes: number | null
   /** pickup_time parsed as number (minutes) — global/legacy */
@@ -369,6 +373,14 @@ function deriveSettings(raw: StoreSettings | undefined): StoreSettingsDerived {
       return Number.isFinite(n) && n > 0 ? n : Infinity
     })(),
     taxPercentageRate,
+    cashTaxRate: (() => {
+      const n = toNumber(r.cash_tax, NaN)
+      return Number.isFinite(n) && n > 0 ? n / 100 : 0
+    })(),
+    cardTaxRate: (() => {
+      const n = toNumber(r.card_tax, NaN)
+      return Number.isFinite(n) && n > 0 ? n / 100 : 0
+    })(),
     deliveryTimeMinutes: toPositiveNumberOrNull(r.delivery_time),
     pickupTimeMinutes:   toPositiveNumberOrNull(r.pickup_time),
     dineinTimeMinutes:   toPositiveNumberOrNull(r.dinein_time),

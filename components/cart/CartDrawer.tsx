@@ -49,7 +49,11 @@ export function CartDrawer() {
     .slice(0, 8)
 
   const scrollRef   = useRef<HTMLDivElement>(null)
+
+  // Tax = subtotal × (tax_number / 100). Delivery fee tax mein include nahi hoti.
+  // taxPercent sirf display ke liye (0.15 * 100 = 15.000000000000002 se bachne ke liye toFixed(2)).
   const tax         = Math.round(subtotal * settings.taxPercentageRate)
+  const taxPercent  = parseFloat((settings.taxPercentageRate * 100).toFixed(2))
 
   // Delivery fee from settings, fallback to DEFAULT_DELIVERY_FEE
   const deliveryFeeRaw = orderType === 'delivery'
@@ -198,7 +202,7 @@ export function CartDrawer() {
                 })()}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-600">Tax</span>
+                  <span className="text-neutral-600">Tax ({taxPercent}%)</span>
                   <span className="text-neutral-600">Rs. {tax.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">

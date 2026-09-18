@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { CheckCircle, Circle, Plus, Bike, ArrowLeft, Navigation, Loader2 } from 'lucide-react'
+import { CheckCircle, Circle, Plus, Bike, ArrowLeft, Navigation, Loader2, Gift } from 'lucide-react'
 import {
   useCart, useStoreSettings,
   DEFAULT_DELIVERY_FEE,
@@ -63,6 +63,9 @@ export default function CheckoutPage() {
         selectedAddressId: '',
         newAddrLine: '',
         newAddrCity: 'Karachi',
+        giftReceiptName: '',
+        giftMessage: '',
+        giftReceiptNumber: '',
       },
     })
   const formValues = watch()
@@ -109,14 +112,25 @@ export default function CheckoutPage() {
 
   // ─── derived ──────────────────────────────────────────────────────────────
   // Tax logic:
-  //   — If do_not_apply_tax_to_delivery_charges === TRUE (default behavior):
-  //     tax is calculated on subtotal only.
+  //   — cash_tax (DecimalField, e.g. 18.00): the tax % for COD orders.
+  //   — card_tax (DecimalField, e.g. 18.00): the tax % for card/online orders.
+  //   — If both are 0, fall back to the global taxPercentageRate (legacy).
+  //   — If do_not_apply_tax_to_delivery_charges === TRUE (default): tax base = subtotal only.
   //   — If FALSE: delivery charges are included in the taxable base.
+  const isCash    = formValues.payment === 'cod'
+  const taxRate   = (() => {
+    if (isCash  && settings.cashTaxRate > 0) return settings.cashTaxRate
+    if (!isCash && settings.cardTaxRate > 0) return settings.cardTaxRate
+    // neither specific rate configured — use global rate
+    return settings.taxPercentageRate
+  })()
+
   const taxableBase =
     settings.do_not_apply_tax_to_delivery_charges === false
       ? subtotal + effectiveDeliveryFee
       : subtotal
-  const tax        = Math.round(taxableBase * settings.taxPercentageRate)
+  const tax      = Math.round(taxableBase * taxRate)
+  const taxLabel = `Tax${taxRate > 0 ? ` ${Math.round(taxRate * 100)}%` : ''}`
   const grandTotal = subtotal + tax + effectiveDeliveryFee + packagingFee + convenience
   const checkoutNote = settings.checkout_note
   const orderTypeStr = orderType as string
@@ -249,6 +263,14 @@ export default function CheckoutPage() {
       customer_landmark:      (user ? undefined : values.guestLandmark) || undefined,
       customer_instructions:  values.instructions || undefined,
       cartItems:              items,
+      ...(values.isGift ? {
+        is_gift: true,
+        send_gift: {
+          receipt_name:   values.giftReceiptName.trim(),
+          gift_message:   values.giftMessage.trim(),
+          receipt_number: values.giftReceiptNumber.trim(),
+        },
+      } : {}),
     })
 
     checkoutMutation.checkout(payload)
@@ -307,15 +329,69 @@ export default function CheckoutPage() {
                 </div>
               </div>
             ) : (
-              <div>
-                <h1 className="text-2xl font-bold text-neutral-900">Checkout</h1>
-                <p className="mt-1 text-sm text-neutral-500 flex items-center gap-1">
-                  <Bike size={13} /> Delivery Order 🛵
-                </p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h1 className="text-2xl font-bold text-neutral-900">Checkout</h1>
+                  <p className="mt-1 text-sm text-neutral-500 flex items-center gap-1">
+                    <Bike size={13} /> Delivery Order 🛵
+                  </p>
+                </div>
+
+                {/* Gift toggle button */}
+                <button
+                  type="button"
+                  onClick={() => setValue('isGift', !formValues.isGift)}
+                  className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all ${
+                    formValues.isGift
+                      ? 'border-pink-300 bg-pink-50 text-pink-700'
+                      : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
+                  }`}
+                >
+                  <Gift size={15} />
+                  Send a Gift
+                </button>
               </div>
             )}
 
             <hr className="border-neutral-100" />
+
+            {/* ── Gift recipient details ── */}
+            {formValues.isGift && (
+              <div className="rounded-xl border border-pink-200 bg-pink-50/60 p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Gift size={16} className="text-pink-500 shrink-0" />
+                  <p className="text-sm font-bold text-pink-700">Gift Recipient Details</p>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Recipient Name <span className="text-pink-500">*</span></label>
+                  <input
+                    {...register('giftReceiptName')}
+                    placeholder="e.g. Mohid"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Recipient Mobile <span className="text-pink-500">*</span></label>
+                  <input
+                    {...register('giftReceiptNumber')}
+                    placeholder="03xx-xxxxxxx"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Gift Message</label>
+                  <textarea
+                    {...register('giftMessage')}
+                    placeholder="e.g. Happy Birthday! 🎂"
+                    rows={3}
+                    className={`${inputClass} resize-none`}
+                  />
+                </div>
+              </div>
+            )}
 
             {settings.close_store && (
               <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -633,7 +709,7 @@ export default function CheckoutPage() {
                 )
               })()}
 
-              <PriceRow label="Tax 18%"   value={`Rs. ${tax.toLocaleString()}`} />
+              <PriceRow label={taxLabel} value={tax > 0 ? `Rs. ${tax.toLocaleString()}` : '—'} />
               {orderType === 'delivery' && (
                 <PriceRow
                   label="Delivery Fee"
