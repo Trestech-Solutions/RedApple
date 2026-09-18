@@ -19,7 +19,7 @@ import { useGetMenu } from '@/api/client/browse'
 import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
 import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
-import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner } from '@/api/types'
+import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
 
 const DEFAULT_ICON = 'solar:cup-hot-bold-duotone'
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop'
@@ -251,7 +251,14 @@ function transformMenu(menu: MenuResponse | undefined): {
       const itemRecords = cat.items ?? []
       if (itemRecords.length > 0) {
         itemRecords
-          .filter((it) => it.status !== false && (it.status as unknown) !== 0)
+          .filter((it) => {
+            if (it.status === false || (it.status as unknown) === 0) return false
+            // Hide item if current PKT time is outside its availability window
+            if (it.start_time && it.end_time) {
+              return isDealActiveNowPKT(it.start_time, it.end_time)
+            }
+            return true
+          })
           .forEach((it) => {
             itemToProduct(it, catId, idPairs, products)
             if (it.is_popular) popularRawItems.push(it)
@@ -1052,6 +1059,83 @@ export default function HomePage() {
         onSelect={handleCategoryChange}
       />
 
+      {/* ── Offers strip — scrollable pill row below CategoryNav ── */}
+  {/* ── Offers strip — full-width sleek banner cards, centered ── */}
+{(() => {
+  const activeOffers: MenuOffer[] = (menu?.offers ?? []).filter(
+    (o) => o.status && o.is_available_now,
+  )
+  if (activeOffers.length === 0) return null
+
+  return (
+    <section className="mx-auto max-w-[1400px] px-4 py-4 md:px-8">
+      <div className="flex justify-center">
+        <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-hide md:justify-center">
+          {activeOffers.map((offer) => {
+            const amt        = parseFloat(offer.amount || '0')
+            const isPercent  = offer.discount_type === 'percentage'
+            // Only show a value badge when explicitly enabled AND there's a real number
+            const showValue  = offer.show_percentage_text === true && amt > 0
+            const valueStr   = showValue ? (isPercent ? `${Math.round(amt)}%` : `Rs.${Math.round(amt)}`) : ''
+            const bannerUrl  = resolveMediaUrl(offer.banner_image)
+
+            return (
+              <div
+                key={offer.id}
+                className="relative flex h-24 w-[92vw] max-w-3xl shrink-0 snap-center items-center overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 transition-transform duration-300 hover:scale-[1.01] sm:h-28 md:h-32 md:w-full"
+                style={{ backgroundColor: 'var(--color-primary,#171717)' }}
+              >
+                {/* Banner image fills the whole strip */}
+                {bannerUrl && (
+                  <Image
+                    src={bannerUrl}
+                    alt={offer.discount_text || 'Offer'}
+                    fill
+                    priority={false}
+                    sizes="(max-width: 768px) 92vw, 900px"
+                    className="object-cover"
+                  />
+                )}
+
+                {/* Gradient so text stays legible over any image */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
+
+                <div className="relative z-10 flex w-full items-center justify-between gap-4 px-5 sm:px-8">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm sm:h-11 sm:w-11">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-white sm:text-base md:text-lg">
+                        {offer.discount_text || 'Flat'}{valueStr ? ` ${valueStr}` : ''} Off
+                      </p>
+                      {offer.discount_message && (
+                        <p className="mt-0.5 truncate text-xs text-white/80 sm:text-sm">
+                          {offer.discount_message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {valueStr && (
+                    <span
+                      className="hidden shrink-0 items-center justify-center rounded-full px-4 py-1.5 text-sm font-extrabold text-white shadow-md sm:flex sm:text-base"
+                      style={{ backgroundColor: 'var(--color-secondary,#e11d48)' }}
+                    >
+                      {valueStr}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+})()}
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}

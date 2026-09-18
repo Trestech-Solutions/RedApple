@@ -158,9 +158,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const requestedQty = item.quantity ?? 1
 
       // Deals use string ids like "fixed_deal_1" / "on_spot_deal_1"
+      // Addons use "addon_<id>" — allowed through without numeric productId check.
       const isDeal =
         typeof item.id === 'string' &&
-        (item.id.startsWith('fixed_deal_') || item.id.startsWith('on_spot_deal_'))
+        (item.id.startsWith('fixed_deal_') || item.id.startsWith('on_spot_deal_') || item.id.startsWith('addon_'))
 
       const coercedId        = Number(item.id)
       const numericProductId = Number.isFinite(coercedId) && coercedId > 0 ? coercedId : null

@@ -481,6 +481,10 @@ export type MenuItem = {
   text_button_color?: string | null;
   /** Cart-row style identifier for this item (e.g. 'highlight', 'compact'). */
   cart_style?: string | null;
+  /** Daily availability window start — "HH:MM:SS" (PKT). If set with end_time, item only shows during this window. */
+  start_time?: string | null;
+  /** Daily availability window end — "HH:MM:SS" (PKT). */
+  end_time?: string | null;
   branch_prices?: unknown[];
   size_prices?: SizePrice[];
   date_added?: string;
@@ -595,7 +599,30 @@ export type MenuAddonCategory = {
   name: string;
   description?: string | null;
   status?: boolean;
-  addons?: unknown[];
+  addons?: MenuAddonDetail[];
+};
+
+/** Promotional offer as returned inside the menu endpoint response. */
+export type MenuOffer = {
+  id: number;
+  restaurant: number;
+  branch: number;
+  branch_name?: string;
+  banner_image: string | null;
+  show_percentage_text: boolean;
+  amount: string;
+  discount_type: 'percentage' | 'fixed' | string;
+  included_categories: number[];
+  orders_over: string;
+  discount_text: string;
+  discount_message: string;
+  valid_from_date: string | null;
+  valid_to_date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  days: string[];
+  status: boolean;
+  is_available_now: boolean;
 };
 
 export type MenuResponse = {
@@ -615,6 +642,8 @@ export type MenuResponse = {
   popular_items?:  MenuItem[];
   // Branch-wise promotional banners (shown in hero carousel)
   banners?:        MenuBanner[];
+  // Storefront promotional offers (discount strips)
+  offers?:         MenuOffer[];
   // Social media links
   social_media_links?: {
     facebook_link:  string;

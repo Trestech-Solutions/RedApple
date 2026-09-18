@@ -46,7 +46,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-white hover:bg-white/20 transition-colors sm:h-8 sm:w-8"
+            className="flex h-7 w-7 items-center justify-center bg-[var(--color-secondary)] rounded-full text-white hover:bg-white/20 transition-colors sm:h-8 sm:w-8"
           >
             <X size={16} className="sm:hidden" />
             <X size={18} className="hidden sm:block" />
@@ -54,13 +54,13 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
         </div>
 
         {/* Nav links */}
-        <nav className="flex flex-col gap-2.5 px-4 sm:gap-3 sm:px-5">
+        <nav className="flex flex-col  gap-2.5 px-4 sm:gap-3 sm:px-5">
           {MENU_ITEMS.map((item) => (
             <a
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="rounded-lg [background-color:color-mix(in_srgb,var(--color-primary),white_12%)] px-4 py-3 text-sm font-bold text-white hover:[background-color:color-mix(in_srgb,var(--color-primary),white_25%)] transition-colors sm:px-5 sm:py-3.5"
+              className="rounded-lg bg-[var(--color-secondary)]  [background-color:color-mix(in_srgb,var(--color-primary),white_12%)] px-4 py-3 text-sm font-bold text-white hover:[background-color:color-mix(in_srgb,var(--color-primary),white_25%)] transition-colors sm:px-5 sm:py-3.5"
             >
               {item.label}
             </a>

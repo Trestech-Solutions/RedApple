@@ -241,7 +241,8 @@ function Modal1({ onClose }: { onClose: () => void }) {
 
         {/* Logo */}
         <div className="flex flex-col items-center pt-6 pb-1 sm:pt-8">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-neutral-900 bg-white shadow-md overflow-hidden sm:h-20 sm:w-20">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 bg-white shadow-md overflow-hidden sm:h-20 sm:w-20"
+            style={{ borderColor: 'var(--color-primary)' }}>
             <Image src="/web/logo.webp" alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
           </div>
         </div>
@@ -254,7 +255,10 @@ function Modal1({ onClose }: { onClose: () => void }) {
             <div className="flex rounded-full border border-neutral-300 bg-neutral-100 p-1 gap-1">
               {(['delivery', 'pickup'] as OrderType[]).map((type) => (
                 <button key={type} onClick={() => { setOrderType(type); setGeoError('') }}
-                  className={`rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all sm:px-6 sm:py-2 sm:text-xs ${orderType === type ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-500 hover:text-neutral-800'}`}>
+                  className={`rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all sm:px-6 sm:py-2 sm:text-xs`}
+                  style={orderType === type
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }
+                    : {}}>
                   {type === 'pickup' ? 'Pick-Up' : 'Delivery'}
                 </button>
               ))}
@@ -269,7 +273,8 @@ function Modal1({ onClose }: { onClose: () => void }) {
 
           <div className="mb-3.5 flex justify-center sm:mb-4">
             <button onClick={handleUseCurrentLocation} disabled={geoLoading}
-              className="flex items-center gap-1.5 rounded-full bg-neutral-900 px-4 py-1.5 text-[11px] font-semibold text-white hover:bg-neutral-700 disabled:opacity-60 transition-colors sm:px-5 sm:py-2 sm:text-xs">
+              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-semibold disabled:opacity-60 transition-colors sm:px-5 sm:py-2 sm:text-xs hover:opacity-90"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
               {geoLoading ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
               {geoLoading ? 'Detecting...' : 'Use Current Location'}
             </button>
@@ -278,9 +283,12 @@ function Modal1({ onClose }: { onClose: () => void }) {
           {/* City dropdown — shared for both modes */}
           <div className="relative mb-2.5 sm:mb-3">
             {loadingCities
-              ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
+              ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
               : <select value={selectedCityId} onChange={(e) => { setSelectedCityId(e.target.value) }}
-                  className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none sm:px-4 sm:py-3 sm:text-sm">
+                  className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:outline-none sm:px-4 sm:py-3 sm:text-sm"
+                  style={{ '--tw-ring-color': 'var(--color-primary)' } as React.CSSProperties}
+                  onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
+                  onBlur={(e) => { e.target.style.borderColor = '' }}>
                   <option value="">Select City</option>
                   {sortedCities.map((c) => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
                 </select>
@@ -294,10 +302,12 @@ function Modal1({ onClose }: { onClose: () => void }) {
               {!selectedCityId
                 ? <div className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">Select a city first</div>
                 : loadingCityBranches
-                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
+                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                 : <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)}
                     disabled={!selectedCityId || branchList.length === 0}
-                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">
+                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
+                    onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
+                    onBlur={(e) => { e.target.style.borderColor = '' }}>
                     <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
                     {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
                   </select>
@@ -312,10 +322,12 @@ function Modal1({ onClose }: { onClose: () => void }) {
               {!selectedCityId
                 ? <div className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">Select a city first</div>
                 : loadingCityAreas
-                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-neutral-900" /></div>
+                ? <div className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 flex items-center justify-center"><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                 : <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
                     disabled={!selectedCityId || areaList.length === 0}
-                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm">
+                    className="w-full appearance-none rounded-lg border border-neutral-300 bg-white px-3 py-2.5 pr-10 text-xs text-neutral-700 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
+                    onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
+                    onBlur={(e) => { e.target.style.borderColor = '' }}>
                     <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
                     {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
                   </select>
@@ -346,7 +358,8 @@ function Modal1({ onClose }: { onClose: () => void }) {
           )}
 
           <button onClick={handleConfirm} disabled={!canConfirm}
-            className="w-full rounded-xl bg-neutral-900 py-2.5 text-xs font-bold text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all sm:py-3 sm:text-sm flex items-center justify-center gap-2">
+            className="w-full rounded-xl py-2.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all sm:py-3 sm:text-sm flex items-center justify-center gap-2 hover:opacity-90"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
             {confirming ? <><Loader2 size={14} className="animate-spin" /><span>Confirming…</span></> : 'Confirm Location'}
           </button>
         </div>
@@ -375,12 +388,15 @@ function Modal2({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
       <div className="relative w-full max-w-lg rounded-3xl bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
 
-        {/* Yellow header with logo */}
-        <div className="relative rounded-t-3xl bg-black pb-10 pt-6 flex flex-col items-center">
-          <button onClick={onClose} className="absolute right-4 top-4 rounded-full p-1.5 text-neutral-700 hover:bg-black/10 transition-colors" aria-label="Close">
+        {/* Header with logo using primary color */}
+        <div className="relative rounded-t-3xl pb-10 pt-6 flex flex-col items-center"
+          style={{ backgroundColor: 'var(--color-primary)' }}>
+          <button onClick={onClose} className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-black/10 transition-colors" aria-label="Close"
+            style={{ color: 'var(--color-secondary)' }}>
             <X size={18} />
           </button>
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-neutral-900 shadow-lg overflow-hidden">
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl shadow-lg overflow-hidden"
+            style={{ backgroundColor: 'var(--color-primary)' }}>
             <Image src="/web/logo.webp" alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
           </div>
         </div>
@@ -396,7 +412,10 @@ function Modal2({ onClose }: { onClose: () => void }) {
             <div className="flex rounded-full border border-neutral-200 bg-neutral-100 p-1 gap-1 w-full max-w-[240px]">
               {(['delivery', 'pickup'] as OrderType[]).map((type) => (
                 <button key={type} onClick={() => { setOrderType(type); setGeoError('') }}
-                  className={`flex-1 rounded-full py-2 text-xs font-bold transition-all ${orderType === type ? 'bg-[#f5c518] text-neutral-900 shadow-sm' : 'text-neutral-500 hover:text-neutral-800'}`}>
+                  className={`flex-1 rounded-full py-2 text-xs font-bold transition-all ${orderType === type ? 'shadow-sm' : 'text-neutral-500 hover:text-neutral-800'}`}
+                  style={orderType === type
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }
+                    : {}}>
                   {type === 'pickup' ? 'Pick-Up' : 'Delivery'}
                 </button>
               ))}
@@ -410,7 +429,8 @@ function Modal2({ onClose }: { onClose: () => void }) {
           {/* Use current location — outlined yellow button */}
           <div className="mb-5 flex justify-center">
             <button onClick={handleUseCurrentLocation} disabled={geoLoading}
-              className="flex items-center gap-2 rounded-full border-2 border-[#f5c518] px-5 py-2 text-xs font-semibold text-[#d4a017] hover:bg-[#f5c518]/10 disabled:opacity-60 transition-colors">
+              className="flex items-center gap-2 rounded-full border-2 px-5 py-2 text-xs font-semibold disabled:opacity-60 transition-colors hover:opacity-80"
+              style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>
               {geoLoading ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
               {geoLoading ? 'Detecting...' : 'Use Current Location'}
             </button>
@@ -419,7 +439,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
           {/* City cards with images */}
           <p className="mb-3 text-center text-sm font-bold text-neutral-800">Please Select City</p>
           {loadingCities ? (
-            <div className="flex justify-center py-4"><Loader2 size={20} className="animate-spin text-[#f5c518]" /></div>
+            <div className="flex justify-center py-4"><Loader2 size={20} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
           ) : (
             <div className="mb-5 flex flex-wrap justify-center gap-3">
               {sortedCities.map((city) => {
@@ -431,9 +451,10 @@ function Modal2({ onClose }: { onClose: () => void }) {
                     onClick={() => { setSelectedCityId(String(city.id)); setSelectedAreaId('') }}
                     className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all w-[100px] ${
                       isSelected
-                        ? 'border-[#cc1111] bg-white shadow-md'
+                        ? 'bg-white shadow-md'
                         : 'border-dashed border-neutral-300 bg-white hover:border-neutral-400'
                     }`}
+                    style={isSelected ? { borderColor: 'var(--color-primary)' } : {}}
                   >
                     {/* City image or placeholder */}
                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
@@ -454,7 +475,8 @@ function Modal2({ onClose }: { onClose: () => void }) {
     />
   )}
 </div>
-                    <span className={`text-xs font-semibold ${isSelected ? 'text-[#cc1111]' : 'text-neutral-700'}`}>
+                    <span className={`text-xs font-semibold ${isSelected ? '' : 'text-neutral-700'}`}
+                      style={isSelected ? { color: 'var(--color-primary)' } : {}}>
                       {city.name}
                     </span>
                   </button>
@@ -472,22 +494,26 @@ function Modal2({ onClose }: { onClose: () => void }) {
               <div className="relative">
                 {orderType === 'pickup' ? (
                   loadingCityBranches
-                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-[#f5c518]" /></div>
+                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                     : (
                       <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)}
                         disabled={branchList.length === 0}
-                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:border-[#f5c518] focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400">
+                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400"
+                        onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
+                        onBlur={(e) => { e.target.style.borderColor = '' }}>
                         <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
                         {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
                       </select>
                     )
                 ) : (
                   loadingCityAreas
-                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin text-[#f5c518]" /></div>
+                    ? <div className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 flex items-center justify-center"><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                     : (
                       <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
                         disabled={areaList.length === 0}
-                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:border-[#f5c518] focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400">
+                        className="w-full appearance-none rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-10 text-sm text-neutral-700 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400"
+                        onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
+                        onBlur={(e) => { e.target.style.borderColor = '' }}>
                         <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
                         {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
                       </select>

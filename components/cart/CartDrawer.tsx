@@ -8,6 +8,9 @@ import Link from 'next/link'
 import { useCart, DEFAULT_DELIVERY_FEE, useStoreSettings } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useGetMenu } from '@/api/client/browse'
+import { ProductDetailModal } from '@/components/product/ProductDetailModal'
+import type { ProductData } from '@/components/product/ProductCard'
+import type { MenuAddonDetail } from '@/api/types'
 
 const PLACEHOLDER  = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=400&auto=format&fit=crop'
 
@@ -43,10 +46,38 @@ export function CartDrawer() {
 
   const { data: menuData } = useGetMenu({ branchId, areaId })
 
-  const popularItems = (menuData?.menu ?? [])
-    .flatMap((cat) => cat.items ?? [])
-    .filter((it) => it.status !== false && it.status !== 0)
-    .slice(0, 8)
+  // ── Frequently Bought Together: prefer addon_categories, fall back to menu items ──
+  const addonFlatList: MenuAddonDetail[] = (menuData?.addon_categories ?? [])
+    .filter((cat) => cat.status !== false)
+    .flatMap((cat) => (cat.addons ?? []).filter((a) => a.status !== false))
+    .slice(0, 10)
+
+  const menuFallbackItems = addonFlatList.length === 0
+    ? (menuData?.menu ?? [])
+        .flatMap((cat) => cat.items ?? [])
+        .filter((it) => it.status !== false && it.status !== 0)
+        .slice(0, 8)
+    : []
+
+  const hasFbtItems = addonFlatList.length > 0 || menuFallbackItems.length > 0
+
+  // ── Modal state for addon detail ──
+  const [addonModal, setAddonModal] = useState<ProductData | null>(null)
+
+  /** Convert a MenuAddonDetail into a minimal ProductData for the detail modal */
+  function addonToProductData(addon: MenuAddonDetail): ProductData {
+    const price = Math.round(parseFloat(addon.price || '0'))
+    const image = resolveMediaUrl(addon.photo)
+    return {
+      id:          `addon_${addon.id}`,
+      productId:   addon.id,          // use addon.id so addItem stores it
+      name:        addon.name,
+      description: addon.description || '',
+      price:       String(price),
+      options:     [],
+      image,
+    }
+  }
 
   const scrollRef   = useRef<HTMLDivElement>(null)
 
@@ -109,12 +140,12 @@ export function CartDrawer() {
             <EmptyCart />
           )}
 
-          {items.length > 0 && popularItems.length > 0 && (
+          {items.length > 0 && hasFbtItems && (
             <div className="px-5 pb-5">
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div>
                   <p className="text-sm font-bold text-neutral-800">Frequently Bought Together</p>
-                  <p className="text-xs text-neutral-500">Customers often buy these together</p>
+                  <p className="text-xs text-neutral-500">Tap any item to add to your order</p>
                 </div>
                 <div className="flex gap-1.5 pt-0.5">
                   <button onClick={() => scrollPopular('left')} aria-label="Scroll left"
@@ -129,18 +160,46 @@ export function CartDrawer() {
               </div>
 
               <div ref={scrollRef} className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2">
-                {popularItems.map((prod) => {
-                  const price = Math.round(parseFloat(prod.price_at_branch || prod.front_price || '0'))
+                {/* Addon items from addon_categories */}
+                {addonFlatList.map((addon) => {
+                  const price    = Math.round(parseFloat(addon.price || '0'))
+                  const imageUrl = resolveMediaUrl(addon.photo)
+                  return (
+                    <div
+                      key={`addon-${addon.id}`}
+                      className="shrink-0 w-[110px] cursor-pointer group"
+                      onClick={() => setAddonModal(addonToProductData(addon))}
+                    >
+                      <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden border border-neutral-100 bg-neutral-50">
+                        <Image src={imageUrl} alt={addon.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setAddonModal(addonToProductData(addon)) }}
+                          aria-label={`View ${addon.name}`}
+                          className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-md hover:bg-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors border border-neutral-200"
+                        >
+                          <PlusIcon size={14} strokeWidth={3} />
+                        </button>
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-sm font-semibold text-neutral-800">Rs. {price.toLocaleString()}</p>
+                        <p className="text-[11px] text-neutral-500 truncate">{addon.name}</p>
+                        {addon.description && (
+                          <p className="text-[10px] text-neutral-400 truncate">{addon.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Fallback: menu items if no addons configured */}
+                {menuFallbackItems.map((prod) => {
+                  const price    = Math.round(parseFloat(prod.price_at_branch || prod.front_price || '0'))
                   const imageUrl = resolveMediaUrl(prod.feature_image)
                   return (
                     <div key={prod.id} className="shrink-0 w-[110px]">
                       <div className="relative w-[110px] h-[110px] rounded-lg overflow-hidden border border-neutral-100 bg-neutral-50">
-                        <Image
-                          src={imageUrl}
-                          alt={prod.name}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={imageUrl} alt={prod.name} fill className="object-cover" />
                         <button
                           onClick={() => addItem({
                             id:        String(prod.id),
@@ -165,6 +224,8 @@ export function CartDrawer() {
               </div>
             </div>
           )}
+
+          {/* Addon detail modal — rendered OUTSIDE the aside to avoid stacking context issues */}
 
           {items.length > 0 && (
             <div className="px-5 pb-4">
@@ -267,6 +328,14 @@ export function CartDrawer() {
           </div>
         )}
       </aside>
+
+      {/* Addon detail modal — outside <aside> so it isn't clipped by the drawer's stacking context */}
+      {addonModal && (
+        <ProductDetailModal
+          product={addonModal}
+          onClose={() => setAddonModal(null)}
+        />
+      )}
     </>
   )
 }
