@@ -536,13 +536,21 @@ function transformMenu(menu: MenuResponse | undefined): {
 
   return { categories, products, idPairs, popularProducts }
 }
-const POPULAR_LIMIT = 4
+// const POPULAR_LIMIT = 4
 /** Wrapper for the popular grid that owns the modal state. */
+/** Arrow styling — primary = background, secondary = icon + border.
+ *  Replace the CSS var names below with your project's actual theme tokens. */
+const ARROW_CLASS =
+  'absolute top-1/2 z-20 -translate-y-1/2 hidden sm:flex h-10 w-10 items-center justify-center rounded-full ' +
+  'border-2 shadow-lg transition-all hover:scale-105 hover:brightness-110 active:scale-95 ' +
+  'bg-[var(--color-primary,#171717)] text-[var(--color-secondary,#ffffff)] border-[var(--color-secondary,#ffffff)]'
+
+/** Wrapper for the popular carousel — same carousel on mobile, tablet and laptop. */
 function PopularSection({ products }: { products: ProductData[] }) {
   const [selected, setSelected] = useState<ProductData | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const items = products.slice(0, POPULAR_LIMIT)
+  const items = products.slice(0, 50)
 
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return
@@ -553,40 +561,39 @@ function PopularSection({ products }: { products: ProductData[] }) {
 
   return (
     <>
-      <div className="relative group/carousel">
-        {/* Left arrow — carousel mode only (hidden on lg+) */}
+      <div className="relative">
+        {/* Left arrow — always visible on sm+ */}
         <button
           type="button"
           onClick={() => scroll('left')}
           aria-label="Scroll left"
-          className="absolute -left-4 top-1/2 z-20 -translate-y-1/2 hidden sm:flex lg:hidden h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg border border-neutral-200 text-neutral-700 opacity-0 group-hover/carousel:opacity-100 hover:bg-neutral-50 transition-all"
+          className={`${ARROW_CLASS} -left-4`}
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={20} />
         </button>
 
-        {/* < lg: flex carousel | lg+: 4-col grid */}
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 sm:gap-4 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:snap-none"
+          className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 sm:gap-4 lg:gap-5"
         >
           {items.map((product) => (
             <div
               key={product.id}
-              className="snap-start shrink-0 w-[44vw] sm:w-[28vw] md:w-[22vw] min-w-[160px] max-w-[240px] lg:w-auto lg:min-w-0 lg:max-w-none"
+              className="snap-start shrink-0 w-[44vw] sm:w-[28vw] md:w-[22vw] min-w-[160px] max-w-[240px] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0"
             >
               <PopularItemCard product={product} onOpen={setSelected} />
             </div>
           ))}
         </div>
 
-        {/* Right arrow — carousel mode only (hidden on lg+) */}
+        {/* Right arrow — always visible on sm+ */}
         <button
           type="button"
           onClick={() => scroll('right')}
           aria-label="Scroll right"
-          className="absolute -right-4 top-1/2 z-20 -translate-y-1/2 hidden sm:flex lg:hidden h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg border border-neutral-200 text-neutral-700 opacity-0 group-hover/carousel:opacity-100 hover:bg-neutral-50 transition-all"
+          className={`${ARROW_CLASS} -right-4`}
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={20} />
         </button>
       </div>
 
