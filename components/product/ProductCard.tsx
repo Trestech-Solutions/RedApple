@@ -652,7 +652,7 @@ function Card4({ product, onOpen }: ProductCardProps) {
   const btnBg     = settings.item_price_background  || '#e8352a'
   const btnFg     = settings.item_price_text_color  || '#ffffff'
   const btnBorder = settings.item_price_border_color || btnBg
-  const priceColor = '#3d8b37' // green price, matches screenshot
+  const priceColor = settings.item_price_border_color ||'#3d8b37' // green price, matches screenshot
 
   if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
 
@@ -705,7 +705,7 @@ function Card4({ product, onOpen }: ProductCardProps) {
 
       {/* Content */}
       <div className="flex flex-1 flex-col px-[clamp(0.375rem,1.2vw,0.75rem)] pb-[clamp(0.25rem,0.8vw,0.5rem)] pt-[clamp(0.625rem,2vw,1.25rem)]">
-        <h3 className="line-clamp-2 text-[clamp(0.875rem,2.2vw,1.5rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.005em] text-neutral-900">
+        <h3 className="line-clamp-2 text-[clamp(0.875rem,2.2vw,1.5rem)] font-bold  leading-[1.1] tracking-[-0.005em] text-neutral-900">
           {product.name}
         </h3>
 
@@ -725,7 +725,7 @@ function Card4({ product, onOpen }: ProductCardProps) {
         <div className="mt-auto flex items-end justify-between gap-2 pt-[clamp(1.5rem,5vw,3.5rem)]">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-[0.4em] gap-y-0.5 pb-[0.15em]">
             {showFrom && (
-              <span className="text-[clamp(0.563rem,1.3vw,0.813rem)] font-extrabold uppercase tracking-wide" style={{ color: priceColor }}>
+              <span className="text-[clamp(0.563rem,1.3vw,0.813rem)] font-extrabold  tracking-wide" style={{ color: priceColor }}>
                 From
               </span>
             )}
@@ -735,7 +735,7 @@ function Card4({ product, onOpen }: ProductCardProps) {
               </span>
             )}
             {(isOrderable || product.dealMeta) && (
-              <span className="whitespace-nowrap text-[clamp(1rem,2.8vw,1.875rem)] font-extrabold uppercase leading-none tracking-[-0.01em]" style={{ color: priceColor }}>
+              <span className="whitespace-nowrap text-[clamp(1rem,2.8vw,1.875rem)] font-bold  leading-none tracking-[-0.01em]" style={{ color: priceColor }}>
                 Rs. {priceLabel}
               </span>
             )}

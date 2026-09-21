@@ -610,16 +610,9 @@ function PopularSection({ products }: { products: ProductData[] }) {
 }
 
 /** Self-contained popular item card — portrait, image top, name + price below, dark + button. */
-/** Self-contained popular item card — portrait, image top, name + price below, themed + button. */
 function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
-  const { settings } = useStoreSettings()
   const [added, setAdded] = useState(false)
-
-  // Primary = background, Secondary = icon/text colour (same as Card2 / Card3)
-  const btnBg     = settings.item_price_background   || '#e8352a'
-  const btnFg     = settings.item_price_text_color   || '#ffffff'
-  const btnBorder = settings.item_price_border_color || btnBg
 
   const hasSizes      = !!product.sizes && product.sizes.length > 0
   const defaultSize   = hasSizes ? product.sizes![0]! : undefined
@@ -649,82 +642,59 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
   }
-  const handleIncrease = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (needsSelection) { onOpen(product); return }
-    if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1)
-  }
-  const handleDecrease = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (needsSelection) { onOpen(product); return }
-    if (!cartItem) return
-    if (cartItem.quantity <= 1) removeItem(cartItem)
-    else updateQuantity(cartItem, cartItem.quantity - 1)
-  }
+  const handleIncrease = (e: React.MouseEvent) => { e.stopPropagation(); if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1) }
+  const handleDecrease = (e: React.MouseEvent) => { e.stopPropagation(); if (!cartItem) return; if (cartItem.quantity <= 1) removeItem(cartItem); else updateQuantity(cartItem, cartItem.quantity - 1) }
 
   return (
     <div
-      className="group relative flex cursor-pointer flex-col overflow-visible rounded-2xl bg-transparent transition-shadow duration-300"
+      className="group relative flex flex-col overflow-visible rounded-2xl bg-transparent  transition-shadow duration-300  cursor-pointer"
       onClick={() => onOpen(product)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(product) } }}
     >
       {/* Image */}
-      <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">
-        <Image
+<div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">        <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
-        {/* Themed + button — bottom-right */}
+        {/* Dark + button — bottom-right, partially overlapping the card edge */}
         {isOrderable && (
           cartQty > 0 && !needsSelection ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-2 right-2 z-10 flex h-10 items-center gap-1 rounded-full border-2 bg-white px-1 shadow-lg sm:h-12"
-              style={{ borderColor: btnBorder }}
+              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900 px-1.5 py-1 shadow-lg"
             >
-              <button
-                type="button" onClick={handleDecrease} aria-label="Decrease"
-                className="flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full transition-opacity hover:opacity-70 active:scale-95"
-                style={{ color: btnBg }}
-              >
-                <Minus className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={3} />
+              <button type="button" onClick={handleDecrease} aria-label="Decrease"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
+                <Minus size={12} />
               </button>
-              <span className="min-w-[1.5rem] text-center text-sm font-extrabold tabular-nums sm:text-base" style={{ color: btnBg }}>
-                {cartQty}
-              </span>
-              <button
-                type="button" onClick={handleIncrease} aria-label="Increase"
-                className="flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full transition-opacity hover:opacity-90 active:scale-95"
-                style={{ backgroundColor: btnBg, color: btnFg }}
-              >
-                <Plus className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={3} />
-              </button>
+              <span className="w-5 text-center text-xs font-bold text-white">{cartQty}</span>
+          <button type="button" onClick={handleIncrease} aria-label="Increase"
+  className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
+  <Plus size={12} />
+</button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={handleAdd}
-              aria-label="Add to cart"
-              className={`absolute bottom-2 right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 shadow-lg transition-transform duration-150 hover:opacity-90 active:scale-90 sm:h-12 sm:w-12 motion-reduce:transition-none ${added ? 'border-transparent bg-green-600 text-white' : ''}`}
-              style={!added ? { backgroundColor: btnBg, color: btnFg, borderColor: btnBorder } : {}}
-            >
-              {added
-                ? <Check className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={3} />
-                : <Plus className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={3} />}
-            </button>
+    <button
+  type="button"
+  onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
+  aria-label="Add to cart"
+  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
+>
+  {added ? <Check size={16} /> : <Plus size={18} />}
+</button>
           )
         )}
       </div>
 
       {/* Text */}
-      <div className="px-1 pb-3 pt-2.5">
-        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900">{product.name}</h3>
+      <div className="px-1 pt-2.5 pb-3">
+        <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
         <div className="mt-1 flex items-baseline gap-1.5">
           {hasOrig && (
             <span className="text-xs text-neutral-400 line-through">

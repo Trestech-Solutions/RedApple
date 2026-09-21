@@ -210,7 +210,7 @@ export type StoreSettings = {
   // Category nav design variant
   category_design?: 'category-1' | 'category-2' | 'category-3'
   // Order/Location modal design: 'modal-1' = existing (dropdown cities), 'modal-2' = image city cards
-  order_modal_design?: 'modal-1' | 'modal-2'
+  order_modal_design?: 'modal-1' | 'modal-2' | 'modal-3'
 
   // Android / iOS app
   android_icon?: string | null
