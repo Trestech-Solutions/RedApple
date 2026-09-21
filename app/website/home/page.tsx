@@ -610,9 +610,16 @@ function PopularSection({ products }: { products: ProductData[] }) {
 }
 
 /** Self-contained popular item card — portrait, image top, name + price below, dark + button. */
+/** Self-contained popular item card — portrait, image top, name + price below, themed + button. */
 function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
+  const { settings } = useStoreSettings()
   const [added, setAdded] = useState(false)
+
+  // Primary = background, Secondary = icon/text colour (same as Card2 / Card3)
+  const btnBg     = settings.item_price_background   || '#e8352a'
+  const btnFg     = settings.item_price_text_color   || '#ffffff'
+  const btnBorder = settings.item_price_border_color || btnBg
 
   const hasSizes      = !!product.sizes && product.sizes.length > 0
   const defaultSize   = hasSizes ? product.sizes![0]! : undefined
@@ -642,59 +649,82 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
   }
-  const handleIncrease = (e: React.MouseEvent) => { e.stopPropagation(); if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1) }
-  const handleDecrease = (e: React.MouseEvent) => { e.stopPropagation(); if (!cartItem) return; if (cartItem.quantity <= 1) removeItem(cartItem); else updateQuantity(cartItem, cartItem.quantity - 1) }
+  const handleIncrease = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (needsSelection) { onOpen(product); return }
+    if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1)
+  }
+  const handleDecrease = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (needsSelection) { onOpen(product); return }
+    if (!cartItem) return
+    if (cartItem.quantity <= 1) removeItem(cartItem)
+    else updateQuantity(cartItem, cartItem.quantity - 1)
+  }
 
   return (
     <div
-      className="group relative flex flex-col overflow-visible rounded-2xl bg-transparent  transition-shadow duration-300  cursor-pointer"
+      className="group relative flex cursor-pointer flex-col overflow-visible rounded-2xl bg-transparent transition-shadow duration-300"
       onClick={() => onOpen(product)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(product) } }}
     >
       {/* Image */}
-<div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">        <Image
+      <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">
+        <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
 
-        {/* Dark + button — bottom-right, partially overlapping the card edge */}
+        {/* Themed + button — bottom-right */}
         {isOrderable && (
           cartQty > 0 && !needsSelection ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900 px-1.5 py-1 shadow-lg"
+              className="absolute bottom-2 right-2 z-10 flex h-10 items-center gap-1 rounded-full border-2 bg-white px-1 shadow-lg sm:h-12"
+              style={{ borderColor: btnBorder }}
             >
-              <button type="button" onClick={handleDecrease} aria-label="Decrease"
-                className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
-                <Minus size={12} />
+              <button
+                type="button" onClick={handleDecrease} aria-label="Decrease"
+                className="flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full transition-opacity hover:opacity-70 active:scale-95"
+                style={{ color: btnBg }}
+              >
+                <Minus className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={3} />
               </button>
-              <span className="w-5 text-center text-xs font-bold text-white">{cartQty}</span>
-          <button type="button" onClick={handleIncrease} aria-label="Increase"
-  className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
-  <Plus size={12} />
-</button>
+              <span className="min-w-[1.5rem] text-center text-sm font-extrabold tabular-nums sm:text-base" style={{ color: btnBg }}>
+                {cartQty}
+              </span>
+              <button
+                type="button" onClick={handleIncrease} aria-label="Increase"
+                className="flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full transition-opacity hover:opacity-90 active:scale-95"
+                style={{ backgroundColor: btnBg, color: btnFg }}
+              >
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={3} />
+              </button>
             </div>
           ) : (
-    <button
-  type="button"
-  onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
-  aria-label="Add to cart"
-  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
->
-  {added ? <Check size={16} /> : <Plus size={18} />}
-</button>
+            <button
+              type="button"
+              onClick={handleAdd}
+              aria-label="Add to cart"
+              className={`absolute bottom-2 right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 shadow-lg transition-transform duration-150 hover:opacity-90 active:scale-90 sm:h-12 sm:w-12 motion-reduce:transition-none ${added ? 'border-transparent bg-green-600 text-white' : ''}`}
+              style={!added ? { backgroundColor: btnBg, color: btnFg, borderColor: btnBorder } : {}}
+            >
+              {added
+                ? <Check className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={3} />
+                : <Plus className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={3} />}
+            </button>
           )
         )}
       </div>
 
       {/* Text */}
-      <div className="px-1 pt-2.5 pb-3">
-        <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
+      <div className="px-1 pb-3 pt-2.5">
+        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900">{product.name}</h3>
         <div className="mt-1 flex items-baseline gap-1.5">
           {hasOrig && (
             <span className="text-xs text-neutral-400 line-through">
@@ -1079,6 +1109,74 @@ export default function HomePage() {
             const valueStr   = showValue ? (isPercent ? `${Math.round(amt)}%` : `Rs.${Math.round(amt)}`) : ''
             const bannerUrl  = resolveMediaUrl(offer.banner_image)
 
+            // ── NO IMAGE: light cream strip → [icon] Flat (20) % Off ────────────
+            if (!bannerUrl) {
+              const label = offer.discount_text || 'Flat'
+              return (
+                <div
+                  key={offer.id}
+                  className="relative flex min-h-16 w-[92vw] shrink-0 snap-center items-center overflow-hidden rounded-2xl px-4 py-2 shadow-md ring-1 ring-black/5 sm:min-h-[68px] sm:px-6 md:w-full"
+                  style={{ backgroundColor: 'var(--color-primary, #171717)' }}
+                >
+                  <div
+                    className="flex min-w-0 items-center gap-3"
+                    style={{ color: 'var(--color-secondary, #ffffff)' }}
+                  >
+                    {/* Badge-percent icon */}
+                    <svg
+                      width="26"
+                      height="26"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                    >
+                      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                      <path d="m15 9-6 6" />
+                      <path d="M9 9h.01" />
+                      <path d="M15 15h.01" />
+                    </svg>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-2.5">
+                        <span className="text-xl font-extrabold leading-none sm:text-2xl">
+                          {label}{showValue && !isPercent ? ' Rs.' : ''}
+                        </span>
+
+                        {showValue && (
+                          <span
+                            className="-translate-y-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-extrabold sm:h-10 sm:w-10 sm:text-xl"
+                            style={{
+                              backgroundColor: 'var(--color-secondary, #ffffff)',
+                              color: 'var(--color-primary, #171717)',
+                              boxShadow:
+                                '0 6px 16px color-mix(in srgb, var(--color-secondary, #ffffff) 35%, transparent)',
+                            }}
+                          >
+                            {Math.round(amt)}
+                          </span>
+                        )}
+
+                        <span className="text-lg font-bold leading-none sm:text-2xl">
+                          {showValue && isPercent ? '% Off' : 'Off'}
+                        </span>
+                      </div>
+
+                      {offer.discount_message && (
+                        <p className="mt-1 truncate text-xs opacity-80 sm:text-sm">
+                          {offer.discount_message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+
+            // ── WITH IMAGE: banner + gradient + white text ───────────────────────
             return (
               <div
                 key={offer.id}
@@ -1086,16 +1184,14 @@ export default function HomePage() {
                 style={{ backgroundColor: 'var(--color-primary,#171717)' }}
               >
                 {/* Banner image fills the whole strip */}
-                {bannerUrl && (
-                  <Image
-                    src={bannerUrl}
-                    alt={offer.discount_text || 'Offer'}
-                    fill
-                    priority={false}
-                    sizes="(max-width: 768px) 92vw, 900px"
-                    className="object-cover"
-                  />
-                )}
+                <Image
+                  src={bannerUrl}
+                  alt={offer.discount_text || 'Offer'}
+                  fill
+                  priority={false}
+                  sizes="(max-width: 768px) 92vw, 900px"
+                  className="object-cover"
+                />
 
                 {/* Gradient so text stays legible over any image */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />

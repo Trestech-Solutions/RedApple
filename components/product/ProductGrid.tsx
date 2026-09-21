@@ -20,7 +20,7 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
   // card-2/card-3 = portrait grid (2→3→4→5→6 cols, denser since cards are smaller)
   const gridClass = design === 'card-1'
     ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:grid-cols-3 xl:gap-6'
-    : 'grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-5 xl:gap-6 2xl:grid-cols-6'
+    : 'grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6 2xl:grid-cols-6'
 
   useEffect(() => {
     if (!selected) return

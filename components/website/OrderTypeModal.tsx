@@ -51,6 +51,11 @@ function resolveImg(path?: string | null): string | null {
   return null
 }
 
+const FALLBACK_LOGO = '/web/logo.webp'
+function resolveLogo(path?: string | null): string {
+  return resolveImg(path) ?? FALLBACK_LOGO
+}
+
 function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R    = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -231,6 +236,8 @@ function Modal1({ onClose }: { onClose: () => void }) {
     branchList, loadingCityBranches, selectedBranchId, setSelectedBranchId,
     handleUseCurrentLocation, handleConfirm, canConfirm,
   } = useModalLogic(onClose)
+  const { settings } = useStoreSettings()
+  const merchantLogo = resolveLogo(settings.merchant_logo)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
@@ -243,7 +250,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col items-center pt-6 pb-1 sm:pt-8">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 bg-white shadow-md overflow-hidden sm:h-20 sm:w-20"
             style={{ borderColor: 'var(--color-primary)' }}>
-            <Image src="/web/logo.webp" alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
+            <Image src={merchantLogo} alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
           </div>
         </div>
 
@@ -383,6 +390,8 @@ function Modal2({ onClose }: { onClose: () => void }) {
     selectedCityObj,
     handleUseCurrentLocation, handleConfirm, canConfirm,
   } = useModalLogic(onClose)
+  const { settings } = useStoreSettings()
+  const merchantLogo = resolveLogo(settings.merchant_logo)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
@@ -397,7 +406,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
           </button>
           <div className="flex h-20 w-20 items-center justify-center rounded-2xl shadow-lg overflow-hidden"
             style={{ backgroundColor: 'var(--color-primary)' }}>
-            <Image src="/web/logo.webp" alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
+            <Image src={merchantLogo} alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />
           </div>
         </div>
 
@@ -457,24 +466,24 @@ function Modal2({ onClose }: { onClose: () => void }) {
                     style={isSelected ? { borderColor: 'var(--color-primary)' } : {}}
                   >
                     {/* City image or placeholder */}
-                   <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
-  {imgSrc ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={imgSrc}
-      alt={city.name}
-      className="h-full w-full object-contain"
-    />
-  ) : (
-    <Image
-      src="/karachi.svg"
-      alt={city.name}
-      width={56}
-      height={56}
-      className="h-full w-full object-contain"
-    />
-  )}
-</div>
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
+                      {imgSrc ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={imgSrc}
+                          alt={city.name}
+                          className="h-full w-full object-contain"
+                        />
+                      ) : (
+                        <Image
+                          src="/karachi.svg"
+                          alt={city.name}
+                          width={56}
+                          height={56}
+                          className="h-full w-full object-contain"
+                        />
+                      )}
+                    </div>
                     <span className={`text-xs font-semibold ${isSelected ? '' : 'text-neutral-700'}`}
                       style={isSelected ? { color: 'var(--color-primary)' } : {}}>
                       {city.name}
@@ -533,11 +542,10 @@ function Modal2({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Select button — full-width yellow */}
+          {/* Select button — primary bg, secondary text */}
           <button onClick={handleConfirm} disabled={!canConfirm}
-                      style={{ borderColor: 'var(--color-primary)' }}
-
-            className="w-full text-white rounded-2xl bg-black py-3.5 text-sm font-bold text-neutral-900 hover:bg-[#e6b800] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md">
+            className="w-full rounded-2xl py-3.5 text-sm font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
             {confirming ? <><Loader2 size={16} className="animate-spin" /><span>Confirming…</span></> : 'Select'}
           </button>
         </div>

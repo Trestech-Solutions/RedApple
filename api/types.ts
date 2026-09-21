@@ -206,7 +206,7 @@ export type StoreSettings = {
   price_rounder_center?: boolean
   category_navbar_background_color?: string
   // Product card design variant
-  product_card_design?: 'card-1' | 'card-2' | 'card-3'
+  product_card_design?: 'card-1' | 'card-2' | 'card-3' | 'card-4'
   // Category nav design variant
   category_design?: 'category-1' | 'category-2' | 'category-3'
   // Order/Location modal design: 'modal-1' = existing (dropdown cities), 'modal-2' = image city cards

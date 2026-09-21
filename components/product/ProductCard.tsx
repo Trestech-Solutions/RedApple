@@ -195,7 +195,6 @@ function Chip({
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CARD-1 (default) — horizontal: text left, SMALL image right (matches
-// angeethipk.com reference: image is ~35-40% of card width, self-centered,
 // not stretched to full card height; price is plain bold text, no pill,
 // unless the store explicitly turns price_rounder_center on).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -384,11 +383,17 @@ function Card2({ product, onOpen }: ProductCardProps) {
   const stackTagBg = settings.stack_tag_background_color
   const stackTagFg = settings.stack_tag_color
   const showStack  = Boolean(settings.show_stack_tag_on_item)
-  const btnBg     = settings.item_price_background  || '#171717'
+  const btnBg     = settings.item_price_background  || '#d63a2b'
   const btnFg     = settings.item_price_text_color  || '#ffffff'
   const btnBorder = settings.item_price_border_color || btnBg
 
   if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
+
+  const priceLabel = isOrderable
+    ? displayPriceNum.toLocaleString()
+    : product.dealMeta
+    ? Math.round(parseFloat(product.dealMeta.finalPrice)).toLocaleString()
+    : ''
 
   return (
     <div
@@ -396,17 +401,18 @@ function Card2({ product, onOpen }: ProductCardProps) {
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
       onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
-      className={`${CARD_SHELL} flex flex-col overflow-hidden rounded-[clamp(0.75rem,2.2vw,1.125rem)] hover:-translate-y-0.5 hover:ring-black/10 hover:shadow-[0_16px_36px_-18px_rgba(0,0,0,0.25)] motion-reduce:hover:translate-y-0 ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
+      className={`${CARD_SHELL} flex flex-col overflow-hidden rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_-12px_rgba(0,0,0,0.25)] ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
     >
-      {/* Image — 4:3 so it scales cleanly at every column width */}
-      <div className="relative aspect-[4/3] w-full flex-shrink-0 overflow-hidden bg-neutral-100">
+      {/* Square image, full-bleed */}
+      <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-neutral-100">
         <Image
           src={product.image} alt={product.name} fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-cover"
         />
+
         {product.tag && (
-          <span className="absolute left-2 top-2 sm:left-2.5 sm:top-2.5">
+          <span className="absolute left-2 top-2">
             <Chip
               className={showStack ? '' : 'bg-[#f2c14e] text-neutral-900'}
               style={showStack ? { backgroundColor: stackTagBg || '#f2c14e', color: stackTagFg || '#000' } : undefined}
@@ -415,11 +421,17 @@ function Card2({ product, onOpen }: ProductCardProps) {
             </Chip>
           </span>
         )}
+
+        {/* Discount tag — bottom-right, rounded rectangle (not a pill) */}
         {displayDiscount && (
-          <span className="absolute right-2 top-2 sm:right-2.5 sm:top-2.5">
-            <Chip style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</Chip>
+          <span
+            className="absolute bottom-1.5 right-1.5 rounded-lg px-[clamp(0.5rem,1.6vw,0.75rem)] py-[clamp(0.25rem,0.9vw,0.375rem)] text-[clamp(0.688rem,1.7vw,0.875rem)] font-extrabold uppercase leading-none"
+            style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#171717' }}
+          >
+            {displayDiscount}
           </span>
         )}
+
         {!isOrderable && !product.dealMeta && (
           <span className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
             <Chip className="bg-white/95 text-neutral-700">Coming soon</Chip>
@@ -427,34 +439,34 @@ function Card2({ product, onOpen }: ProductCardProps) {
         )}
       </div>
 
-      {/* Content — tight, deliberate rhythm rather than stretched filler space */}
-      <div className="flex flex-1 flex-col px-[clamp(0.625rem,2vw,1.25rem)] pb-[clamp(0.625rem,2vw,1.25rem)] pt-[clamp(0.5rem,1.6vw,1rem)]">
-        <h3 className="min-w-0 truncate text-[clamp(0.781rem,1.9vw,1.125rem)] font-semibold tracking-[-0.01em] text-neutral-900">
+      {/* Content */}
+      <div className="flex flex-1 flex-col px-[clamp(0.625rem,2vw,1.25rem)] pb-[clamp(0.75rem,2.2vw,1.25rem)] pt-[clamp(0.625rem,2vw,1.125rem)]">
+        <h3 className="line-clamp-1 text-[clamp(0.813rem,2vw,1.125rem)] font-extrabold uppercase leading-tight tracking-[-0.005em] text-neutral-900">
           {product.name}
         </h3>
 
-        {/* Single-line description slot, reserved so cards stay level */}
-        <p className="mt-[0.25em] min-h-[1.4em] truncate text-[clamp(0.656rem,1.5vw,0.875rem)] leading-[1.4] text-neutral-500">
+        {/* Two-line description slot, reserved so cards stay level */}
+        <p className="mt-[clamp(0.5rem,2.4vw,1.25rem)] line-clamp-2 min-h-[2.8em] text-[clamp(0.688rem,1.6vw,0.938rem)] leading-[1.4] text-neutral-500">
           {product.description || '\u00A0'}
         </p>
 
         {product.dealMeta?.timeWindow && (
-          <span className="mt-[0.4em] w-fit max-w-full truncate text-[clamp(0.594rem,1.4vw,0.75rem)] font-medium text-amber-600">
+          <span className="mt-1 w-fit max-w-full truncate text-[clamp(0.594rem,1.4vw,0.75rem)] font-medium text-amber-600">
             🕐 {product.dealMeta.timeWindow}
           </span>
         )}
 
-        {/* Price + action share one line — the card's focal point */}
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-neutral-100 pt-[clamp(0.5rem,1.6vw,0.75rem)]">
-          <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+        {/* Price left, ADD right */}
+        <div className="mt-auto flex items-center justify-between gap-2 pt-[clamp(0.625rem,2.2vw,1.25rem)]">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
             {isOrderable && displayOriginal && (
-              <span className="text-[clamp(0.594rem,1.4vw,0.75rem)] text-neutral-400 line-through">
+              <span className="whitespace-nowrap text-[clamp(0.688rem,1.6vw,0.938rem)] text-neutral-400 line-through">
                 Rs.{parseInt(displayOriginal, 10).toLocaleString()}
               </span>
             )}
             {(isOrderable || product.dealMeta) && (
-              <span className="text-[clamp(0.813rem,1.9vw,1.125rem)] font-bold tracking-[-0.01em] text-neutral-900">
-                Rs. {isOrderable ? displayPriceNum.toLocaleString() : Math.round(parseFloat(product.dealMeta!.finalPrice)).toLocaleString()}
+              <span className="whitespace-nowrap text-[clamp(0.875rem,2.1vw,1.25rem)] font-extrabold tracking-[-0.01em] text-neutral-900">
+                Rs. {priceLabel}
               </span>
             )}
           </div>
@@ -462,20 +474,22 @@ function Card2({ product, onOpen }: ProductCardProps) {
           {isOrderable && !needsSelection && cartQty > 0 ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="flex h-[clamp(1.75rem,5vw,2.25rem)] flex-shrink-0 items-center gap-1 rounded-full border px-1"
+              className="flex h-[clamp(1.875rem,5vw,2.5rem)] flex-shrink-0 items-center gap-1 rounded-lg border px-1"
               style={{ borderColor: btnBorder }}
             >
               <button
                 type="button" onClick={handleDecrease} aria-label={`Remove one ${product.name}`}
-                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full hover:opacity-70 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
+                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-md hover:opacity-70 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
                 style={{ color: btnBg }}
               >
                 <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
-              <span className="min-w-[1rem] text-center text-[clamp(0.688rem,1.6vw,0.875rem)] font-bold tabular-nums" style={{ color: btnBg }}>{cartQty}</span>
+              <span className="min-w-[1rem] text-center text-[clamp(0.75rem,1.6vw,0.938rem)] font-bold tabular-nums" style={{ color: btnBg }}>
+                {cartQty}
+              </span>
               <button
                 type="button" onClick={handleIncrease} aria-label={`Add one ${product.name}`}
-                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full hover:opacity-90 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
+                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-md hover:opacity-90 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
                 style={{ backgroundColor: btnBg, color: btnFg }}
               >
                 <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -484,12 +498,10 @@ function Card2({ product, onOpen }: ProductCardProps) {
           ) : isOrderable ? (
             <button
               type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
-              className={`flex h-[clamp(1.875rem,6vw,2.5rem)] w-[clamp(1.875rem,6vw,2.5rem)] flex-shrink-0 items-center justify-center rounded-full shadow-sm transition-transform duration-150 hover:opacity-90 active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
+              className={`flex-shrink-0 rounded-lg px-[clamp(0.875rem,2.6vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] text-[clamp(0.688rem,1.6vw,0.938rem)] font-extrabold uppercase leading-none tracking-wide transition-transform duration-150 hover:opacity-90 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
               style={!added ? { backgroundColor: btnBg, color: btnFg } : {}}
             >
-              {added
-                ? <Check className="h-[52%] w-[52%]" strokeWidth={3} />
-                : <Plus className="h-[52%] w-[52%]" strokeWidth={2.5} />}
+              {added ? '✓ Added' : 'Add'}
             </button>
           ) : null}
         </div>
@@ -625,6 +637,150 @@ function Card3({ product, onOpen }: ProductCardProps) {
     </div>
   )
 }
+function Card4({ product, onOpen }: ProductCardProps) {
+  const {
+    settings, added, needsSelection, hasSizes,
+    displayPriceNum, displayOriginal, displayDiscount, isOrderable,
+    cartQty, handleAdd, handleIncrease, handleDecrease,
+  } = useCardLogic(product, onOpen)
+
+  const discountBg = settings.discount_background_color
+  const discountFg = settings.discount_text_color
+  const stackTagBg = settings.stack_tag_background_color
+  const stackTagFg = settings.stack_tag_color
+  const showStack  = Boolean(settings.show_stack_tag_on_item)
+  const btnBg     = settings.item_price_background  || '#e8352a'
+  const btnFg     = settings.item_price_text_color  || '#ffffff'
+  const btnBorder = settings.item_price_border_color || btnBg
+  const priceColor = '#3d8b37' // green price, matches screenshot
+
+  if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
+
+  const priceLabel = isOrderable
+    ? displayPriceNum.toLocaleString()
+    : product.dealMeta
+    ? Math.round(parseFloat(product.dealMeta.finalPrice)).toLocaleString()
+    : ''
+
+  // "FROM" label shows when the product has multiple sizes/options
+  const showFrom = product.fromLabel || (hasSizes && product.sizes!.length > 1)
+
+  return (
+    <div
+      onClick={() => onOpen?.(product)}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
+      className={`group relative flex h-full flex-col rounded-[clamp(1rem,3vw,1.75rem)] border-2 border-neutral-200 bg-white p-[clamp(0.5rem,1.4vw,0.75rem)] transition-shadow duration-200 hover:shadow-[0_14px_32px_-14px_rgba(0,0,0,0.3)] motion-reduce:transition-none ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
+    >
+      {/* Inset square image with its own rounded corners */}
+      <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden rounded-[clamp(0.5rem,1.2vw,0.75rem)] bg-neutral-100">
+        <Image
+          src={product.image} alt={product.name} fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+
+        {product.tag && (
+          <span className="absolute left-2 top-2">
+            <Chip
+              className={showStack ? '' : 'bg-[#f2c14e] text-neutral-900'}
+              style={showStack ? { backgroundColor: stackTagBg || '#f2c14e', color: stackTagFg || '#000' } : undefined}
+            >
+              {product.tag}
+            </Chip>
+          </span>
+        )}
+        {displayDiscount && (
+          <span className="absolute right-2 top-2">
+            <Chip style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#000' }}>{displayDiscount}</Chip>
+          </span>
+        )}
+        {!isOrderable && !product.dealMeta && (
+          <span className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
+            <Chip className="bg-white/95 text-neutral-700">Coming soon</Chip>
+          </span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col px-[clamp(0.375rem,1.2vw,0.75rem)] pb-[clamp(0.25rem,0.8vw,0.5rem)] pt-[clamp(0.625rem,2vw,1.25rem)]">
+        <h3 className="line-clamp-2 text-[clamp(0.875rem,2.2vw,1.5rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.005em] text-neutral-900">
+          {product.name}
+        </h3>
+
+        {product.description && (
+          <p className="mt-1.5 line-clamp-2 text-[clamp(0.688rem,1.5vw,0.875rem)] leading-[1.4] text-neutral-500">
+            {product.description}
+          </p>
+        )}
+
+        {product.dealMeta?.timeWindow && (
+          <p className="mt-1 truncate text-[clamp(0.594rem,1.4vw,0.75rem)] font-medium text-amber-600">
+            🕐 {product.dealMeta.timeWindow}
+          </p>
+        )}
+
+        {/* Price left, round + button right */}
+        <div className="mt-auto flex items-end justify-between gap-2 pt-[clamp(1.5rem,5vw,3.5rem)]">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-[0.4em] gap-y-0.5 pb-[0.15em]">
+            {showFrom && (
+              <span className="text-[clamp(0.563rem,1.3vw,0.813rem)] font-extrabold uppercase tracking-wide" style={{ color: priceColor }}>
+                From
+              </span>
+            )}
+            {isOrderable && displayOriginal && (
+              <span className="whitespace-nowrap text-[clamp(0.625rem,1.4vw,0.813rem)] text-neutral-400 line-through">
+                Rs.{parseInt(displayOriginal, 10).toLocaleString()}
+              </span>
+            )}
+            {(isOrderable || product.dealMeta) && (
+              <span className="whitespace-nowrap text-[clamp(1rem,2.8vw,1.875rem)] font-extrabold uppercase leading-none tracking-[-0.01em]" style={{ color: priceColor }}>
+                Rs. {priceLabel}
+              </span>
+            )}
+          </div>
+
+          {isOrderable && !needsSelection && cartQty > 0 ? (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex h-[clamp(2.25rem,6vw,3.25rem)] flex-shrink-0 items-center gap-1 rounded-full border-2 px-1"
+              style={{ borderColor: btnBorder }}
+            >
+              <button
+                type="button" onClick={handleDecrease} aria-label={`Remove one ${product.name}`}
+                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full hover:opacity-70 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
+                style={{ color: btnBg }}
+              >
+                <Minus className="h-4 w-4" strokeWidth={3} />
+              </button>
+              <span className="min-w-[1.25rem] text-center text-[clamp(0.813rem,1.8vw,1.063rem)] font-extrabold tabular-nums" style={{ color: btnBg }}>
+                {cartQty}
+              </span>
+              <button
+                type="button" onClick={handleIncrease} aria-label={`Add one ${product.name}`}
+                className={`flex aspect-square h-[calc(100%-6px)] items-center justify-center rounded-full hover:opacity-90 active:scale-95 motion-reduce:active:scale-100 ${FOCUS_RING}`}
+                style={{ backgroundColor: btnBg, color: btnFg }}
+              >
+                <Plus className="h-4 w-4" strokeWidth={3} />
+              </button>
+            </div>
+          ) : isOrderable ? (
+            <button
+              type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
+              className={`flex h-[clamp(2.25rem,6.5vw,3.5rem)] w-[clamp(2.25rem,6.5vw,3.5rem)] flex-shrink-0 items-center justify-center rounded-full shadow-sm transition-transform duration-150 hover:opacity-90 active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
+              style={!added ? { backgroundColor: btnBg, color: btnFg } : {}}
+            >
+              {added
+                ? <Check className="h-[55%] w-[55%]" strokeWidth={3} />
+                : <Plus className="h-[60%] w-[60%]" strokeWidth={3} />}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main export
@@ -636,5 +792,6 @@ export function ProductCard({ product, onOpen }: ProductCardProps) {
 
   if (design === 'card-2') return <Card2 product={product} onOpen={onOpen} />
   if (design === 'card-3') return <Card3 product={product} onOpen={onOpen} />
+  if (design === 'card-4') return <Card4 product={product} onOpen={onOpen} />
   return <Card1 product={product} onOpen={onOpen} />
 }
