@@ -6,10 +6,12 @@ import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Angeethi - Pakistani & BBQ Restaurant",
+  title: "Tooso - Pakistani & BBQ Restaurant",
   description:
-    "Angeethi is a Pakistani and BBQ restaurant serving delicious traditional dishes, BBQ, and flavorful meals for dine-in and takeaway.",
+    "Tooso is a Pakistani and BBQ restaurant serving delicious traditional dishes, BBQ, and flavorful meals for dine-in and takeaway.",
 };
+
+
 
 export const viewport: Viewport = {
   colorScheme: "light dark",
