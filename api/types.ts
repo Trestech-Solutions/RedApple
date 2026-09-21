@@ -971,9 +971,44 @@ export type Order = {
   items: OrderItem[];
   created_at: string;
   updated_at: string;
+  /** Customer's star rating (1–5). Null means no feedback yet. */
+  stars?: number | null;
+  /** Customer's written feedback comment. */
+  feed_back_comment?: string;
 };
 
 export type CheckoutResponse = Order;
+
+/** Payload for PATCH /storefront/orders/<id>/feedback/ */
+export type OrderFeedbackPayload = {
+  customer_phone: string;
+  stars: number;
+  feed_back_comment?: string;
+};
+
+/** Payload for POST /storefront/contact-us/ */
+export type ContactUsPayload = {
+  restaurant: number | string;
+  branch?: number | null;
+  full_name: string;
+  email: string;
+  phone: string;
+  message?: string;
+};
+
+/** Payload for POST /storefront/complaints/ */
+export type ComplaintPayload = {
+  restaurant: number | string;
+  branch?: number | null;
+  complaint_type: 'takeaway' | 'delivery';
+  delivery_method?: 'foodpanda' | 'website_phone_facebook' | '';
+  title?: 'mr' | 'mrs' | 'ms' | 'miss' | '';
+  customer_name: string;
+  customer_phone: string;
+  order_code?: string;
+  date_of_visit?: string | null;
+  complaint_description: string;
+};
 
 // ─── Storefront Customer Auth & Profile ──────────────────────────────────────
 

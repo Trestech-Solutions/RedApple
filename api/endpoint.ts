@@ -19,6 +19,12 @@ const API_ENDPOINTS = {
   StorefrontOrders: {
     create: '/storefront/orders/',
     detail: (id: number | string) => `/storefront/orders/${id}/`,
+    feedback: (id: number | string) => `/storefront/orders/${id}/feedback/`,
+  },
+
+  StorefrontPublic: {
+    contactUs:  '/storefront/contact-us/',
+    complaints: '/storefront/complaints/',
   },
 
   StorefrontCustomerAuth: {

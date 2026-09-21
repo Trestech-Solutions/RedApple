@@ -24,6 +24,7 @@ import {
 import {
   setUser as reduxSetUser,
   logout as reduxLogout,
+  setTokens as reduxSetTokens,
   type AuthUser,
 } from '@/redux/slices/authSlice'
 import {
@@ -107,6 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch()
 
   const user             = useAppSelector((s) => s.auth.user)
+  const reduxTokens      = useAppSelector((s) => ({ access: s.auth.accessToken, refresh: s.auth.refreshToken }))
   const reduxItems       = useAppSelector((s) => s.cart.items)
   const isCartOpen       = useAppSelector((s) => s.cart.isCartOpen)
   const reduxCartToken   = useAppSelector((s) => s.cart.cartToken)
@@ -117,12 +119,64 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const areaId           = useAppSelector((s) => s.order.areaId)
   const locationModalOpen = useAppSelector((s) => s.order.locationModalOpen)
 
+  // ─── Auth hydration: sync localStorage customer session into Redux ──────────
+  // On first load (after SSR hydration), if redux auth.user is null but
+  // trestech_customer_user exists in localStorage, we hydrate Redux so that:
+  //   - `useCart().user` returns the saved user immediately
+  //   - redux-persist persists the correct user/tokens going forward
+  // This also reconciles any edge case where localStorage tokens exist but
+  // the Redux state (from an older save) has empty tokens.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const savedToken = localStorage.getItem('trestech_customer_token')
+    const savedRefresh = localStorage.getItem('trestech_customer_refresh_token')
+    const savedUserRaw = localStorage.getItem('trestech_customer_user')
+
+    let savedUser: AuthUser | null = null
+    if (savedUserRaw) {
+      try {
+        const parsed = JSON.parse(savedUserRaw) as any
+        savedUser = {
+          name:   parsed.name ?? '',
+          phone:  parsed.phone ?? '',
+          email:  parsed.email || undefined,
+          gender: parsed.gender as AuthUser['gender'] | undefined,
+        }
+      } catch { savedUser = null }
+    }
+
+    // Hydrate tokens into Redux if missing
+    if (savedToken && !reduxTokens.access) {
+      dispatch(reduxSetTokens({
+        accessToken: savedToken,
+        refreshToken: savedRefresh ?? '',
+      }))
+    }
+    // Hydrate user into Redux if missing
+    if (savedUser && !user) {
+      dispatch(reduxSetUser(savedUser))
+    }
+    // If localStorage says logged out but Redux says logged in, clear Redux
+    if (!savedToken && (reduxTokens.access || user)) {
+      dispatch(reduxLogout())
+    }
+  }, [dispatch, reduxTokens.access, user]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const addresses: SavedAddress[] = []
 
   const setUser = useCallback(
     (u: AuthUser | null) => {
-      if (u) dispatch(reduxSetUser(u))
-      else dispatch(reduxLogout())
+      if (u) {
+        dispatch(reduxSetUser(u))
+      } else {
+        // Full customer sign-out: clear localStorage + Redux
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('trestech_customer_token')
+          localStorage.removeItem('trestech_customer_refresh_token')
+          localStorage.removeItem('trestech_customer_user')
+        }
+        dispatch(reduxLogout())
+      }
     },
     [dispatch]
   )

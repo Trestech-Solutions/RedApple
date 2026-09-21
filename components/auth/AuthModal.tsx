@@ -7,6 +7,8 @@ import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
 import type { RegisterPayload, CustomerLoginResponse } from '@/api/types'
+import { useAppDispatch } from '@/redux/hooks'
+import { setTokens as reduxSetTokens, logout as reduxLogout } from '@/redux/slices/authSlice'
 
 const COUNTRY_CODES = [
   { code: '+92', flag: '🇵🇰' },
@@ -44,7 +46,7 @@ function resolveImg(path?: string | null): string | null {
 const FALLBACK_LOGO =
   'https://assets.indolj.io/upload/1776252259-1652698752-uk-1.jpg'
 
-function persistTokens(data: CustomerLoginResponse) {
+function persistTokens(data: CustomerLoginResponse, dispatch?: ReturnType<typeof useAppDispatch>) {
   if (typeof window === 'undefined') return
   localStorage.setItem(CUSTOMER_TOKEN_KEY, data.access)
   if (data.refresh) localStorage.setItem(CUSTOMER_REFRESH_KEY, data.refresh)
@@ -59,6 +61,21 @@ function persistTokens(data: CustomerLoginResponse) {
     is_active: c.is_active,
     date_joined: c.date_joined,
   }))
+  // Also sync tokens into Redux so redux-persist can restore them next time
+  if (dispatch && data.access) {
+    dispatch(reduxSetTokens({
+      accessToken: data.access,
+      refreshToken: data.refresh ?? '',
+    }))
+  }
+}
+
+function clearCustomerAuth(dispatch?: ReturnType<typeof useAppDispatch>) {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(CUSTOMER_TOKEN_KEY)
+  localStorage.removeItem(CUSTOMER_REFRESH_KEY)
+  localStorage.removeItem(CUSTOMER_USER_KEY)
+  if (dispatch) dispatch(reduxLogout())
 }
 
 function normalizePhone(raw: string): string {
@@ -71,6 +88,7 @@ function normalizePhone(raw: string): string {
 export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const { setUser } = useCart()
   const { settings } = useStoreSettings()
+  const dispatch = useAppDispatch()
 
   const brandLogoSrc = useMemo(
     () => resolveImg(settings.merchant_logo) ?? FALLBACK_LOGO,
@@ -98,7 +116,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
 
   const login = useLogin({
     onSuccess(data) {
-      persistTokens(data)
+      persistTokens(data, dispatch)
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -111,7 +129,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
 
   const register = useRegister({
     onSuccess(data) {
-      persistTokens(data)
+      persistTokens(data, dispatch)
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -186,7 +204,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
               onClick={() => { setStep(s); setError('') }}
               className={`py-4 text-sm font-bold uppercase tracking-wide transition-colors ${
                 step === s
-                  ? 'bg-white text-[#000000] border-b-2 border-[#000000]'
+                  ? 'bg-white text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
                   : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
               }`}
             >
@@ -198,7 +216,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
         <div className="px-5 py-6 sm:px-8 sm:py-8">
           {/* Brand header */}
           <div className="flex flex-col items-center mb-5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#000000] bg-white shadow-md overflow-hidden sm:h-16 sm:w-16 mb-3">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--color-primary)] bg-white shadow-md overflow-hidden sm:h-16 sm:w-16 mb-3">
               <Image
                 src={brandLogoSrc}
                 alt="Brand Logo"
@@ -231,7 +249,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                 <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
                   Mobile Number
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[#000000] focus-within:ring-1 focus-within:ring-[#000000] transition-all">
+                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
                   <select
                     value={countryCode}
                     onChange={(e) => setCC(e.target.value)}
@@ -256,7 +274,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                 <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
                   Password
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[#000000] focus-within:ring-1 focus-within:ring-[#000000] transition-all">
+                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
                   <input
                     type={showLoginPass ? 'text' : 'password'}
                     placeholder="Enter your password"
@@ -279,7 +297,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
               <button
                 onClick={handleLogin}
                 disabled={sending}
-                className="w-full rounded-lg bg-[#000000] py-2.5 text-xs font-bold text-white hover:bg-[#1f1f1f] disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
+                className="w-full rounded-lg bg-[var(--color-primary)] py-2.5 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
               >
                 {sending ? 'Logging in...' : 'Login'}
               </button>
@@ -292,13 +310,13 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
               {/* Full Name */}
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Full Name <span className="text-[#000000]">*</span>
+                  Full Name <span className="text-[var(--color-primary)]">*</span>
                 </label>
                 <input
                   value={regName}
                   onChange={(e) => { setRegName(e.target.value); setError('') }}
                   placeholder="e.g. John Doe"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] sm:px-4 sm:py-3 sm:text-sm"
+                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
                 />
               </div>
 
@@ -306,7 +324,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                 <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
                   Mobile Number
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[#000000] focus-within:ring-1 focus-within:ring-[#000000] transition-all">
+                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
                   <select
                     value={countryCode}
                     onChange={(e) => setCC(e.target.value)}
@@ -335,7 +353,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] sm:px-4 sm:py-3 sm:text-sm"
+                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
                 />
               </div>
 
@@ -343,7 +361,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                 <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
                   Password
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[#000000] focus-within:ring-1 focus-within:ring-[#000000] transition-all">
+                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
                   <input
                     type={showRegPass ? 'text' : 'password'}
                     value={regPass}
@@ -371,14 +389,14 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                   value={regPass2}
                   onChange={(e) => { setRegPass2(e.target.value); setError('') }}
                   placeholder="Re-enter password"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] sm:px-4 sm:py-3 sm:text-sm"
+                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
                 />
               </div>
 
               <button
                 onClick={handleRegister}
                 disabled={sending}
-                className="w-full rounded-lg bg-[#000000] py-2.5 text-xs font-bold text-white hover:bg-[#1f1f1f] disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
+                className="w-full rounded-lg bg-[var(--color-primary)] py-2.5 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
               >
                 {sending ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -407,7 +425,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
               onClick={() => { setStep('login'); setError('') }}
               className="mt-4 w-full text-center text-[11px] text-neutral-500 hover:text-neutral-700 sm:text-xs"
             >
-              Already have an account? <span className="text-[#000000] font-semibold">Login →</span>
+              Already have an account? <span className="text-[var(--color-primary)] font-semibold">Login →</span>
             </button>
           )}
         </div>

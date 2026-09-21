@@ -535,6 +535,8 @@ function Modal2({ onClose }: { onClose: () => void }) {
 
           {/* Select button — full-width yellow */}
           <button onClick={handleConfirm} disabled={!canConfirm}
+                      style={{ borderColor: 'var(--color-primary)' }}
+
             className="w-full text-white rounded-2xl bg-black py-3.5 text-sm font-bold text-neutral-900 hover:bg-[#e6b800] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md">
             {confirming ? <><Loader2 size={16} className="animate-spin" /><span>Confirming…</span></> : 'Select'}
           </button>

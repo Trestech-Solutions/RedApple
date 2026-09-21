@@ -35,12 +35,41 @@ export function ProfileLayout({ children }: { children: React.ReactNode }) {
     else openLocationModal()
   }
 
-  // Redirect if not logged in
+  // Helper: true when the customer has a valid session (in either Redux or localStorage)
+  const hasSession = (): boolean => {
+    if (user) return true
+    if (typeof window === 'undefined') return false
+    const token = localStorage.getItem('trestech_customer_token')
+    return !!token
+  }
+
+  // Redirect if not logged in — but only after client hydration so we
+  // don't prematurely redirect based on a stale SSR snapshot of Redux state.
+  // Also tolerate the brief window where user/token are still being
+  // hydrated on the client (hasSession returns true from localStorage fallback).
   useEffect(() => {
-    if (user === null) router.replace('/')
+    // Wait until the user is defined (or confirmed null after hydration).
+    // Avoid redirect if localStorage still has a token (CartProvider will soon
+    // sync it into Redux and the user check will pass on the next render).
+    let cancelled = false
+    const check = () => {
+      if (cancelled) return
+      if (typeof window === 'undefined') return
+      const hasToken = !!localStorage.getItem('trestech_customer_token')
+      if (!user && !hasToken) {
+        router.replace('/')
+      }
+    }
+    // Run twice: immediate check + delayed check in case we arrived before
+    // localStorage auth was read.
+    check()
+    const t = setTimeout(check, 50)
+    return () => { cancelled = true; clearTimeout(t) }
   }, [user, router])
 
-  if (!user) return null
+  // Render nothing until we have a client-side session decision.
+  // If user is null but localStorage has a token, CartProvider will sync it.
+  if (!hasSession()) return null
 
   return (
     <div className="min-h-screen font-sans text-neutral-800">

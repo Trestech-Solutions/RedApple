@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2, XCircle } from 'lucide-react'
+import { Loader2, XCircle, Star } from 'lucide-react'
 import api from '@/api/axios'
 import API_ENDPOINTS from '@/api/endpoint'
 import type { Order } from '@/api/types'
 import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderStatusTimeline'
+import { useSubmitOrderFeedback } from '@/api/client/customer'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,83 @@ function PriceRow({
     >
       <span>{label}</span>
       <span>{value}</span>
+    </div>
+  )
+}
+
+// ─── Feedback form (shown when order is completed and no feedback yet) ────────
+
+function FeedbackForm({ orderId, customerPhone }: { orderId: number; customerPhone: string }) {
+  const [stars,   setStars]   = useState(0)
+  const [hover,   setHover]   = useState(0)
+  const [comment, setComment] = useState('')
+  const [done,    setDone]    = useState(false)
+
+  const { submitFeedback, isPending } = useSubmitOrderFeedback(orderId, {
+    onSuccess: () => setDone(true),
+  })
+
+  if (done) {
+    return (
+      <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-5 text-center space-y-1">
+        <p className="text-lg">⭐</p>
+        <p className="font-bold text-emerald-700">Thank you for your feedback!</p>
+        <p className="text-sm text-emerald-600">Your review helps us improve.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-2xl bg-white p-6 shadow-sm space-y-4">
+      <h3 className="font-bold text-neutral-800">How was your order?</h3>
+
+      {/* Star picker */}
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setStars(n)}
+            onMouseEnter={() => setHover(n)}
+            onMouseLeave={() => setHover(0)}
+            aria-label={`${n} star${n > 1 ? 's' : ''}`}
+            className="transition-transform hover:scale-110"
+          >
+            <Star
+              size={28}
+              className={`transition-colors ${
+                n <= (hover || stars)
+                  ? 'fill-amber-400 stroke-amber-400'
+                  : 'stroke-neutral-300 fill-transparent'
+              }`}
+            />
+          </button>
+        ))}
+        {stars > 0 && (
+          <span className="ml-2 text-sm font-semibold text-neutral-600">
+            {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][stars]}
+          </span>
+        )}
+      </div>
+
+      {/* Comment */}
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Tell us more about your experience (optional)"
+        rows={3}
+        className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm text-neutral-700 outline-none focus:border-neutral-400 resize-none"
+      />
+
+      <button
+        type="button"
+        disabled={stars === 0 || isPending}
+        onClick={() => submitFeedback({ customer_phone: customerPhone, stars, feed_back_comment: comment })}
+        className="w-full rounded-xl py-3 text-sm font-bold text-[var(--color-secondary)] transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-90"
+        style={{ backgroundColor: 'var(--color-primary)' }}
+      >
+        {isPending ? 'Submitting…' : 'Submit Review'}
+      </button>
     </div>
   )
 }
@@ -278,6 +356,26 @@ export default function OrderConfirmationPage() {
                 />
               </div>
             </div>
+
+            {/* Feedback form — shown once order is completed and no rating yet */}
+            {order.status?.toLowerCase() === 'completed' && !order.stars && (
+              <FeedbackForm orderId={order.id} customerPhone={order.customer_phone} />
+            )}
+
+            {/* Already reviewed — show the rating */}
+            {order.stars != null && (
+              <div className="rounded-2xl bg-white p-5 shadow-sm text-center space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  {[1,2,3,4,5].map((n) => (
+                    <Star key={n} size={20}
+                      className={n <= (order.stars ?? 0) ? 'fill-amber-400 stroke-amber-400' : 'stroke-neutral-200 fill-transparent'} />
+                  ))}
+                </div>
+                {order.feed_back_comment && (
+                  <p className="text-sm text-neutral-500 italic">&ldquo;{order.feed_back_comment}&rdquo;</p>
+                )}
+              </div>
+            )}
 
             <button
               onClick={() => router.push('/website/home')}

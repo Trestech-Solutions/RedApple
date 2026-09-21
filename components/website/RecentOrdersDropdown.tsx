@@ -139,7 +139,7 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
             }
           </ul>
 
-          <div className="border-t border-neutral-100 px-4 py-2.5 text-center">
+          {/* <div className="border-t border-neutral-100 px-4 py-2.5 text-center">
             <Link
               href="/website/profile/myOrders"
               onClick={() => setOpen(false)}
@@ -147,7 +147,7 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
             >
               View all orders →
             </Link>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

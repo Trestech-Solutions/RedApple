@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import {
-  Search, ArrowUp, MessageCircle,
-} from 'lucide-react'
+import { useSubmitContactUs } from '@/api/client/customer'
+import { getRestaurantId } from '@/api/utils'
 
 export default function ContactUsPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+
+  const { submitContactUs, isPending } = useSubmitContactUs({
+    onSuccess: () => setSubmitted(true),
+  })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -16,7 +18,13 @@ export default function ContactUsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    submitContactUs({
+      restaurant: Number(getRestaurantId()),
+      full_name:  form.name,
+      email:      form.email,
+      phone:      form.phone,
+      message:    form.message,
+    })
   }
 
   return (
@@ -90,9 +98,10 @@ export default function ContactUsPage() {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="rounded bg-[#000000] px-8 py-2.5 text-sm font-bold text-white hover:bg-red-700 transition-colors"
+                disabled={isPending}
+                className="rounded bg-[#000000] px-8 py-2.5 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                Submit
+                {isPending ? 'Sending…' : 'Submit'}
               </button>
             </div>
           </form>

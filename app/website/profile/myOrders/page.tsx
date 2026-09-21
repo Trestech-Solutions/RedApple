@@ -78,13 +78,13 @@ export default function MyOrdersPage() {
               onClick={() => setTab(t)}
               className={`py-4 text-sm font-semibold capitalize transition-colors relative ${
                 tab === t
-                  ? 'bg-[#000000] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-secondary)]'
                   : 'bg-white text-neutral-500 hover:bg-neutral-50'
               }`}
             >
               {t === 'active' ? 'Active Orders' : 'Past Orders'}
               <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] ${
-                tab === t ? 'bg-white/20 text-white' : 'bg-neutral-100 text-neutral-600'
+                tab === t ? 'bg-[var(--color-secondary)]/20 text-[var(--color-secondary)]' : 'bg-neutral-100 text-neutral-600'
               }`}>
                 {count}
               </span>
@@ -152,7 +152,7 @@ function OrderRow({
   onToggle: () => void;
 }) {
   const cls = statusClasses(order.status)
-  const totalNum = fmtMoneyNum(order.total)
+  const totalNum = fmtMoney(order.total)
   return (
     <div>
       <button
@@ -232,8 +232,8 @@ function OrderDetail({ summary }: { summary: OrderHistoryItem }) {
   return (
     <div className="border-t border-neutral-100 bg-neutral-50/60 px-6 py-4 space-y-4">
       {/* Grand total header */}
-      <div className="rounded-xl bg-[#000000] px-5 py-4 text-center text-white shadow-sm">
-        <p className="text-[10px] uppercase tracking-wider text-neutral-400 mb-0.5">
+      <div className="rounded-xl bg-[var(--color-primary)] px-5 py-4 text-center text-[var(--color-secondary)] shadow-sm">
+        <p className="text-[10px] uppercase tracking-wider [color:color-mix(in_srgb,var(--color-secondary),transparent_40%)] mb-0.5">
           Order #{summary.order_no} · Grand Total
         </p>
         <p className="text-2xl font-extrabold tracking-tight">{total}</p>

@@ -2,12 +2,14 @@
 
 import { useForm, Controller } from 'react-hook-form'
 import Image from 'next/image'
+import { useSubmitComplaint } from '@/api/client/customer'
+import { getRestaurantId } from '@/api/utils'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type ComplaintType = 'Takeaway' | 'Delivery'
 type DeliveryMethod = 'Food Panda' | 'Website, Phone or Facebook'
-type Title = 'Mr.' | 'Mrs.' | 'Ms.' | 'Dr.'
+type Title = 'Mr.' | 'Mrs.' | 'Ms.' | 'Miss.'
 
 type FormValues = {
   complaintType: ComplaintType
@@ -21,9 +23,18 @@ type FormValues = {
   description: string
 }
 
-const TITLES: Title[] = ['Mr.', 'Mrs.', 'Ms.', 'Dr.']
+const TITLES: Title[] = ['Mr.', 'Mrs.', 'Ms.', 'Miss.']
 const COMPLAINT_TYPES: ComplaintType[] = ['Takeaway', 'Delivery']
 const DELIVERY_METHODS: DeliveryMethod[] = ['Food Panda', 'Website, Phone or Facebook']
+
+// Map UI values to backend API values
+const TITLE_MAP: Record<Title, 'mr' | 'mrs' | 'ms' | 'miss'> = {
+  'Mr.': 'mr', 'Mrs.': 'mrs', 'Ms.': 'ms', 'Miss.': 'miss',
+}
+const DELIVERY_METHOD_MAP: Record<DeliveryMethod, 'foodpanda' | 'website_phone_facebook'> = {
+  'Food Panda': 'foodpanda',
+  'Website, Phone or Facebook': 'website_phone_facebook',
+}
 
 const DEFAULT_VALUES: FormValues = {
   complaintType: 'Takeaway',
@@ -100,7 +111,7 @@ export default function SubmitComplaintPage() {
     formState: { isSubmitSuccessful },
   } = useForm<FormValues>({ defaultValues: DEFAULT_VALUES })
 
-  const complaintType = watch('complaintType')
+  const complaintType  = watch('complaintType')
   const deliveryMethod = watch('deliveryMethod')
 
   const showFoodPandaMsg = complaintType === 'Delivery' && deliveryMethod === 'Food Panda'
@@ -108,9 +119,22 @@ export default function SubmitComplaintPage() {
     complaintType === 'Takeaway' ||
     (complaintType === 'Delivery' && deliveryMethod === 'Website, Phone or Facebook')
 
+  const { submitComplaint, isPending } = useSubmitComplaint()
+
   const onSubmit = (data: FormValues) => {
-    // TODO: send `data` to your API route here
-    console.log(data)
+    submitComplaint({
+      restaurant:            Number(getRestaurantId()),
+      complaint_type:        data.complaintType === 'Takeaway' ? 'takeaway' : 'delivery',
+      delivery_method:       data.deliveryMethod ? DELIVERY_METHOD_MAP[data.deliveryMethod] : '',
+      title:                 TITLE_MAP[data.title],
+      customer_name:         data.name,
+      customer_phone:        data.phone,
+      order_code:            data.orderCode || undefined,
+      date_of_visit:         data.dateOfVisit || null,
+      complaint_description: data.description,
+    }, {
+      onSuccess: () => reset(DEFAULT_VALUES),
+    })
   }
 
   return (
@@ -213,9 +237,10 @@ export default function SubmitComplaintPage() {
                 <div className="flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="rounded bg-[#000000] px-10 py-2.5 text-sm font-bold text-white hover:bg-red-700 transition-colors"
+                    disabled={isPending}
+                    className="rounded bg-[#000000] px-10 py-2.5 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-50"
                   >
-                    Submit
+                    {isPending ? 'Submitting…' : 'Submit'}
                   </button>
                 </div>
               </div>

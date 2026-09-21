@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '../axios';
 import API_ENDPOINTS from '../endpoint';
@@ -154,17 +154,27 @@ export const buildGuestPayload    = buildOrderPayload;
 export const buildLoggedInPayload = buildOrderPayload;
 
 // ─── Get Order detail ──────────────────────────────────────────────────────────
-// GET /api/storefront/orders/<id>/
+// GET /storefront/orders/<id>/ — Response: Order object (OrderSerializer)
+
 export function useGetOrder(params: { orderId: string | number | null }) {
-  // Not using useQuery here — orders are fetched once on the receipt page
-  // and the response is already returned from the create mutation.
-  // Keeping this as a plain async helper; call it from a component effect if needed.
-  const fetch = async () => {
-    if (!params.orderId) return null;
-    const res = await api.get<CheckoutResponse>(
-      API_ENDPOINTS.StorefrontOrders.detail(params.orderId)
-    );
-    return res.data;
+  const query = useQuery<CheckoutResponse | null, ApiError>({
+    queryKey: ['storefront-order', params.orderId],
+    queryFn: async () => {
+      if (!params.orderId) return null;
+      const res = await api.get<CheckoutResponse>(
+        API_ENDPOINTS.StorefrontOrders.detail(params.orderId)
+      );
+      return res.data;
+    },
+    staleTime: 1000 * 30,
+    gcTime:    1000 * 60 * 10,
+    enabled:   !!params.orderId,
+    retry:     false,
+  });
+
+  return {
+    ...query,
+    // Backwards-compat fetch helper for imperative usage
+    fetch: query.refetch,
   };
-  return { fetch, data: undefined as CheckoutResponse | undefined, isLoading: false, error: null };
 }

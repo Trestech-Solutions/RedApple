@@ -14,6 +14,10 @@ import type {
   AddAddressPayload,
   UpdateAddressPayload,
   OrderHistoryItem,
+  Order,
+  OrderFeedbackPayload,
+  ContactUsPayload,
+  ComplaintPayload,
 } from '../types';
 
 export { extractErrorMessage } from '../types';
@@ -376,25 +380,86 @@ export function useDeleteAddress(options?: {
 
 // ─── Get Order History ────────────────────────────────────────────────────────
 
+/**
+ * Normalize the raw Order object returned by `/storefront/customers/orders/`
+ * into the flat `OrderHistoryItem` shape that the list UI expects.
+ *
+ * Backend sends a full `Order` serializer with keys like `order_number`,
+ * `created_at`, `grand_total`; the list consumes `order_no`, `placed_at`,
+ * `total`, etc. This bridges the two WITHOUT any backend changes.
+ */
+function normalizeOrderHistoryEntry(raw: any): OrderHistoryItem {
+  const r = (raw ?? {}) as any;
+  // Order id + numbering
+  const id       = Number(r.id) || 0;
+  const orderNo  = String(r.order_no ?? r.order_number ?? r.order_no ?? `#${id}`);
+  // Dates
+  const placedAt = String(r.placed_at ?? r.created_at ?? '');
+  const estDel   = r.estimated_delivery_at ?? null;
+  const delAt    = r.delivered_at ?? null;
+  // Totals — prefer grand_total, fall back to total
+  const total    = String(
+    r.total ?? r.grand_total ?? r.subtotal ?? '0',
+  );
+  // Order meta
+  const orderType    = String(r.order_type ?? '');
+  const branchName   = r.branch_name ?? null;
+  const statusRaw    = String(r.status ?? 'Pending');
+  // Normalize status capitalization so isActiveOrder() Set checks match
+  const status = statusRaw.length > 0
+    ? statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1).toLowerCase()
+    : 'Pending';
+  // Payment method may or may not be present on the history serializer —
+  // fall back to a sensible placeholder instead of `undefined` so the row
+  // doesn't render an empty string.
+  const paymentMethod = String(
+    r.payment_method ?? r.paymentMode ?? r.payment ?? '—',
+  );
+  // Item count from nested items array (present in the full serializer) or
+  // the dedicated items_count field if the backend ever adds it.
+  const itemsCount = Number.isFinite(Number(r.items_count))
+    ? Number(r.items_count)
+    : Array.isArray(r.items) ? r.items.length : 0;
+
+  return {
+    id,
+    order_no:              orderNo,
+    order_type:            orderType,
+    status,
+    total,
+    placed_at:             placedAt,
+    estimated_delivery_at: estDel,
+    delivered_at:          delAt,
+    branch_name:           branchName,
+    payment_method:        paymentMethod,
+    items_count:           itemsCount,
+  };
+}
+
 export function useGetOrderHistory(options?: {
   onSuccess?: (data: OrderHistoryItem[]) => void;
   onError?: (message: string) => void;
   enabled?: boolean;
+  userId?: string | number | null;
 }) {
   const query = useQuery<OrderHistoryItem[], ApiError>({
-    queryKey: ORDER_HISTORY_QUERY_KEY,
+    // Scope the cache key per user so switching accounts or logging in/out
+    // always fetches fresh data instead of reusing a stale/errored result.
+    queryKey: [...ORDER_HISTORY_QUERY_KEY, options?.userId ?? 'me'],
     queryFn: () =>
       api
-        .get<{ results?: OrderHistoryItem[] } | OrderHistoryItem[]>(
+        .get<{ results?: any[] } | any[]>(
           API_ENDPOINTS.StorefrontCustomerAuth.getOrderHistory
         )
         .then((r) => {
-          const data = r.data as { results?: OrderHistoryItem[] } | OrderHistoryItem[];
-          return Array.isArray(data) ? data : data.results ?? [];
+          const raw = r.data as { results?: any[] } | any[];
+          const list: any[] = Array.isArray(raw) ? raw : raw.results ?? [];
+          return list.map(normalizeOrderHistoryEntry);
         }),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 15,
     enabled: options?.enabled ?? true,
+    retry: false,   // Don't retry 401/403 — user simply isn't logged in
   });
 
   reactUseEffect(() => {
@@ -425,4 +490,99 @@ export function useUpdateCustomer(options?: {
   onError?: (message: string) => void;
 }) {
   return useUpdateMyProfile(options);
+}
+
+// ─── Submit Contact-Us Message ────────────────────────────────────────────────
+
+export function useSubmitContactUs(options?: {
+  onSuccess?: () => void;
+  onError?: (message: string) => void;
+}) {
+  const mutation = useMutation<{ id: number }, ApiError, ContactUsPayload>({
+    mutationFn: (payload) =>
+      api
+        .post<{ id: number }>(API_ENDPOINTS.StorefrontPublic.contactUs, payload)
+        .then((r) => r.data),
+    onSuccess() {
+      toast.success('Your message has been sent. We will get back to you shortly.');
+      options?.onSuccess?.();
+    },
+    onError(err) {
+      const msg = (err as ApiError)?.detail || 'Failed to send message. Please try again.';
+      toast.error(msg);
+      options?.onError?.(msg);
+    },
+  });
+
+  return {
+    submitContactUs: mutation.mutate,
+    submitContactUsAsync: mutation.mutateAsync,
+    ...mutation,
+  };
+}
+
+// ─── Submit Complaint ─────────────────────────────────────────────────────────
+
+export function useSubmitComplaint(options?: {
+  onSuccess?: () => void;
+  onError?: (message: string) => void;
+}) {
+  const mutation = useMutation<{ id: number }, ApiError, ComplaintPayload>({
+    mutationFn: (payload) =>
+      api
+        .post<{ id: number }>(API_ENDPOINTS.StorefrontPublic.complaints, payload)
+        .then((r) => r.data),
+    onSuccess() {
+      toast.success('Your complaint has been submitted. Our team will review it shortly.');
+      options?.onSuccess?.();
+    },
+    onError(err) {
+      const msg = (err as ApiError)?.detail || 'Failed to submit complaint. Please try again.';
+      toast.error(msg);
+      options?.onError?.(msg);
+    },
+  });
+
+  return {
+    submitComplaint: mutation.mutate,
+    submitComplaintAsync: mutation.mutateAsync,
+    ...mutation,
+  };
+}
+
+// ─── Submit Order Feedback ────────────────────────────────────────────────────
+
+export function useSubmitOrderFeedback(
+  orderId: number | string,
+  options?: {
+    onSuccess?: (order: Order) => void;
+    onError?: (message: string) => void;
+  }
+) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation<Order, ApiError, OrderFeedbackPayload>({
+    mutationFn: (payload) =>
+      api
+        .patch<Order>(API_ENDPOINTS.StorefrontOrders.feedback(orderId), payload)
+        .then((r) => r.data),
+    onSuccess(order) {
+      toast.success('Thank you for your feedback!');
+      // Invalidate order detail so the updated stars/comment reflect
+      queryClient.invalidateQueries({ queryKey: ['storefront-order', String(orderId)] });
+      queryClient.invalidateQueries({ queryKey: ORDER_HISTORY_QUERY_KEY });
+      options?.onSuccess?.(order);
+    },
+    onError(err) {
+      const msg = (err as ApiError)?.detail || 'Failed to submit feedback. Please try again.';
+      toast.error(msg);
+      options?.onError?.(msg);
+    },
+  });
+
+  return {
+    submitFeedback: mutation.mutate,
+    submitFeedbackAsync: mutation.mutateAsync,
+    ...mutation,
+  };
 }

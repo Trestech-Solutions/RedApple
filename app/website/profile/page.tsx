@@ -95,7 +95,7 @@ export default function ProfilePage() {
                 setFirstName(parts[0] ?? '')
                 setLastName(parts.slice(1).join(' ') ?? '')
               }}
-              className="flex-1 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000]"
+              className="flex-1 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
             <Pencil size={15} className="shrink-0 text-neutral-400" />
           </div>
@@ -110,12 +110,12 @@ export default function ProfilePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@email.com"
-              className="flex-1 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000]"
+              className="flex-1 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
             <button
               onClick={() => refetch()}
               type="button"
-              className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[#000000] hover:underline whitespace-nowrap"
+              className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--color-primary)] hover:underline whitespace-nowrap"
             >
               <RefreshCw size={12} /> Update Email
             </button>
@@ -132,7 +132,7 @@ export default function ProfilePage() {
                   type="radio"
                   checked={gender === g}
                   onChange={() => setGender(g)}
-                  className="accent-[#000000]"
+                  className="accent-[var(--color-primary)]"
                 />
                 {g}
               </label>
@@ -152,7 +152,7 @@ export default function ProfilePage() {
         <button
           onClick={handleUpdate}
           disabled={updater.isPending}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#000000] py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-3 text-sm font-bold text-[var(--color-secondary)] hover:brightness-90 transition-colors disabled:opacity-50"
         >
           {updater.isPending ? <><Loader2 size={15} className="animate-spin" />Saving…</> : 'Update Profile'}
         </button>
