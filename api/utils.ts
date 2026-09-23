@@ -35,7 +35,7 @@ export function buildUrl(
 
 export const RESTAURANT_ID =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_RESTAURANT_ID) ||
-  '2';
+  '3';
 
 export function getRestaurantId(): string {
   if (typeof window !== 'undefined') {
