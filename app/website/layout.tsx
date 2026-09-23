@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import {
-  CartProvider, StoreSettingsProvider, useCart, useStoreSettings,
+  CartProvider, StoreSettingsProvider, useStoreSettings,
 } from '@/lib/hooks/useCart'
 import { ReduxProvider } from '@/redux/Provider'
 import { CartDrawer } from '@/components/cart/CartDrawer'
@@ -14,7 +14,6 @@ import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
 import { MenuDrawer } from '@/components/website/MenuDrawer'
-import { OrderTypeModal } from '@/components/website/OrderTypeModal'
 
 const DEFAULT_PATTERN_URL =
   'https://assets.indolj.io/upload/1693394669-Final-Pattern.png'
@@ -61,24 +60,16 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 }
 
 function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
-  const { locationModalOpen, closeLocationModal } = useCart()
   const { settings, isLoading } = useStoreSettings()
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
 
-  // While the combine-menu API call is in-flight, show the full-page skeleton
-  // so the user never sees an unstyled / partial navbar before data is ready.
   if (isLoading) return <WebsiteSkeleton />
 
-  // Background: prefer menu_page_background_image → background_color → default pattern
   const bgImage = resolveMediaUrl(settings.menu_page_background_image) || DEFAULT_PATTERN_URL
   const bgColor = settings.background_color || ''
 
-  // Brand colours exposed as CSS custom properties so any component can use
-  // var(--color-primary) / var(--color-secondary) / var(--color-tertiary)
-  // without extra prop-drilling. Empty values fall back to sensible defaults
-  // (black / white / white) so the UI never breaks.
   const primaryColor   = settings.primary_color   || '#000000'
   const secondaryColor = settings.secondary_color || '#FFFFFF'
   const tertiaryColor  = settings.tertiary_color  || '#FFFFFF'
@@ -102,6 +93,8 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
           Store is currently closed — {settings.close_message}
         </div>
       )}
+
+      {/* Owns OrderTypeModal (first visit + openLocationModal) */}
       <WebsiteBootstrap />
       <CartDrawer />
 
@@ -115,8 +108,8 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
       <CartBar />
       <WebsiteFooter />
-
-      <a
+<a
+      
         href="https://wa.me/923366655786"
         target="_blank"
         rel="noopener noreferrer"
@@ -128,9 +121,6 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         </span>
       </a>
 
-      {locationModalOpen && (
-        <OrderTypeModal onClose={closeLocationModal} />
-      )}
       {authModalOpen && (
         <AuthModal
           onClose={() => setAuthModalOpen(false)}

@@ -20,6 +20,7 @@ import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
 import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
 import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
+import { getRestaurantId } from '@/api/utils'
 
 const DEFAULT_ICON = 'solar:cup-hot-bold-duotone'
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop'
@@ -1066,7 +1067,8 @@ export default function HomePage() {
     (o) => o.status && o.is_available_now,
   )
   if (activeOffers.length === 0) return null
-
+ 
+  {console.log("restsurant id", getRestaurantId)}
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-4 md:px-8">
       <div className="flex justify-center">

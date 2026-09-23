@@ -68,6 +68,23 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+// ─── Safe close hook (double-call guard, shared by all modals) ────────────────
+
+function useSafeClose(onClose: () => void, delay = 0) {
+  const [closing, setClosing] = useState(false)
+  const closedRef = useRef(false)
+
+  const close = () => {
+    if (closedRef.current) return
+    closedRef.current = true
+    setClosing(true)
+    if (delay > 0) setTimeout(onClose, delay)
+    else onClose()
+  }
+
+  return { closing, close }
+}
+
 // ─── Shared logic hook ────────────────────────────────────────────────────────
 
 // Static area id to always pass alongside the selected branch for pickup.
@@ -141,16 +158,16 @@ function useModalLogic(onClose: () => void) {
             setGeoLoading(false); return
           }
         } catch (_) { /* fall through */ }
-        const citiesWithCoords = sortedCities.filter((c) => c.latitude != null && c.longitude != null)
-        if (citiesWithCoords.length > 0) {
-          const nearest = citiesWithCoords.reduce((best, c) =>
-            distanceKm(latitude, longitude, parseFloat(String(c.latitude)), parseFloat(String(c.longitude))) <
-            distanceKm(latitude, longitude, parseFloat(String(best.latitude)), parseFloat(String(best.longitude)))
-              ? c : best
-          )
-          setSelectedCityId(String(nearest.id))
-        }
-        setGeoLoading(false)
+   const citiesWithCoords = sortedCities.filter((c) => c.latitude != null && c.longitude != null)
+if (citiesWithCoords.length > 0) {
+  const nearest = citiesWithCoords.reduce((best, c) => {
+    const dCurrent = distanceKm(latitude, longitude, parseFloat(String(c.latitude)), parseFloat(String(c.longitude)))
+    const dBest    = distanceKm(latitude, longitude, parseFloat(String(best.latitude)), parseFloat(String(best.longitude)))
+    return dCurrent < dBest ? c : best
+  })
+  setSelectedCityId(String(nearest.id))
+}
+setGeoLoading(false)
       },
       (err) => {
         setGeoLoading(false)
@@ -238,11 +255,12 @@ function Modal1({ onClose }: { onClose: () => void }) {
   } = useModalLogic(onClose)
   const { settings } = useStoreSettings()
   const merchantLogo = resolveLogo(settings.merchant_logo)
+  const { close } = useSafeClose(onClose)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
       <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
-        <button onClick={onClose} className="absolute right-3 top-3 rounded-full p-1 text-neutral-400 hover:bg-neutral-100 transition-colors z-10" aria-label="Close">
+        <button type="button" onClick={close} className="absolute right-3 top-3 rounded-full p-1 text-neutral-400 hover:bg-neutral-100 transition-colors z-10" aria-label="Close">
           <X size={18} />
         </button>
 
@@ -261,7 +279,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
           <div className="mb-5 flex justify-center sm:mb-6">
             <div className="flex rounded-full border border-neutral-300 bg-neutral-100 p-1 gap-1">
               {(['delivery', 'pickup'] as OrderType[]).map((type) => (
-                <button key={type} onClick={() => { setOrderType(type); setGeoError('') }}
+                <button type="button" key={type} onClick={() => { setOrderType(type); setGeoError('') }}
                   className={`rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all sm:px-6 sm:py-2 sm:text-xs`}
                   style={orderType === type
                     ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }
@@ -279,7 +297,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
           </p>
 
           <div className="mb-3.5 flex justify-center sm:mb-4">
-            <button onClick={handleUseCurrentLocation} disabled={geoLoading}
+            <button type="button" onClick={handleUseCurrentLocation} disabled={geoLoading}
               className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-semibold disabled:opacity-60 transition-colors sm:px-5 sm:py-2 sm:text-xs hover:opacity-90"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
               {geoLoading ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
@@ -364,7 +382,7 @@ function Modal1({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          <button onClick={handleConfirm} disabled={!canConfirm}
+          <button type="button" onClick={handleConfirm} disabled={!canConfirm}
             className="w-full rounded-xl py-2.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all sm:py-3 sm:text-sm flex items-center justify-center gap-2 hover:opacity-90"
             style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
             {confirming ? <><Loader2 size={14} className="animate-spin" /><span>Confirming…</span></> : 'Confirm Location'}
@@ -391,6 +409,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
   } = useModalLogic(onClose)
   const { settings } = useStoreSettings()
   const merchantLogo = resolveLogo(settings.merchant_logo)
+  const { close } = useSafeClose(onClose)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
@@ -399,7 +418,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
         {/* Header with logo using primary color */}
         <div className="relative rounded-t-3xl pb-10 pt-6 flex flex-col items-center"
           style={{ backgroundColor: 'var(--color-primary)' }}>
-          <button onClick={onClose} className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-black/10 transition-colors" aria-label="Close"
+          <button type="button" onClick={close} className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-black/10 transition-colors" aria-label="Close"
             style={{ color: 'var(--color-secondary)' }}>
             <X size={18} />
           </button>
@@ -419,7 +438,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
           <div className="mb-5 flex justify-center">
             <div className="flex rounded-full border border-neutral-200 bg-neutral-100 p-1 gap-1 w-full max-w-[240px]">
               {(['delivery', 'pickup'] as OrderType[]).map((type) => (
-                <button key={type} onClick={() => { setOrderType(type); setGeoError('') }}
+                <button type="button" key={type} onClick={() => { setOrderType(type); setGeoError('') }}
                   className={`flex-1 rounded-full py-2 text-xs font-bold transition-all ${orderType === type ? 'shadow-sm' : 'text-neutral-500 hover:text-neutral-800'}`}
                   style={orderType === type
                     ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }
@@ -436,7 +455,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
 
           {/* Use current location — outlined yellow button */}
           <div className="mb-5 flex justify-center">
-            <button onClick={handleUseCurrentLocation} disabled={geoLoading}
+            <button type="button" onClick={handleUseCurrentLocation} disabled={geoLoading}
               className="flex items-center gap-2 rounded-full border-2 px-5 py-2 text-xs font-semibold disabled:opacity-60 transition-colors hover:opacity-80"
               style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>
               {geoLoading ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
@@ -455,6 +474,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
                 const imgSrc = resolveImg(city.image)
                 return (
                   <button
+                    type="button"
                     key={city.id}
                     onClick={() => { setSelectedCityId(String(city.id)); setSelectedAreaId('') }}
                     className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all w-[100px] ${
@@ -542,7 +562,7 @@ function Modal2({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Select button — primary bg, secondary text */}
-          <button onClick={handleConfirm} disabled={!canConfirm}
+          <button type="button" onClick={handleConfirm} disabled={!canConfirm}
             className="w-full rounded-2xl py-3.5 text-sm font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md"
             style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
             {confirming ? <><Loader2 size={16} className="animate-spin" /><span>Confirming…</span></> : 'Select'}
@@ -562,70 +582,55 @@ function Modal2({ onClose }: { onClose: () => void }) {
 //   • animated step reveal for location + confirm
 //   • all animations are pure CSS (no extra deps)
 // ─────────────────────────────────────────────────────────────────────────────
+// ─── Tiny helpers for Tailwind-only animations ───────────────────────────────
 
-let injectedAnimStyles = false
-function useInjectAnimStyles() {
+function useMounted() {
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
-    if (injectedAnimStyles) return
-    injectedAnimStyles = true
-    const style = document.createElement('style')
-    style.setAttribute('data-otm3-styles', 'true')
-    style.textContent = `
-      @keyframes otm3-backdrop-in { from { opacity: 0 } to { opacity: 1 } }
-      @keyframes otm3-sheet-in {
-        from { opacity: 0; transform: translateY(24px) scale(.96); }
-        to   { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      @keyframes otm3-pop-in {
-        0%   { opacity: 0; transform: translateY(10px) scale(.9); }
-        60%  { opacity: 1; transform: translateY(-2px) scale(1.03); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      @keyframes otm3-float {
-        0%, 100% { transform: translateY(0); }
-        50%      { transform: translateY(-3px); }
-      }
-      @keyframes otm3-pulse-ring {
-        0%   { box-shadow: 0 0 0 0 var(--otm3-ring-color, rgba(0,0,0,.25)); }
-        70%  { box-shadow: 0 0 0 10px rgba(0,0,0,0); }
-        100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
-      }
-      @keyframes otm3-shimmer {
-        0%   { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-      }
-      @keyframes otm3-spin-slow { to { transform: rotate(360deg); } }
-      @keyframes otm3-expand {
-        from { opacity: 0; max-height: 0; transform: translateY(-6px); }
-        to   { opacity: 1; max-height: 400px; transform: translateY(0); }
-      }
-      .otm3-backdrop { animation: otm3-backdrop-in .25s ease-out both; }
-      .otm3-sheet { animation: otm3-sheet-in .38s cubic-bezier(.2,.8,.2,1) both; }
-      .otm3-pop { animation: otm3-pop-in .45s cubic-bezier(.2,.8,.2,1) both; }
-      .otm3-float { animation: otm3-float 3.2s ease-in-out infinite; }
-      .otm3-expand { animation: otm3-expand .35s cubic-bezier(.2,.8,.2,1) both; overflow: hidden; }
-      .otm3-shimmer {
-        background-image: linear-gradient(110deg, transparent 40%, rgba(255,255,255,.55) 50%, transparent 60%);
-        background-size: 200% 100%;
-        animation: otm3-shimmer 2.4s ease-in-out infinite;
-      }
-      .otm3-spin-slow { animation: otm3-spin-slow 6s linear infinite; }
-      .otm3-glow-ring { animation: otm3-pulse-ring 1.8s ease-out infinite; }
-      .otm3-scrollbar::-webkit-scrollbar { width: 6px; }
-      .otm3-scrollbar::-webkit-scrollbar-track { background: transparent; }
-      .otm3-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 999px; }
-      .otm3-city-btn { transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease, border-color .22s ease, background-color .22s ease; }
-      .otm3-city-btn:hover { transform: translateY(-3px); }
-      .otm3-city-btn:active { transform: translateY(-1px) scale(.97); }
-      .otm3-select-wrap select { transition: border-color .2s ease, box-shadow .2s ease; }
-      .otm3-select-wrap select:focus { box-shadow: 0 0 0 4px var(--otm3-focus-ring, rgba(0,0,0,.08)); }
-    `
-    document.head.appendChild(style)
+    const id = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(id)
   }, [])
+  return mounted
 }
 
+// Fade + slide + scale in on mount (with optional stagger delay in ms)
+function Pop({ delay = 0, className = '', children }: { delay?: number; className?: string; children: React.ReactNode }) {
+  const mounted = useMounted()
+  return (
+    <div
+      className={`transition-all duration-500 ease-[cubic-bezier(.2,.8,.2,1)] ${
+        mounted ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-2.5 scale-90 opacity-0'
+      } ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
+
+// Smooth height expand on mount (use `key` to replay)
+function Reveal({ className = '', children }: { className?: string; children: React.ReactNode }) {
+  const mounted = useMounted()
+  return (
+    <div
+      className={`grid transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${
+        mounted ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+      } ${className}`}
+    >
+      <div className="-m-1 min-h-0 overflow-hidden p-1">{children}</div>
+    </div>
+  )
+}
+
+const selectCls =
+  'w-full appearance-none rounded-2xl border-2 border-neutral-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-neutral-700 outline-none transition-shadow focus:border-[color:var(--color-primary)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--color-primary)_18%,transparent)] disabled:bg-neutral-50 disabled:text-neutral-400'
+
+const loaderBoxCls =
+  'flex w-full items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3'
+
+// ─── Modal 3 ─────────────────────────────────────────────────────────────────
+
 function Modal3({ onClose }: { onClose: () => void }) {
-  useInjectAnimStyles()
   const {
     orderType, setOrderType, geoLoading, geoError, setGeoError, confirming,
     sortedCities, loadingCities, selectedCityId, setSelectedCityId,
@@ -637,60 +642,47 @@ function Modal3({ onClose }: { onClose: () => void }) {
   const { settings } = useStoreSettings()
   const merchantLogo = resolveLogo(settings.merchant_logo)
 
-  const [closing, setClosing] = useState(false)
-  const toggleWrapRef = useRef<HTMLDivElement>(null)
-
-  const smoothClose = () => {
-    setClosing(true)
-    setTimeout(onClose, 180)
-  }
+  const { closing, close: smoothClose } = useSafeClose(onClose, 200)
+  const mounted = useMounted()
+  const visible = mounted && !closing
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 otm3-backdrop"
-      style={{
-        opacity: closing ? 0 : undefined,
-        transition: closing ? 'opacity .18s ease' : undefined,
-        background: 'radial-gradient(circle at 50% 20%, rgba(0,0,0,.55), rgba(0,0,0,.72))',
-        backdropFilter: 'blur(6px)',
-      }}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[radial-gradient(circle_at_50%_20%,rgba(0,0,0,.55),rgba(0,0,0,.72))] p-2 backdrop-blur-[6px] transition-opacity duration-200 sm:p-4 ${
+        visible ? 'opacity-100' : 'opacity-0'
+      }`}
       onClick={(e) => { if (e.target === e.currentTarget) smoothClose() }}
     >
       <div
-        className="otm3-sheet otm3-scrollbar relative w-full max-w-md overflow-y-auto rounded-[28px] max-h-[92vh]"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.94))',
-          boxShadow: '0 30px 80px -20px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.4) inset',
-          opacity: closing ? 0 : undefined,
-          transform: closing ? 'translateY(16px) scale(.97)' : undefined,
-          transition: closing ? 'all .18s ease' : undefined,
-        }}
+        className={`relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-[28px] bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,.55)] ring-1 ring-inset ring-white/40 transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/10 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${
+          visible ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-6 scale-95 opacity-0'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Ambient gradient glow header */}
-        <div
-          className="relative overflow-hidden rounded-t-[28px] px-6 pt-7 pb-14"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary) 55%, color-mix(in srgb, var(--color-primary) 70%, black) 100%)',
-          }}
-        >
-          {/* decorative blurred orbs */}
-          <div className="pointer-events-none absolute -left-8 -top-10 h-32 w-32 rounded-full bg-white/20 blur-2xl otm3-float" />
-          <div className="pointer-events-none absolute -right-6 top-6 h-24 w-24 rounded-full bg-white/10 blur-2xl otm3-float" style={{ animationDelay: '.8s' }} />
+        {/* Gradient header */}
+        <div className="relative overflow-hidden rounded-t-[28px] bg-[linear-gradient(135deg,var(--color-primary)_0%,var(--color-primary)_55%,color-mix(in_srgb,var(--color-primary)_70%,black)_100%)] px-6 pb-14 pt-7">
+          {/* decorative orbs */}
+          <div className="pointer-events-none absolute -left-8 -top-10 h-32 w-32 animate-pulse rounded-full bg-white/20 blur-2xl" />
+          <div className="pointer-events-none absolute -right-6 top-6 h-24 w-24 animate-pulse rounded-full bg-white/10 blur-2xl [animation-delay:.8s]" />
 
           <button
+            type="button"
             onClick={smoothClose}
-            className="absolute right-4 top-4 z-10 rounded-full bg-black/15 p-1.5 text-white backdrop-blur-sm transition-all hover:bg-black/25 hover:rotate-90"
+            className="absolute right-4 top-4 z-10 touch-manipulation rounded-full bg-black/15 p-1.5 text-white backdrop-blur-sm active:bg-black/30"
             aria-label="Close"
           >
-            <X size={16} />
+            <X size={26} />
           </button>
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="otm3-pop otm3-glow-ring flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-xl overflow-hidden ring-4 ring-white/30"
-              style={{ ['--otm3-ring-color' as any]: 'rgba(255,255,255,.35)' }}>
-              <Image src={merchantLogo} alt="Logo" width={64} height={64} className="h-full w-full object-contain" priority />
-            </div>
+            <Pop>
+              <div className="relative">
+                <span className="absolute inset-0 animate-ping rounded-2xl bg-white/40 [animation-duration:2s]" />
+                <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-xl ring-4 ring-white/30">
+                  <Image src={merchantLogo} alt="Logo" width={64} height={64} className="h-full w-full object-contain" priority />
+                </div>
+              </div>
+            </Pop>
             <div className="mt-3 flex items-center gap-1.5">
               <Sparkles size={13} className="text-white/90" />
               <h2 className="text-center text-sm font-extrabold tracking-wide text-white sm:text-base">Where should we send it?</h2>
@@ -699,152 +691,150 @@ function Modal3({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Body — floats up over the header */}
-        <div className="relative -mt-8 z-10 rounded-t-[26px] bg-white px-5 pb-6 pt-5 sm:px-6">
+        {/* Body */}
+        <div className="relative z-10 -mt-8 rounded-t-[26px] bg-white px-5 pb-6 pt-5 sm:px-6">
 
           {/* Segmented control with sliding pill */}
-          <div
-            ref={toggleWrapRef}
-            className="otm3-pop relative mx-auto mb-5 flex w-full max-w-[280px] rounded-2xl bg-neutral-100 p-1"
-            style={{ animationDelay: '.05s' }}
-          >
-            <div
-              className="absolute inset-y-1 w-[calc(50%-4px)] rounded-xl shadow-md transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)]"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                left: orderType === 'delivery' ? '4px' : 'calc(50% + 0px)',
-              }}
-            />
-            {(['delivery', 'pickup'] as OrderType[]).map((type) => {
-              const active = orderType === type
-              const Icon = type === 'pickup' ? Store : MapPin
-              return (
-                <button
-                  key={type}
-                  onClick={() => { setOrderType(type); setGeoError('') }}
-                  className="relative z-10 flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition-colors duration-300"
-                  style={{ color: active ? 'var(--color-secondary)' : '#6b7280' }}
-                >
-                  <Icon size={13} className={active ? '' : 'opacity-60'} />
-                  {type === 'pickup' ? 'Pick-Up' : 'Delivery'}
-                </button>
-              )
-            })}
-          </div>
+          <Pop delay={50}>
+            <div className="relative mx-auto mb-5 flex w-full max-w-[280px] rounded-2xl bg-neutral-100 p-1">
+              <div
+                className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-xl bg-[var(--color-primary)] shadow-md transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${
+                  orderType === 'delivery' ? 'left-1' : 'left-1/2'
+                }`}
+              />
+              {(['delivery', 'pickup'] as OrderType[]).map((type) => {
+                const active = orderType === type
+                const Icon = type === 'pickup' ? Store : MapPin
+                return (
+                  <button
+                    type="button"
+                    key={type}
+                    onClick={() => { setOrderType(type); setGeoError('') }}
+                    className={`relative z-10 flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition-colors duration-300 ${
+                      active ? 'text-[color:var(--color-secondary)]' : 'text-gray-500'
+                    }`}
+                  >
+                    <Icon size={13} className={active ? '' : 'opacity-60'} />
+                    {type === 'pickup' ? 'Pick-Up' : 'Delivery'}
+                  </button>
+                )
+              })}
+            </div>
+          </Pop>
 
           {geoError && (
-            <div className="otm3-pop mb-3 rounded-xl bg-red-50 px-3 py-2 text-center text-xs font-medium text-red-600 border border-red-100">
-              {geoError}
-            </div>
+            <Pop>
+              <div className="mb-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-center text-xs font-medium text-red-600">
+                {geoError}
+              </div>
+            </Pop>
           )}
 
           {/* Current location button */}
-          <div className="otm3-pop mb-5 flex justify-center" style={{ animationDelay: '.1s' }}>
+          <Pop delay={100} className="mb-5 flex justify-center">
             <button
+              type="button"
               onClick={handleUseCurrentLocation}
               disabled={geoLoading}
-              className="group relative flex items-center gap-2 overflow-hidden rounded-full px-5 py-2.5 text-xs font-bold shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60"
-              style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 12%, white)', color: 'var(--color-primary)' }}
+              className="group relative flex touch-manipulation items-center gap-2 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,white)] px-5 py-2.5 text-xs font-bold text-[color:var(--color-primary)] shadow-sm transition-all hover:shadow-md active:scale-95 disabled:opacity-60"
             >
-              <span className="absolute inset-0 otm3-shimmer opacity-0 group-hover:opacity-100" />
-              {geoLoading ? <Loader2 size={13} className="animate-spin" /> : <Navigation size={13} className="transition-transform group-hover:-rotate-12" />}
+              <span className="pointer-events-none absolute inset-y-0 -left-full w-1/2 -skew-x-12 bg-white/50 transition-transform duration-700 group-hover:translate-x-[400%]" />
+              {geoLoading
+                ? <Loader2 size={13} className="animate-spin" />
+                : <Navigation size={13} className="transition-transform group-hover:-rotate-12" />}
               <span className="relative">{geoLoading ? 'Detecting your location…' : 'Use Current Location'}</span>
             </button>
-          </div>
+          </Pop>
 
           {/* City chip grid */}
-          <p className="otm3-pop mb-3 text-center text-xs font-bold uppercase tracking-wider text-neutral-400" style={{ animationDelay: '.12s' }}>
-            Choose your city
-          </p>
+          <Pop delay={120}>
+            <p className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-neutral-400">Choose your city</p>
+          </Pop>
 
           {loadingCities ? (
-            <div className="flex justify-center py-6"><Loader2 size={22} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
+            <div className="flex justify-center py-6">
+              <Loader2 size={22} className="animate-spin text-[color:var(--color-primary)]" />
+            </div>
           ) : (
-            <div className="mb-5  grid grid-cols-3 gap-2.5 sm:grid-cols-4">
+            <div className="mb-5 grid grid-cols-3 gap-2.5 sm:grid-cols-4">
               {sortedCities.map((city, i) => {
                 const isSelected = String(city.id) === selectedCityId
                 const imgSrc = resolveImg(city.image)
                 return (
-                  <button
-                    key={city.id}
-                    onClick={() => { setSelectedCityId(String(city.id)); setSelectedAreaId('') }}
-                    className="otm3-city-btn otm3-pop flex flex-col items-center gap-1.5 rounded-2xl border p-2.5"
-                    style={{
-                      animationDelay: `${0.05 + i * 0.03}s`,
-                      borderColor: isSelected ? 'var(--color-primary)' : '#e5e7eb',
-                      backgroundColor: isSelected ? 'color-mix(in srgb, var(--color-primary) 8%, white)' : 'white',
-                      boxShadow: isSelected ? '0 6px 16px -6px color-mix(in srgb, var(--color-primary) 45%, transparent)' : 'none',
-                    }}
-                  >
-                    <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
-                      {imgSrc ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={imgSrc} alt={city.name} className="h-full w-full object-contain" />
-                      ) : (
-                        <Image src="/karachi.svg" alt={city.name} width={40} height={40} className="h-full w-full object-contain" />
-                      )}
-                      {isSelected && (
-                        <span
-                          className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-white"
-                          style={{ backgroundColor: 'var(--color-primary)' }}
-                        >
-                          <Check size={10} strokeWidth={3} />
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className="text-[11px] font-semibold leading-tight text-center"
-                      style={{ color: isSelected ? 'var(--color-primary)' : '#374151' }}
+                  <Pop key={city.id} delay={50 + i * 30}>
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedCityId(String(city.id)); setSelectedAreaId('') }}
+                      className={`flex h-full w-full touch-manipulation flex-col items-center gap-1.5 rounded-2xl border p-2.5 transition-all duration-200 active:scale-95 ${
+                        isSelected
+                          ? 'border-[color:var(--color-primary)] bg-[color-mix(in_srgb,var(--color-primary)_8%,white)] shadow-[0_6px_16px_-6px_color-mix(in_srgb,var(--color-primary)_45%,transparent)]'
+                          : 'border-neutral-200 bg-white'
+                      }`}
                     >
-                      {city.name}
-                    </span>
-                  </button>
+                      <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-50">
+                        <div className="h-full w-full overflow-hidden rounded-xl">
+                          {imgSrc ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={imgSrc} alt={city.name} className="h-full w-full object-contain" />
+                          ) : (
+                            <Image src="/karachi.svg" alt={city.name} width={40} height={40} className="h-full w-full object-contain" />
+                          )}
+                        </div>
+                        {isSelected && (
+                          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
+                            <Check size={10} strokeWidth={3} />
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className={`text-center text-[11px] font-semibold leading-tight ${
+                          isSelected ? 'text-[color:var(--color-primary)]' : 'text-gray-700'
+                        }`}
+                      >
+                        {city.name}
+                      </span>
+                    </button>
+                  </Pop>
                 )
               })}
             </div>
           )}
 
-          {/* Location / branch step — expands in */}
+          {/* Location / branch step */}
           {selectedCityId && (
-            <div key={`${orderType}-${selectedCityId}`} className="otm3-expand mb-5">
+            <Reveal key={`${orderType}-${selectedCityId}`} className="mb-5">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-neutral-700">
                 {orderType === 'pickup' ? <Store size={13} /> : <MapPin size={13} />}
                 {orderType === 'pickup' ? 'Select a branch' : 'Select your area'}
               </p>
 
-              <div className="otm3-select-wrap relative">
+              <div className="relative">
                 {orderType === 'pickup' ? (
                   loadingCityBranches ? (
-                    <div className="flex w-full items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-                      <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+                    <div className={loaderBoxCls}>
+                      <Loader2 size={16} className="animate-spin text-[color:var(--color-primary)]" />
                     </div>
                   ) : (
                     <select
                       value={selectedBranchId}
                       onChange={(e) => setSelectedBranchId(e.target.value)}
                       disabled={branchList.length === 0}
-                      className="w-full appearance-none rounded-2xl border-2 border-neutral-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-neutral-700 outline-none disabled:bg-neutral-50 disabled:text-neutral-400"
-                      style={{ ['--otm3-focus-ring' as any]: 'color-mix(in srgb, var(--color-primary) 18%, transparent)' }}
-                      onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
-                      onBlur={(e) => { e.target.style.borderColor = '#e5e7eb' }}
+                      className={selectCls}
                     >
                       <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
                       {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
                     </select>
                   )
                 ) : loadingCityAreas ? (
-                  <div className="flex w-full items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3">
-                    <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+                  <div className={loaderBoxCls}>
+                    <Loader2 size={16} className="animate-spin text-[color:var(--color-primary)]" />
                   </div>
                 ) : (
                   <select
                     value={selectedAreaId}
                     onChange={(e) => setSelectedAreaId(e.target.value)}
                     disabled={areaList.length === 0}
-                    className="w-full appearance-none rounded-2xl border-2 border-neutral-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-neutral-700 outline-none disabled:bg-neutral-50 disabled:text-neutral-400"
-                    style={{ ['--otm3-focus-ring' as any]: 'color-mix(in srgb, var(--color-primary) 18%, transparent)' }}
-                    onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
-                    onBlur={(e) => { e.target.style.borderColor = '#e5e7eb' }}
+                    className={selectCls}
                   >
                     <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
                     {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
@@ -855,51 +845,60 @@ function Modal3({ onClose }: { onClose: () => void }) {
 
               {/* Preview card */}
               {orderType === 'pickup' && selectedBranchObj && (
-                <div className="otm3-pop mt-3 flex items-center gap-3 rounded-2xl border border-neutral-100 bg-gradient-to-br from-neutral-50 to-white px-4 py-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, white)' }}>
-                    <Store size={16} style={{ color: 'var(--color-primary)' }} />
+                <Pop className="mt-3">
+                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-100 bg-gradient-to-br from-neutral-50 to-white px-4 py-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--color-primary)_15%,white)]">
+                      <Store size={16} className="text-[color:var(--color-primary)]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-neutral-800">{selectedBranchObj.name}</p>
+                      {selectedCityObj && <p className="text-[11px] text-neutral-500">{selectedCityObj.name}</p>}
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-neutral-800">{selectedBranchObj.name}</p>
-                    {selectedCityObj && <p className="text-[11px] text-neutral-500">{selectedCityObj.name}</p>}
-                  </div>
-                </div>
+                </Pop>
               )}
               {orderType === 'delivery' && selectedAreaObj && (
-                <div className="otm3-pop mt-3 flex items-center gap-3 rounded-2xl border border-neutral-100 bg-gradient-to-br from-neutral-50 to-white px-4 py-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, white)' }}>
-                    <MapPin size={16} style={{ color: 'var(--color-primary)' }} />
+                <Pop className="mt-3">
+                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-100 bg-gradient-to-br from-neutral-50 to-white px-4 py-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--color-primary)_15%,white)]">
+                      <MapPin size={16} className="text-[color:var(--color-primary)]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      {loadingAreaDetail ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 size={12} className="animate-spin" />
+                          <span className="text-xs text-neutral-500">Finding your outlet…</span>
+                        </div>
+                      ) : (
+                        <p className="truncate text-sm font-bold text-neutral-800">
+                          {(areaDetail ?? selectedAreaObj)?.branch_name || '—'}
+                        </p>
+                      )}
+                      <p className="truncate text-[11px] text-neutral-500">
+                        {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    {loadingAreaDetail ? (
-                      <div className="flex items-center gap-2"><Loader2 size={12} className="animate-spin" /><span className="text-xs text-neutral-500">Finding your outlet…</span></div>
-                    ) : (
-                      <p className="truncate text-sm font-bold text-neutral-800">{(areaDetail ?? selectedAreaObj)?.branch_name || '—'}</p>
-                    )}
-                    <p className="truncate text-[11px] text-neutral-500">
-                      {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
-                    </p>
-                  </div>
-                </div>
+                </Pop>
               )}
-            </div>
+            </Reveal>
           )}
 
           {/* Confirm button */}
           <button
+            type="button"
             onClick={handleConfirm}
             disabled={!canConfirm}
-            className="group relative w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
-            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}
+            className="group relative flex w-full touch-manipulation items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[var(--color-primary)] py-3.5 text-sm font-bold text-[color:var(--color-secondary)] shadow-lg transition-all hover:shadow-xl active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-35"
           >
-            {!confirming && canConfirm && <span className="absolute inset-0 otm3-shimmer" />}
+            {!confirming && canConfirm && (
+              <span className="pointer-events-none absolute inset-y-0 -left-full w-1/2 -skew-x-12 bg-white/40 transition-transform duration-700 group-hover:translate-x-[400%]" />
+            )}
             <span className="relative flex items-center gap-2">
               {confirming ? (
                 <><Loader2 size={16} className="animate-spin" /> Confirming…</>
               ) : (
-                <>Confirm & Continue <Check size={15} className="transition-transform group-hover:translate-x-0.5" /></>
+                <>Confirm &amp; Continue <Check size={15} className="transition-transform group-hover:translate-x-0.5" /></>
               )}
             </span>
           </button>

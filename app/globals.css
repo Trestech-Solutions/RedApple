@@ -62,24 +62,6 @@
   --radius: 0.5rem;
 }
 
-.dark {
-  color-scheme: dark;
-  --background: #111827;
-  --foreground: #F3F4F6;
-  --card: #1F2937;
-  --card-foreground: #F3F4F6;
-  --primary: #F59E0B;
-  --primary-foreground: #111827;
-  --secondary: #6B7280;
-  --secondary-foreground: #F3F4F6;
-  --muted: #374151;
-  --muted-foreground: #9CA3AF;
-  --accent: #2563EB;
-  --accent-foreground: #F3F4F6;
-  --border: #374151;
-  --input: #1F2937;
-  --radius: 0.5rem;
-}
 
 @layer base {
   html {
