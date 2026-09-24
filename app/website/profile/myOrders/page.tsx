@@ -11,7 +11,7 @@ import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderSta
 
 // Active = anything that is not a terminal status
 const TERMINAL_STATUSES = new Set([
-  'completed', 'delivered', 'cancelled', 'canceled', 'rejected', 'refunded', 'failed',
+  'completed', 'delivered', 'cancelled', 'canceled', 'cancel', 'rejected', 'refunded', 'failed',
 ])
 
 function fmtDate(iso: string | null | undefined): string {
@@ -36,7 +36,7 @@ function statusClasses(status: string): { pill: string; dot: string } {
   if (s === 'preparing')                                   return { pill: 'bg-orange-100 text-orange-700',  dot: 'bg-orange-500'  }
   if (s === 'out_for_delivery' || s === 'out-for-delivery') return { pill: 'bg-blue-100   text-blue-700',    dot: 'bg-blue-500'    }
   if (s === 'completed' || s === 'delivered')              return { pill: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' }
-  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return { pill: 'bg-red-100 text-red-700',  dot: 'bg-red-500'     }
+  if (s === 'cancelled' || s === 'canceled' || s === 'cancel' || s === 'rejected') return { pill: 'bg-red-100 text-red-700',  dot: 'bg-red-500'     }
   return { pill: 'bg-neutral-100 text-neutral-700', dot: 'bg-neutral-400' }
 }
 
@@ -47,7 +47,7 @@ function statusLabel(status: string): string {
   if (s === 'preparing')                                    return 'Preparing'
   if (s === 'out_for_delivery' || s === 'out-for-delivery') return 'Out For Delivery'
   if (s === 'completed' || s === 'delivered')               return 'Completed'
-  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return 'Cancelled'
+  if (s === 'cancelled' || s === 'canceled' || s === 'cancel' || s === 'rejected') return 'Cancelled'
   return status
 }
 

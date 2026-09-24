@@ -29,7 +29,7 @@ function statusLabel(status: string): string {
   if (s === 'preparing')                                    return 'Preparing'
   if (s === 'out_for_delivery' || s === 'out-for-delivery') return 'Out For Delivery'
   if (s === 'completed' || s === 'delivered')               return 'Completed'
-  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return 'Cancelled'
+  if (s === 'cancelled' || s === 'canceled' || s === 'cancel' || s === 'rejected') return 'Cancelled'
   return capitalize(status)
 }
 
