@@ -16,15 +16,28 @@ import { useRecentOrders } from '@/lib/hooks/useRecentOrders'
 // ─── Status badge colours ─────────────────────────────────────────────────────
 
 function statusColour(status: string): string {
-  const s = status.toLowerCase()
-  if (s === 'pending')    return 'bg-amber-100 text-amber-700'
-  if (s === 'confirmed')  return 'bg-blue-100 text-blue-700'
-  if (s === 'preparing')  return 'bg-purple-100 text-purple-700'
-  if (s === 'ready')      return 'bg-teal-100 text-teal-700'
-  if (s === 'dispatched' || s === 'on the way') return 'bg-indigo-100 text-indigo-700'
-  if (s === 'delivered' || s === 'completed')   return 'bg-emerald-100 text-emerald-700'
-  if (s === 'cancelled' || s === 'rejected')    return 'bg-red-100 text-red-700'
+  const s = (status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  if (s === 'pending')                           return 'bg-amber-100 text-amber-700'
+  if (s === 'accepted' || s === 'confirmed')     return 'bg-green-100 text-green-700'
+  if (s === 'preparing')                         return 'bg-orange-100 text-orange-700'
+  if (s === 'out_for_delivery' ||
+      s === 'out-for-delivery')                  return 'bg-blue-100 text-blue-700'
+  if (s === 'completed' || s === 'delivered')    return 'bg-emerald-100 text-emerald-700'
+  if (s === 'cancelled' || s === 'rejected')     return 'bg-red-100 text-red-700'
   return 'bg-neutral-100 text-neutral-600'
+}
+
+/** Human-readable label for a status value */
+function statusLabel(status: string): string {
+  const s = (status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  if (s === 'pending')                          return 'Pending'
+  if (s === 'accepted' || s === 'confirmed')    return 'Accepted'
+  if (s === 'preparing')                        return 'Preparing'
+  if (s === 'out_for_delivery' ||
+      s === 'out-for-delivery')                 return 'Out For Delivery'
+  if (s === 'completed' || s === 'delivered')   return 'Completed'
+  if (s === 'cancelled' || s === 'rejected')    return 'Cancelled'
+  return capitalize(status)
 }
 
 function capitalize(s: string) {
@@ -119,7 +132,7 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
                         : statusColour(order.status)
                     }`}
                   >
-                    {order.status === 'unknown' ? '—' : capitalize(order.status)}
+                    {order.status === 'unknown' ? '—' : statusLabel(order.status)}
                   </span>
                 </Link>
               </li>

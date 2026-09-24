@@ -9,11 +9,9 @@ import { useGetOrder as useGetOrderDetail } from '@/api/client/checkout'
 import type { OrderHistoryItem } from '@/api/types'
 import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderStatusTimeline'
 
-const NON_TERMINAL_STATUSES = new Set([
-  'Pending', 'Received', 'Accepted', 'Preparing',
-  'Ready', 'Out for Delivery', 'Out-for-delivery', 'Out_For_Delivery',
-  'On The Way', 'Out For Delivery', 'In Progress', 'Processing',
-  'Assigned', 'Dispatched', 'Shipped',
+// Active = anything that is not a terminal status
+const TERMINAL_STATUSES = new Set([
+  'completed', 'delivered', 'cancelled', 'canceled', 'rejected', 'refunded', 'failed',
 ])
 
 function fmtDate(iso: string | null | undefined): string {
@@ -32,19 +30,30 @@ function fmtMoney(v: string | number | null | undefined): string {
 }
 
 function statusClasses(status: string): { pill: string; dot: string } {
-  const s = (status || '').toLowerCase()
-  if (s.includes('cancel'))        return { pill: 'bg-red-100 text-red-700', dot: 'bg-red-500' }
-  if (s.includes('deliver'))       return { pill: 'bg-green-100 text-green-700', dot: 'bg-green-500' }
-  if (s.includes('ready') || s.includes('out') || s.includes('dispatch') || s.includes('ship'))
-                                    return { pill: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' }
-  if (s.includes('prepar') || s.includes('progress') || s.includes('process') || s.includes('accepted') || s.includes('received'))
-                                    return { pill: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' }
+  const s = (status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  if (s === 'pending')                                     return { pill: 'bg-amber-100  text-amber-700',   dot: 'bg-amber-400'   }
+  if (s === 'accepted'  || s === 'confirmed')              return { pill: 'bg-green-100  text-green-700',   dot: 'bg-green-500'   }
+  if (s === 'preparing')                                   return { pill: 'bg-orange-100 text-orange-700',  dot: 'bg-orange-500'  }
+  if (s === 'out_for_delivery' || s === 'out-for-delivery') return { pill: 'bg-blue-100   text-blue-700',    dot: 'bg-blue-500'    }
+  if (s === 'completed' || s === 'delivered')              return { pill: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' }
+  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return { pill: 'bg-red-100 text-red-700',  dot: 'bg-red-500'     }
   return { pill: 'bg-neutral-100 text-neutral-700', dot: 'bg-neutral-400' }
 }
 
+function statusLabel(status: string): string {
+  const s = (status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  if (s === 'pending')                                      return 'Pending'
+  if (s === 'accepted' || s === 'confirmed')                return 'Accepted'
+  if (s === 'preparing')                                    return 'Preparing'
+  if (s === 'out_for_delivery' || s === 'out-for-delivery') return 'Out For Delivery'
+  if (s === 'completed' || s === 'delivered')               return 'Completed'
+  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return 'Cancelled'
+  return status
+}
+
 function isActiveOrder(o: { status: string }): boolean {
-  const s = (o.status || '').toLowerCase()
-  return NON_TERMINAL_STATUSES.has(o.status) || !['delivered', 'cancelled', 'canceled', 'rejected', 'refunded', 'failed', 'completed'].includes(s)
+  const s = (o.status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  return !TERMINAL_STATUSES.has(s)
 }
 
 export default function MyOrdersPage() {
@@ -167,7 +176,7 @@ function OrderRow({
               <p className="text-base font-bold text-neutral-900">Order #{order.order_no}</p>
               <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${cls.pill}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${cls.dot}`} />
-                {order.status}
+                {statusLabel(order.status)}
               </span>
             </div>
             <p className="text-xs text-neutral-400 inline-flex items-center gap-1">

@@ -22,6 +22,17 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+function statusLabel(status: string): string {
+  const s = (status || '').toLowerCase().trim().replace(/\s+/g, '_')
+  if (s === 'pending')                                      return 'Pending'
+  if (s === 'accepted' || s === 'confirmed')                return 'Accepted'
+  if (s === 'preparing')                                    return 'Preparing'
+  if (s === 'out_for_delivery' || s === 'out-for-delivery') return 'Out For Delivery'
+  if (s === 'completed' || s === 'delivered')               return 'Completed'
+  if (s === 'cancelled' || s === 'canceled' || s === 'rejected') return 'Cancelled'
+  return capitalize(status)
+}
+
 function orderTypeLabel(type: string) {
   if (type === 'dinein')   return 'Dine-in'
   if (type === 'pickup')   return 'Pickup'
@@ -239,7 +250,7 @@ export default function OrderConfirmationPage() {
                 {order.customer_address && (
                   <DetailRow label="Address"  value={order.customer_address} />
                 )}
-                <DetailRow label="Status"     value={capitalize(order.status)} />
+                <DetailRow label="Status"     value={statusLabel(order.status)} />
               </div>
 
               {/* Products */}
