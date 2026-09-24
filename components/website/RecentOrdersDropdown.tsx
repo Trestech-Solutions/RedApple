@@ -23,7 +23,7 @@ function statusColour(status: string): string {
   if (s === 'out_for_delivery' ||
       s === 'out-for-delivery')                  return 'bg-blue-100 text-blue-700'
   if (s === 'completed' || s === 'delivered')    return 'bg-emerald-100 text-emerald-700'
-  if (s === 'cancelled' || s === 'rejected')     return 'bg-red-100 text-red-700'
+  if (s === 'cancel' || s === 'rejected')     return 'bg-red-100 text-red-700'
   return 'bg-neutral-100 text-neutral-600'
 }
 
@@ -36,7 +36,7 @@ function statusLabel(status: string): string {
   if (s === 'out_for_delivery' ||
       s === 'out-for-delivery')                 return 'Out For Delivery'
   if (s === 'completed' || s === 'delivered')   return 'Completed'
-  if (s === 'cancelled' || s === 'rejected')    return 'Cancelled'
+  if (s === 'cancel' || s === 'rejected')    return 'Cancelled'
   return capitalize(status)
 }
 
