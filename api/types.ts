@@ -625,6 +625,32 @@ export type MenuOffer = {
   is_available_now: boolean;
 };
 
+// ─── Footer types (from site_settings) ───────────────────────────────────────
+
+export type StorefrontFooter = {
+  id: number;
+  restaurant: number;
+  logo: string | null;
+  title: string;
+  subtitle: string;
+  description: string;
+  address: string;
+  /** [{"heading": "Company", "links": [{"label": "About", "url": "/about"}]}] */
+  link_groups: { heading: string; links: { label: string; url: string }[] }[];
+  /** [{"text": "Download App", "url": "https://..."}] */
+  buttons: { text: string; url: string }[];
+  /** {"facebook": "https://...", "instagram": "https://..."}  */
+  social_links: Record<string, string>;
+};
+
+export type StorefrontFooterBranchContact = {
+  id: number;
+  branch: number;
+  branch_name: string;
+  phone: string;
+  email: string;
+};
+
 export type MenuResponse = {
   branch:           Branch;
   area:             Area | null;
@@ -656,6 +682,10 @@ export type MenuResponse = {
     pinterest_link: string;
     whatsapp_link:  string;
   };
+  // Footer (title, description, address, link_groups, buttons, social_links)
+  footer?: StorefrontFooter;
+  // Branch-level phone / email for the footer
+  footer_branch_contact?: StorefrontFooterBranchContact | null;
   // Legacy fallback
   categories?:      MenuCategory[];
 };

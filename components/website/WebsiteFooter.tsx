@@ -97,18 +97,32 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 text-neutral-600 transition-colors hover:border-[#E08A3C]/50 hover:bg-[#E08A3C]/10 hover:text-[#C1531B]"
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 text-neutral-600 transition-colors hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)]"
     >
       {icon}
     </a>
   )
 }
 
-const FOOTER_LINKS = [
-  { href: '/website/privacy', label: 'Privacy Policy' },
-  { href: '/website/faqs', label: 'Faqs' },
-  { href: '/website/blogs', label: 'Blogs' },
-]
+// Social links from Footer.social_links JSON (keys: facebook, instagram, twitter, youtube, tiktok, linkedin, snapchat, pinterest, whatsapp)
+// AND from MenuResponse.social_media_links (keys: facebook_link, instagram_link, etc.)
+// We merge both — footer.social_links takes priority.
+function mergeSocial(
+  footerLinks: Record<string, string> | undefined,
+  menuLinks: { facebook_link?: string; instagram_link?: string; twitter_link?: string; youtube_link?: string; tiktok_link?: string; linkedin_link?: string; snapchat_link?: string; pinterest_link?: string; whatsapp_link?: string } | undefined
+) {
+  return {
+    facebook:  footerLinks?.facebook  || footerLinks?.facebook_link  || menuLinks?.facebook_link  || '',
+    instagram: footerLinks?.instagram || footerLinks?.instagram_link || menuLinks?.instagram_link || '',
+    twitter:   footerLinks?.twitter   || footerLinks?.twitter_link   || menuLinks?.twitter_link   || '',
+    youtube:   footerLinks?.youtube   || footerLinks?.youtube_link   || menuLinks?.youtube_link   || '',
+    tiktok:    footerLinks?.tiktok    || footerLinks?.tiktok_link    || menuLinks?.tiktok_link    || '',
+    linkedin:  footerLinks?.linkedin  || footerLinks?.linkedin_link  || menuLinks?.linkedin_link  || '',
+    snapchat:  footerLinks?.snapchat  || footerLinks?.snapchat_link  || menuLinks?.snapchat_link  || '',
+    pinterest: footerLinks?.pinterest || footerLinks?.pinterest_link || menuLinks?.pinterest_link || '',
+    whatsapp:  footerLinks?.whatsapp  || footerLinks?.whatsapp_link  || menuLinks?.whatsapp_link  || '',
+  }
+}
 
 export function WebsiteFooter() {
   const [expanded, setExpanded] = useState(false)
@@ -116,164 +130,210 @@ export function WebsiteFooter() {
   const { branchId, areaId } = useStoreLocation()
   const { data: menuData } = useGetMenu({ branchId, areaId })
 
-  const social = menuData?.social_media_links
+  // ── Data from API ──────────────────────────────────────────────────────────
+  const footer = menuData?.footer
+  const branchContact = menuData?.footer_branch_contact
 
+  // Restaurant name: footer.title → branch.name → fallback
+  const restaurantName = footer?.title?.trim() || (menuData?.branch as any)?.name || 'Restaurant'
+
+  // SEO text blocks from footer
+  const seoTitle    = footer?.subtitle?.trim() || ''
+  const seoDesc     = footer?.description?.trim() || ''
+
+  // Address: branch contact has no address; use footer.address → branch.address
+  const address = footer?.address?.trim() || (menuData?.branch as any)?.address?.trim() || ''
+
+  // Phone/email from FooterBranchContact first, fallback to branch
+  const phone = branchContact?.phone?.trim() || (menuData?.branch as any)?.phone?.trim() || ''
+  const email = branchContact?.email?.trim() || ''
+
+  // Link groups from Footer.link_groups
+  const linkGroups = Array.isArray(footer?.link_groups) ? footer!.link_groups : []
+
+  // Dynamic buttons (app download links from footer or settings)
+  const footerButtons = Array.isArray(footer?.buttons) ? footer!.buttons : []
+
+  // App store badges from settings (takes priority over footer buttons)
   const androidIcon = resolveMediaUrl(settings.android_icon)
-  const iosIcon = resolveMediaUrl(settings.ios_icon)
+  const iosIcon     = resolveMediaUrl(settings.ios_icon)
   const androidLink = settings.android_app_link?.trim() || ''
-  const iosLink = settings.ios_app_link?.trim() || ''
-  const showApps = (androidLink || iosLink) && Boolean(settings.android_icon || settings.ios_icon)
-  const merchantLogo = resolveMediaUrl(settings.merchant_logo)
+  const iosLink     = settings.ios_app_link?.trim() || ''
+  const showApps    = (androidLink || iosLink) && Boolean(settings.android_icon || settings.ios_icon)
 
-  const hasSocial =
-    social &&
-    Object.values(social).some((v) => typeof v === 'string' && v.trim() !== '')
+  // Logo: footer.logo → settings.merchant_logo
+  const footerLogoRaw = footer?.logo?.trim() ? footer.logo : null
+  const merchantLogo  = resolveMediaUrl(footerLogoRaw || settings.merchant_logo)
+
+  // Social links — merge Footer.social_links + MenuResponse.social_media_links
+  const social    = mergeSocial(footer?.social_links, menuData?.social_media_links)
+  const hasSocial = Object.values(social).some((v) => v.trim() !== '')
+
+  const currentYear = new Date().getFullYear()
 
   return (
     <footer className="bg-[var(--color-tertiary)]">
-      {/* SEO content */}
-      <div className="mx-auto max-w-[1400px] px-4 pt-10 sm:px-5 sm:pt-14 md:px-8">
-        <h2 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl md:text-[28px]">
-          Discover Authentic BBQ, Karahi &amp; Matka Biryani in Karachi – Angeethi PK
-        </h2>
-        <h3 className="mt-2 text-base font-medium text-neutral-500 sm:text-lg">
-          Flavor-Packed Kabab &amp; Tikka Rice in Karachi
-        </h3>
 
-        <div
-          className={`relative mt-4 overflow-hidden text-sm leading-relaxed text-neutral-600 transition-all duration-300 sm:text-[15px] ${
-            expanded ? 'max-h-[2000px]' : 'max-h-[3.2rem]'
-          }`}
-        >
-          <p className="max-w-3xl">
-            If you crave flavorful and traditional BBQ, Angeethi PK proudly stands as one of
-            the top spots in the city. Famous for serving Kabab Rice in Karachi, the menu
-            offers perfectly grilled kababs paired with aromatic rice. Food lovers admire the
-            Spicy Kabab Rice Karachi option, seasoned to elevate every bite. Alongside this,
-            juicy Tikka Rice in Karachi brings tender chicken tikka on a bed of fluffy rice,
-            ideal for a hearty meal any time of day.
-          </p>
+      {/* SEO content block — shown only when footer has description */}
+      {(seoTitle || seoDesc) && (
+        <div className="mx-auto max-w-[1400px] px-4 pt-10 sm:px-5 sm:pt-14 md:px-8">
+          {seoTitle && (
+            <h2 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl md:text-[28px]">
+              {seoTitle}
+            </h2>
+          )}
+
+          {seoDesc && (
+            <>
+              <div
+                className={`relative mt-4 overflow-hidden text-sm leading-relaxed text-neutral-600 transition-all duration-300 sm:text-[15px] ${
+                  expanded ? 'max-h-[2000px]' : 'max-h-[3.2rem]'
+                }`}
+              >
+                <p className="max-w-3xl">{seoDesc}</p>
+              </div>
+
+              <button
+                onClick={() => setExpanded((v) => !v)}
+                className="mt-3 flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] hover:opacity-80"
+              >
+                {expanded ? 'Show Less' : 'Show More'}
+                <ChevronDown
+                  size={15}
+                  className={`transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+                />
+              </button>
+            </>
+          )}
         </div>
-
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#C1531B] hover:text-[#a3430f]"
-        >
-          {expanded ? 'Show Less' : 'Show More'}
-          <ChevronDown
-            size={15}
-            className={`transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
-          />
-        </button>
-      </div>
+      )}
 
       {/* ember divider */}
-      <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[#C1531B]/25 to-transparent sm:mt-14" />
+      <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[var(--color-primary)]/20 to-transparent sm:mt-14" />
 
       {/* Main footer band */}
       <div className="bg-[var(--color-tertiary)]">
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-5 sm:py-14 md:px-8">
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_0.8fr_1fr]">
 
-            {/* Brand */}
+          {/* Dynamic grid: always show brand; add columns for contact, link groups, social */}
+          <div className={`grid grid-cols-1 gap-10 sm:grid-cols-2 ${
+            linkGroups.length > 0
+              ? 'lg:grid-cols-[1.3fr_1fr_repeat(var(--lg-cols,1),0.8fr)_1fr]'
+              : 'lg:grid-cols-[1.3fr_1fr_1fr]'
+          }`}
+          style={{ '--lg-cols': linkGroups.length } as React.CSSProperties}
+          >
+
+            {/* ── Brand ── */}
             <div>
               <div className="flex items-center gap-3">
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-neutral-200">
                   <Image
                     src={merchantLogo}
-                    alt="Angeethi"
+                    alt={restaurantName}
                     width={56}
                     height={56}
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <span className="text-xl font-semibold tracking-tight text-neutral-900">Angeethi</span>
+                <span className="text-xl font-semibold tracking-tight text-neutral-900">
+                  {restaurantName}
+                </span>
               </div>
-              <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-500">
-                Roshan Tower, Shop no 6 &amp; 7, Tipu Sultan Rd, Karachi, 75350
-              </p>
 
+              {address && (
+                <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-500">
+                  {address}
+                </p>
+              )}
+
+              {/* App store badges from settings */}
               {showApps && (
                 <div className="mt-5 flex items-center gap-3">
                   {androidLink && (
-                    <a
-                      href={androidLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Get it on Google Play"
-                    >
-                      <Image
-                        src={androidIcon}
-                        alt="Google Play"
-                       width={106}
-                        height={106}
-                        className="object-contain"
-                      />
+                    <a href={androidLink} target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                      <Image src={androidIcon} alt="Google Play" width={106} height={106} className="object-contain" />
                     </a>
                   )}
                   {iosLink && (
-                    <a
-                      href={iosLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Download on the App Store"
-                    >
-                      <Image
-                        src={iosIcon}
-                        alt="App Store"
-                        width={106}
-                        height={106}
-                        className="object-contain"
-                      />
+                    <a href={iosLink} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                      <Image src={iosIcon} alt="App Store" width={106} height={106} className="object-contain" />
                     </a>
                   )}
                 </div>
               )}
+
+              {/* Footer buttons (e.g. "Download App") when no settings app links */}
+              {!showApps && footerButtons.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {footerButtons.map((btn) => (
+                    <a
+                      key={btn.url}
+                      href={btn.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/5 transition-colors"
+                    >
+                      {btn.text}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Contact */}
-            <div>
-              <h4 className="text-sm font-semibold text-neutral-900">Contact</h4>
-              <ul className="mt-4 space-y-2.5 text-sm text-neutral-600">
-                <li>
-                  <a href="tel:03092772497" className="hover:text-[#C1531B]">03092772497</a>
-                </li>
-                <li>
-                  <a href="mailto:angeethiofficial@gmail.com" className="hover:text-[#C1531B]">
-                    angeethiofficial@gmail.com
-                  </a>
-                </li>
-              </ul>
-            </div>
+            {/* ── Contact ── */}
+            {(phone || email) && (
+              <div>
+                <h4 className="text-sm font-semibold text-neutral-900">Contact</h4>
+                <ul className="mt-4 space-y-2.5 text-sm text-neutral-600">
+                  {phone && (
+                    <li>
+                      <a href={`tel:${phone}`} className="hover:text-[var(--color-primary)]">
+                        {phone}
+                      </a>
+                    </li>
+                  )}
+                  {email && (
+                    <li>
+                      <a href={`mailto:${email}`} className="hover:text-[var(--color-primary)]">
+                        {email}
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
 
-            {/* Links */}
-            <div>
-              <h4 className="text-sm font-semibold text-neutral-900">Explore</h4>
-              <ul className="mt-4 space-y-2.5 text-sm text-neutral-600">
-                {FOOTER_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <Link href={link.href} className="hover:text-[#C1531B]">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* ── Dynamic link groups from Footer.link_groups ── */}
+            {linkGroups.map((group) => (
+              <div key={group.heading}>
+                <h4 className="text-sm font-semibold text-neutral-900">{group.heading}</h4>
+                <ul className="mt-4 space-y-2.5 text-sm text-neutral-600">
+                  {group.links.map((link) => (
+                    <li key={link.url}>
+                      <Link href={link.url} className="hover:text-[var(--color-primary)]">
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
-            {/* Social */}
+            {/* ── Social ── */}
             {hasSocial && (
               <div>
                 <h4 className="text-sm font-semibold text-neutral-900">Follow Us</h4>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <SocialLink href={social?.facebook_link ?? ''} label="Facebook" icon={<FacebookIcon />} />
-                  <SocialLink href={social?.instagram_link ?? ''} label="Instagram" icon={<InstagramIcon />} />
-                  <SocialLink href={social?.twitter_link ?? ''} label="Twitter" icon={<TwitterIcon />} />
-                  <SocialLink href={social?.youtube_link ?? ''} label="YouTube" icon={<YoutubeIcon />} />
-                  <SocialLink href={social?.tiktok_link ?? ''} label="TikTok" icon={<TiktokIcon />} />
-                  <SocialLink href={social?.linkedin_link ?? ''} label="LinkedIn" icon={<LinkedinIcon />} />
-                  <SocialLink href={social?.snapchat_link ?? ''} label="Snapchat" icon={<SnapchatIcon />} />
-                  <SocialLink href={social?.pinterest_link ?? ''} label="Pinterest" icon={<PinterestIcon />} />
-                  <SocialLink href={social?.whatsapp_link ?? ''} label="WhatsApp" icon={<WhatsappIcon />} />
+                  <SocialLink href={social.facebook}  label="Facebook"  icon={<FacebookIcon />} />
+                  <SocialLink href={social.instagram} label="Instagram" icon={<InstagramIcon />} />
+                  <SocialLink href={social.twitter}   label="Twitter"   icon={<TwitterIcon />} />
+                  <SocialLink href={social.youtube}   label="YouTube"   icon={<YoutubeIcon />} />
+                  <SocialLink href={social.tiktok}    label="TikTok"    icon={<TiktokIcon />} />
+                  <SocialLink href={social.linkedin}  label="LinkedIn"  icon={<LinkedinIcon />} />
+                  <SocialLink href={social.snapchat}  label="Snapchat"  icon={<SnapchatIcon />} />
+                  <SocialLink href={social.pinterest} label="Pinterest" icon={<PinterestIcon />} />
+                  <SocialLink href={social.whatsapp}  label="WhatsApp"  icon={<WhatsappIcon />} />
                 </div>
               </div>
             )}
@@ -281,7 +341,7 @@ export function WebsiteFooter() {
 
           {/* Bottom bar */}
           <div className="mt-10 flex flex-col items-center justify-center gap-1 border-t border-neutral-200 pt-6 text-xs text-neutral-500 sm:flex-row sm:gap-2">
-            <span>© {new Date().getFullYear()} Angeethi. All Rights Reserved.</span>
+            <span>© {currentYear} {restaurantName}. All Rights Reserved.</span>
             <span className="hidden sm:inline">·</span>
             <span>
               Powered by{' '}
@@ -289,7 +349,7 @@ export function WebsiteFooter() {
                 href="https://trestechsolutions.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-neutral-700 hover:text-[#C1531B]"
+                className="font-medium text-neutral-700 hover:text-[var(--color-primary)]"
               >
                 Trestech
               </Link>
