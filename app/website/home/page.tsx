@@ -957,7 +957,7 @@ export default function HomePage() {
           backgroundSize: 'auto',
           backgroundAttachment: 'fixed',
         }}>
-        <div className="relative mx-auto h-[20vh] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 sm:h-[40vh] sm:rounded-3xl md:h-[55vh] lg:h-[70vh] xl:h-[75vh]">
+<div className="relative mx-auto w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 aspect-[3.30/1] sm:rounded-3xl bg-black">
           {HERO_SLIDES.map((s, i) => {
             const isActive = i === currentSlide
             const isExternal = s.link && /^https?:\/\//i.test(s.link)
@@ -979,7 +979,7 @@ export default function HomePage() {
                 }`}
               >
                 <Wrapper>
-                  <Image src={s.image} alt={s.title || s.heading || 'slide'} fill priority={i === 0} className="object-cover object-center" />
+                  <Image src={s.image} alt={s.title || s.heading || 'slide'} fill priority={i === 0} className="object-contain object-center" />
                   {(s.heading || s.description) && (
                     <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent px-6 pb-10 sm:px-12 sm:pb-16 md:px-16">
                       {s.heading && (
