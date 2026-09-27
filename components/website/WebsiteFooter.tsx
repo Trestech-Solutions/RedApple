@@ -114,7 +114,7 @@ function mergeSocial(
   return {
     facebook:  footerLinks?.facebook  || footerLinks?.facebook_link  || menuLinks?.facebook_link  || '',
     instagram: footerLinks?.instagram || footerLinks?.instagram_link || menuLinks?.instagram_link || '',
-    twitter:   footerLinks?.twitter   || footerLinks?.twitter_link   || menuLinks?.twitter_link   || '',
+    twitter:   footerLinks?.twitter   || footerLinks?.x              || footerLinks?.twitter_link || menuLinks?.twitter_link   || '',
     youtube:   footerLinks?.youtube   || footerLinks?.youtube_link   || menuLinks?.youtube_link   || '',
     tiktok:    footerLinks?.tiktok    || footerLinks?.tiktok_link    || menuLinks?.tiktok_link    || '',
     linkedin:  footerLinks?.linkedin  || footerLinks?.linkedin_link  || menuLinks?.linkedin_link  || '',
