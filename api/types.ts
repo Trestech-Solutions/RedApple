@@ -625,6 +625,21 @@ export type MenuOffer = {
   is_available_now: boolean;
 };
 
+// ─── Branch Business Hours ────────────────────────────────────────────────────
+
+export type BranchBusinessHour = {
+  id: number;
+  branch: number;
+  branch_name: string;
+  day: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+  is_open: boolean;
+  time_from: string | null;   // "HH:MM:SS"
+  time_to: string | null;     // "HH:MM:SS"
+  second_start: string | null;
+  second_end: string | null;
+  custom_text: string;
+};
+
 // ─── Footer types (from site_settings) ───────────────────────────────────────
 
 export type StorefrontFooter = {
@@ -657,6 +672,7 @@ export type MenuResponse = {
   settings:         StoreSettings;
   branch_settings:  Partial<StoreSettings>;
   business_hours:   unknown[];
+  branch_business_hours?: BranchBusinessHour[];
   sizes:            MenuSize[];
   addon_categories: MenuAddonCategory[];
   // Actual API returns `menu` array of categories

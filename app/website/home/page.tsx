@@ -9,6 +9,7 @@ import {
   useCart, useRegisterProductId, useStoreSettings,
 } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
+import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { CategoryNav } from '@/components/website/CategoryNav'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
@@ -613,6 +614,7 @@ function PopularSection({ products }: { products: ProductData[] }) {
 /** Self-contained popular item card — portrait, image top, name + price below, dark + button. */
 function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
+  const { isOpen: storeOpen, closedMessage } = useBusinessHours()
   const [added, setAdded] = useState(false)
 
   const hasSizes      = !!product.sizes && product.sizes.length > 0
@@ -634,6 +636,12 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isOrderable) return
+    if (!storeOpen) {
+      import('sonner').then(({ toast }) => {
+        toast.error(closedMessage ?? 'Store is currently closed')
+      })
+      return
+    }
     if (needsSelection) { onOpen(product); return }
     addItem({
       id: product.id, productId: product.productId, name: product.name,
@@ -685,7 +693,9 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
   type="button"
   onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
   aria-label="Add to cart"
-  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
+  disabled={!storeOpen}
+  title={!storeOpen ? (closedMessage ?? 'Store is currently closed') : undefined}
+  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : !storeOpen ? 'cursor-not-allowed bg-neutral-400 text-white opacity-50' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
 >
   {added ? <Check size={16} /> : <Plus size={18} />}
 </button>

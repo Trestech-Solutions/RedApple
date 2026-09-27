@@ -14,6 +14,7 @@ import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
 import { MenuDrawer } from '@/components/website/MenuDrawer'
+import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 
 const DEFAULT_PATTERN_URL =
   'https://assets.indolj.io/upload/1693394669-Final-Pattern.png'
@@ -61,6 +62,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
 
 function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const { settings, isLoading } = useStoreSettings()
+  const { isOpen, closedMessage, todayOpensAt, todayClosesAt, status } = useBusinessHours()
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
@@ -73,6 +75,11 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const primaryColor   = settings.primary_color   || '#000000'
   const secondaryColor = settings.secondary_color || '#FFFFFF'
   const tertiaryColor  = settings.tertiary_color  || '#FFFFFF'
+
+  // ── Closed banner text ─────────────────────────────────────────────────────
+  const now     = new Date()
+  const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'short' })
+  const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()
 
   return (
     <div
@@ -88,9 +95,33 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         '--color-tertiary':  tertiaryColor,
       } as React.CSSProperties}
     >
-      {settings.close_store && settings.close_message && (
-        <div className="sticky top-0 z-40 bg-red-600 text-white text-center text-xs sm:text-sm py-2 px-3 font-semibold">
-          Store is currently closed — {settings.close_message}
+      {/* ── Closed Banner ─────────────────────────────────────────────────── */}
+      {!isOpen && (
+        <div className="sticky top-0 z-50 w-full bg-red-600 text-white">
+          <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+
+            {/* Left: icon + main message */}
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <span className="text-base" aria-hidden>🔴</span>
+              <span>
+                {closedMessage ?? 'We are currently closed'}
+              </span>
+            </div>
+
+            {/* Right: date · time · hours hint */}
+            <div className="flex items-center gap-3 text-xs font-medium opacity-90">
+              <span>{dateStr}</span>
+              <span className="opacity-50">·</span>
+              <span>{timeStr}</span>
+              {todayOpensAt && todayClosesAt && !settings.close_store && (
+                <>
+                  <span className="opacity-50">·</span>
+                  <span>Hours: {todayOpensAt} – {todayClosesAt}</span>
+                </>
+              )}
+            </div>
+
+          </div>
         </div>
       )}
 

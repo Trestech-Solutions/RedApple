@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Check, Minus, Plus } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
+import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 
 export interface SizeMeta {
   sizeId: number
@@ -66,6 +67,7 @@ interface ProductCardProps {
 function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
   const { settings } = useStoreSettings()
+  const { isOpen: storeOpen, closedMessage } = useBusinessHours()
   const [added, setAdded] = useState(false)
 
   const hasSizes    = !!product.sizes && product.sizes.length > 0
@@ -118,6 +120,14 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isOrderable) return
+    if (!storeOpen) {
+      // Show a toast via the existing toast import — we import it lazily
+      // to avoid a hard dep: just use the native browser alert fallback.
+      import('sonner').then(({ toast }) => {
+        toast.error(closedMessage ?? 'Store is currently closed')
+      })
+      return
+    }
     if (needsSelection) { onOpen?.(product); return }
     addItem({
       id: product.id, productId: product.productId, name: product.name,
@@ -137,6 +147,7 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
 
   const handleIncrease = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (!storeOpen) return
     // Which variant to bump is ambiguous when sizes/options/deal-groups
     // exist — send the person to the modal instead of guessing.
     if (needsSelection) { onOpen?.(product); return }
@@ -145,6 +156,7 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
 
   const handleDecrease = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (!storeOpen) return
     if (needsSelection) { onOpen?.(product); return }
     if (!cartItem) return
     if (cartItem.quantity <= 1) removeItem(cartItem)
@@ -155,6 +167,8 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
     settings, added, hasSizes, defaultSize, defaultOption, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, hasPrice, isOrderable,
     cartItem, cartQty, handleAdd, handleIncrease, handleDecrease,
+    storeClosed: !storeOpen,
+    closedMessage,
   }
 }
 
@@ -204,6 +218,7 @@ function Card1({ product, onOpen }: ProductCardProps) {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
     cartQty, handleAdd, handleIncrease, handleDecrease,
+    storeClosed,
   } = useCardLogic(product, onOpen)
 
   const priceBg      = settings.item_price_background
@@ -351,9 +366,11 @@ function Card1({ product, onOpen }: ProductCardProps) {
         {isOrderable && (needsSelection || cartQty === 0) && (
           <button
             type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
-            className={`absolute -bottom-1 -right-1 z-20 flex h-7 w-7 items-center justify-center rounded-full shadow-md transition-transform duration-150 hover:opacity-90 active:scale-90 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
+            disabled={storeClosed}
+            title={storeClosed ? 'Store is currently closed' : undefined}
+            className={`absolute -bottom-1 -right-1 z-20 flex h-7 w-7 items-center justify-center rounded-full shadow-md transition-transform duration-150 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:opacity-90 active:scale-90'}`}
             style={!added ? {
-              backgroundColor: priceBg || '#171717',
+              backgroundColor: storeClosed ? '#9ca3af' : (priceBg || '#171717'),
               color:           priceFg || '#ffffff',
             } : {}}
           >
@@ -376,6 +393,7 @@ function Card2({ product, onOpen }: ProductCardProps) {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
     cartQty, handleAdd, handleIncrease, handleDecrease,
+    storeClosed,
   } = useCardLogic(product, onOpen)
 
   const discountBg = settings.discount_background_color
@@ -498,8 +516,10 @@ function Card2({ product, onOpen }: ProductCardProps) {
           ) : isOrderable ? (
             <button
               type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
-              className={`flex-shrink-0 rounded-lg px-[clamp(0.875rem,2.6vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] text-[clamp(0.688rem,1.6vw,0.938rem)] font-extrabold uppercase leading-none tracking-wide transition-transform duration-150 hover:opacity-90 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
-              style={!added ? { backgroundColor: btnBg, color: btnFg } : {}}
+              disabled={storeClosed}
+              title={storeClosed ? 'Store is currently closed' : undefined}
+              className={`flex-shrink-0 rounded-lg px-[clamp(0.875rem,2.6vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] text-[clamp(0.688rem,1.6vw,0.938rem)] font-extrabold uppercase leading-none tracking-wide transition-transform duration-150 motion-reduce:transition-none ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:opacity-90 active:scale-95 motion-reduce:active:scale-100'}`}
+              style={!added ? { backgroundColor: storeClosed ? '#9ca3af' : btnBg, color: btnFg } : {}}
             >
               {added ? '✓ Added' : 'Add'}
             </button>
@@ -518,7 +538,7 @@ function Card3({ product, onOpen }: ProductCardProps) {
   const {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
-    cartQty, handleAdd, handleIncrease, handleDecrease,
+    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed,
   } = useCardLogic(product, onOpen)
 
   const discountBg = settings.discount_background_color
@@ -627,8 +647,10 @@ function Card3({ product, onOpen }: ProductCardProps) {
         ) : isOrderable ? (
           <button
             type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
-            className={`h-[clamp(2.125rem,6vw,2.75rem)] w-full rounded-full border text-[clamp(0.688rem,1.6vw,0.938rem)] font-semibold tracking-[0.01em] transition-transform duration-150 hover:opacity-90 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'border-transparent bg-green-600 text-white' : ''}`}
-            style={!added ? { backgroundColor: btnBg, color: btnFg, borderColor: btnBorder } : {}}
+            disabled={storeClosed}
+            title={storeClosed ? 'Store is currently closed' : undefined}
+            className={`h-[clamp(2.125rem,6vw,2.75rem)] w-full rounded-full border text-[clamp(0.688rem,1.6vw,0.938rem)] font-semibold tracking-[0.01em] transition-transform duration-150 motion-reduce:transition-none ${FOCUS_RING} ${added ? 'border-transparent bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:opacity-90 active:scale-[0.98] motion-reduce:active:scale-100'}`}
+            style={!added ? { backgroundColor: storeClosed ? '#9ca3af' : btnBg, color: btnFg, borderColor: storeClosed ? '#9ca3af' : btnBorder } : {}}
           >
             {added ? '✓ Added' : 'Add to cart'}
           </button>
@@ -641,7 +663,7 @@ function Card4({ product, onOpen }: ProductCardProps) {
   const {
     settings, added, needsSelection, hasSizes,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
-    cartQty, handleAdd, handleIncrease, handleDecrease,
+    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed,
   } = useCardLogic(product, onOpen)
 
   const discountBg = settings.discount_background_color
@@ -768,8 +790,10 @@ function Card4({ product, onOpen }: ProductCardProps) {
           ) : isOrderable ? (
             <button
               type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
-              className={`flex h-[clamp(2.25rem,6.5vw,3.5rem)] w-[clamp(2.25rem,6.5vw,3.5rem)] flex-shrink-0 items-center justify-center rounded-full shadow-sm transition-transform duration-150 hover:opacity-90 active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''}`}
-              style={!added ? { backgroundColor: btnBg, color: btnFg } : {}}
+              disabled={storeClosed}
+              title={storeClosed ? 'Store is currently closed' : undefined}
+              className={`flex h-[clamp(2.25rem,6.5vw,3.5rem)] w-[clamp(2.25rem,6.5vw,3.5rem)] flex-shrink-0 items-center justify-center rounded-full shadow-sm transition-transform duration-150 motion-reduce:transition-none ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:opacity-90 active:scale-90 motion-reduce:active:scale-100'}`}
+              style={!added ? { backgroundColor: storeClosed ? '#9ca3af' : btnBg, color: btnFg } : {}}
             >
               {added
                 ? <Check className="h-[55%] w-[55%]" strokeWidth={3} />
