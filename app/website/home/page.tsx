@@ -10,6 +10,7 @@ import {
 } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
+import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 import { CategoryNav } from '@/components/website/CategoryNav'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
@@ -615,6 +616,7 @@ function PopularSection({ products }: { products: ProductData[] }) {
 function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
   const { isOpen: storeOpen, closedMessage } = useBusinessHours()
+  const { triggerFly } = useCartAnimation()
   const [added, setAdded] = useState(false)
 
   const hasSizes      = !!product.sizes && product.sizes.length > 0
@@ -648,6 +650,7 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
       price: priceNum, image: product.image,
       variantId: defaultSize?.sizeId, sizeFk: defaultSize?.sizeFk,
     })
+    triggerFly(e.currentTarget as HTMLElement, product.image)
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
   }

@@ -15,6 +15,8 @@ import { AuthModal } from '@/components/auth/AuthModal'
 import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
 import { MenuDrawer } from '@/components/website/MenuDrawer'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
+import { FloatingActions } from '@/components/website/FloatingActions'
+import { CartAnimationProvider } from '@/lib/context/CartAnimationContext'
 
 const DEFAULT_PATTERN_URL =
   'https://assets.indolj.io/upload/1693394669-Final-Pattern.png'
@@ -53,7 +55,9 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
     <ReduxProvider>
       <CartProvider>
         <StoreSettingsProvider>
-          <WebsiteLayoutInner>{children}</WebsiteLayoutInner>
+          <CartAnimationProvider>
+            <WebsiteLayoutInner>{children}</WebsiteLayoutInner>
+          </CartAnimationProvider>
         </StoreSettingsProvider>
       </CartProvider>
     </ReduxProvider>
@@ -139,6 +143,10 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
       <CartBar />
       <WebsiteFooter />
+
+      {/* ── Floating action buttons (search + scroll-to-top) ── */}
+      <FloatingActions />
+
 <a
       
         href="https://wa.me/923366655786"

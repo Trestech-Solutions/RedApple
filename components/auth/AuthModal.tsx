@@ -2,7 +2,7 @@
 
 import { useState, useEffect as reactUseEffect, useMemo } from 'react'
 import Image from 'next/image'
-import { X, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { X, AlertCircle, Eye, EyeOff, Phone, Lock, User, Mail } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
@@ -24,10 +24,6 @@ interface AuthModalProps {
   onGuestContinue: () => void
 }
 
-// ⚠️ Storefront CUSTOMER tokens use SEPARATE keys from Admin/Staff JWT.
-// The axios interceptor attaches trestech_customer_token to /storefront/ calls,
-// and trestech_token to Admin API calls. If we use the wrong key here,
-// customer endpoints (add address etc.) get 403 "Authentication credentials were not provided".
 const CUSTOMER_TOKEN_KEY   = 'trestech_customer_token'
 const CUSTOMER_REFRESH_KEY = 'trestech_customer_refresh_token'
 const CUSTOMER_USER_KEY    = 'trestech_customer_user'
@@ -50,7 +46,6 @@ function persistTokens(data: CustomerLoginResponse, dispatch?: ReturnType<typeof
   if (typeof window === 'undefined') return
   localStorage.setItem(CUSTOMER_TOKEN_KEY, data.access)
   if (data.refresh) localStorage.setItem(CUSTOMER_REFRESH_KEY, data.refresh)
-  // Backend returns `customer` on storefront auth; fallback to `user` for compatibility
   const c = data.customer ?? data.user
   if (!c) return
   localStorage.setItem(CUSTOMER_USER_KEY, JSON.stringify({
@@ -61,7 +56,6 @@ function persistTokens(data: CustomerLoginResponse, dispatch?: ReturnType<typeof
     is_active: c.is_active,
     date_joined: c.date_joined,
   }))
-  // Also sync tokens into Redux so redux-persist can restore them next time
   if (dispatch && data.access) {
     dispatch(reduxSetTokens({
       accessToken: data.access,
@@ -98,12 +92,10 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const [step, setStep]           = useState<Step>('login')
   const [countryCode, setCC]      = useState('+92')
 
-  // Login state
   const [loginPhone, setLoginPhone]   = useState('')
   const [loginPass, setLoginPass]     = useState('')
   const [showLoginPass, setShowLoginPass] = useState(false)
 
-  // Register state
   const [regName,  setRegName]        = useState('')
   const [regEmail, setRegEmail]       = useState('')
   const [regPhone, setRegPhone]       = useState('')
@@ -186,57 +178,68 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
-      <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+      <div
+        className={`relative w-full rounded-[2rem] bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] max-h-[95vh] overflow-y-auto border border-black/5 transition-all duration-300 ${
+          step === 'register' ? 'max-w-xl' : 'max-w-md'
+        }`}
+      >
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-neutral-600 hover:bg-neutral-300 transition-colors z-10"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-neutral-500 backdrop-blur hover:bg-black/10 hover:text-neutral-800 hover:rotate-90 transition-all duration-300"
         >
-          <X size={14} />
+          <X size={15} />
         </button>
 
-        {/* Tab bar */}
-        <div className="grid grid-cols-2 border-b border-neutral-200">
-          {(['login', 'register'] as Step[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => { setStep(s); setError('') }}
-              className={`py-4 text-sm font-bold uppercase tracking-wide transition-colors ${
-                step === s
-                  ? 'bg-white text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
-                  : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
-              }`}
-            >
-              {s === 'login' ? 'Login' : 'Register'}
-            </button>
-          ))}
-        </div>
-
-        <div className="px-5 py-6 sm:px-8 sm:py-8">
-          {/* Brand header */}
-          <div className="flex flex-col items-center mb-5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--color-primary)] bg-white shadow-md overflow-hidden sm:h-16 sm:w-16 mb-3">
+        {/* Header band */}
+        <div
+          className="relative px-6 pt-8 pb-16 sm:px-8 sm:pt-10 sm:pb-20 rounded-b-[2.5rem]"
+          style={{ background: `linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, black))` }}
+        >
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg overflow-hidden ring-4 ring-white/30 sm:h-20 sm:w-20">
               <Image
                 src={brandLogoSrc}
                 alt="Brand Logo"
-                width={64}
-                height={64}
+                width={80}
+                height={80}
                 className="h-full w-full object-contain"
               />
             </div>
-            <h2 className="text-lg font-bold text-neutral-900 sm:text-xl">
+            <h2 className="mt-4 text-xl font-extrabold tracking-tight text-[var(--color-secondary)] sm:text-2xl">
               {step === 'login' ? 'Welcome Back' : 'Create Account'}
             </h2>
-            <p className="text-xs text-neutral-500 sm:text-sm mt-1">
+            <p className="mt-1 text-xs text-[var(--color-secondary)]/80 sm:text-sm">
               {step === 'login'
-                ? 'Enter your phone number and password'
-                : 'Register to order faster next time'}
+                ? 'Log in to continue your order'
+                : 'Join us for a faster checkout'}
             </p>
           </div>
+        </div>
 
+        {/* Floating tab pill */}
+        <div className="relative z-10 -mt-8 flex justify-center px-6">
+          <div className="grid w-full max-w-xs grid-cols-2 rounded-2xl bg-white p-1 shadow-lg ring-1 ring-black/5">
+            {(['login', 'register'] as Step[]).map((s) => (
+              <button
+                key={s}
+                onClick={() => { setStep(s); setError('') }}
+                className={`relative rounded-xl py-2.5 text-xs font-bold uppercase tracking-wide transition-all duration-300 ${
+                  step === s
+                    ? 'bg-[var(--color-primary)] text-[var(--color-secondary)] shadow-md'
+                    : 'text-neutral-400 hover:text-neutral-600'
+                }`}
+              >
+                {s === 'login' ? 'Login' : 'Register'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-6 pb-8 pt-6 sm:px-8 sm:pb-10">
           {error && (
-            <div className="mb-4 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-[11px] text-red-700 sm:px-4 sm:text-xs">
+            <div className="mb-4 flex items-start gap-2 rounded-2xl bg-red-50 px-4 py-3 text-[11px] text-red-700 ring-1 ring-red-100 sm:text-xs">
               <AlertCircle size={13} className="mt-0.5 shrink-0" />
               <p>{error}</p>
             </div>
@@ -244,16 +247,16 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
 
           {/* ── LOGIN ──────────────────────────────────────────────────── */}
           {step === 'login' && (
-            <>
-              <div className="mb-4">
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Mobile Number
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                  <Phone size={13} className="text-[var(--color-primary)]" /> Mobile Number
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
+                <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
                   <select
                     value={countryCode}
                     onChange={(e) => setCC(e.target.value)}
-                    className="border-r border-neutral-300 bg-neutral-50 px-2 py-2.5 text-xs text-neutral-700 outline-none sm:py-3 sm:text-sm"
+                    className="border-r-2 border-neutral-100 bg-transparent px-2.5 py-3 text-xs font-medium text-neutral-700 outline-none sm:text-sm"
                   >
                     {COUNTRY_CODES.map((c) => (
                       <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
@@ -265,28 +268,28 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                     value={loginPhone}
                     onChange={(e) => { setLoginPhone(e.target.value.replace(/\D/g, '')); setError('') }}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                    className="flex-1 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
+                    className="flex-1 bg-transparent px-3 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:text-sm"
                   />
                 </div>
               </div>
 
-              <div className="mb-5">
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Password
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                  <Lock size={13} className="text-[var(--color-primary)]" /> Password
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
+                <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
                   <input
                     type={showLoginPass ? 'text' : 'password'}
                     placeholder="Enter your password"
                     value={loginPass}
                     onChange={(e) => { setLoginPass(e.target.value); setError('') }}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                    className="flex-1 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
+                    className="flex-1 bg-transparent px-3.5 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:text-sm"
                   />
                   <button
                     type="button"
                     onClick={() => setShowLoginPass((v) => !v)}
-                    className="px-3 text-neutral-400 hover:text-neutral-700 transition-colors"
+                    className="px-3.5 text-neutral-400 hover:text-[var(--color-primary)] transition-colors"
                     aria-label="Toggle password"
                   >
                     {showLoginPass ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -297,91 +300,105 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
               <button
                 onClick={handleLogin}
                 disabled={sending}
-                className="w-full rounded-lg bg-[var(--color-primary)] py-2.5 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
+                className="w-full rounded-2xl bg-[var(--color-primary)] py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-lg shadow-[var(--color-primary)]/30 transition-all hover:brightness-95 active:scale-[0.98] disabled:opacity-60 sm:text-sm"
               >
                 {sending ? 'Logging in...' : 'Login'}
               </button>
-            </>
+
+              <div className="flex items-center gap-3 pt-1">
+                <div className="flex-1 border-t border-dashed border-neutral-200" />
+                <span className="text-[11px] font-medium text-neutral-400 sm:text-xs">Or</span>
+                <div className="flex-1 border-t border-dashed border-neutral-200" />
+              </div>
+
+              <button
+                onClick={onGuestContinue}
+                className="w-full rounded-2xl border-2 border-[var(--color-primary)]/20 bg-[var(--color-primary)]/5 py-3.5 text-xs font-bold text-[var(--color-primary)] transition-all hover:bg-[var(--color-primary)]/10 active:scale-[0.98] sm:text-sm"
+              >
+                Order as Guest
+              </button>
+            </div>
           )}
 
           {/* ── REGISTER ───────────────────────────────────────────────── */}
           {step === 'register' && (
             <div className="space-y-4">
-              {/* Full Name */}
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Full Name <span className="text-[var(--color-primary)]">*</span>
-                </label>
-                <input
-                  value={regName}
-                  onChange={(e) => { setRegName(e.target.value); setError('') }}
-                  placeholder="e.g. John Doe"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Mobile Number
-                </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCC(e.target.value)}
-                    className="border-r border-neutral-300 bg-neutral-50 px-2 py-2.5 text-xs text-neutral-700 outline-none sm:py-3 sm:text-sm"
-                  >
-                    {COUNTRY_CODES.map((c) => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
-                    ))}
-                  </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                    <User size={13} className="text-[var(--color-primary)]" /> Full Name <span className="text-[var(--color-primary)]">*</span>
+                  </label>
                   <input
-                    type="tel"
-                    placeholder="3366655786"
-                    value={regPhone}
-                    onChange={(e) => { setRegPhone(e.target.value.replace(/\D/g, '')); setError('') }}
-                    className="flex-1 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
+                    value={regName}
+                    onChange={(e) => { setRegName(e.target.value); setError('') }}
+                    placeholder="John Doe"
+                    className="w-full rounded-2xl border-2 border-neutral-100 bg-neutral-50 px-3.5 py-3 text-xs text-neutral-800 outline-none transition-all placeholder:text-neutral-400 focus:border-[var(--color-primary)] focus:bg-white sm:text-sm"
                   />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                    <Phone size={13} className="text-[var(--color-primary)]" /> Mobile Number
+                  </label>
+                  <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCC(e.target.value)}
+                      className="border-r-2 border-neutral-100 bg-transparent px-2 py-3 text-xs font-medium text-neutral-700 outline-none sm:text-sm"
+                    >
+                      {COUNTRY_CODES.map((c) => (
+                        <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="tel"
+                      placeholder="3366655786"
+                      value={regPhone}
+                      onChange={(e) => { setRegPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                      className="flex-1 min-w-0 bg-transparent px-3 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                    <Mail size={13} className="text-[var(--color-primary)]" /> Email
+                  </label>
+                  <input
+                    type="email"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    placeholder="john@example.com"
+                    className="w-full rounded-2xl border-2 border-neutral-100 bg-neutral-50 px-3.5 py-3 text-xs text-neutral-800 outline-none transition-all placeholder:text-neutral-400 focus:border-[var(--color-primary)] focus:bg-white sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-600 sm:text-sm">
+                    <Lock size={13} className="text-[var(--color-primary)]" /> Password
+                  </label>
+                  <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
+                    <input
+                      type={showRegPass ? 'text' : 'password'}
+                      value={regPass}
+                      onChange={(e) => { setRegPass(e.target.value); setError('') }}
+                      placeholder="Min 8 chars"
+                      className="flex-1 min-w-0 bg-transparent px-3.5 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegPass((v) => !v)}
+                      className="px-3 text-neutral-400 hover:text-[var(--color-primary)] transition-colors"
+                      aria-label="Toggle password"
+                    >
+                      {showRegPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Email (optional)
-                </label>
-                <input
-                  type="email"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  placeholder="john@example.com"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
-                  Password
-                </label>
-                <div className="flex overflow-hidden rounded-lg border border-neutral-300 focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
-                  <input
-                    type={showRegPass ? 'text' : 'password'}
-                    value={regPass}
-                    onChange={(e) => { setRegPass(e.target.value); setError('') }}
-                    placeholder="Min 6 characters"
-                    className="flex-1 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:py-3 sm:text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowRegPass((v) => !v)}
-                    className="px-3 text-neutral-400 hover:text-neutral-700 transition-colors"
-                    aria-label="Toggle password"
-                  >
-                    {showRegPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-700 sm:text-sm">
+                <label className="mb-1.5 block text-xs font-semibold text-neutral-600 sm:text-sm">
                   Confirm Password
                 </label>
                 <input
@@ -389,44 +406,25 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                   value={regPass2}
                   onChange={(e) => { setRegPass2(e.target.value); setError('') }}
                   placeholder="Re-enter password"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-xs text-neutral-800 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] sm:px-4 sm:py-3 sm:text-sm"
+                  className="w-full rounded-2xl border-2 border-neutral-100 bg-neutral-50 px-3.5 py-3 text-xs text-neutral-800 outline-none transition-all placeholder:text-neutral-400 focus:border-[var(--color-primary)] focus:bg-white sm:px-4 sm:text-sm"
                 />
               </div>
 
               <button
                 onClick={handleRegister}
                 disabled={sending}
-                className="w-full rounded-lg bg-[var(--color-primary)] py-2.5 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-60 transition-colors sm:py-3.5 sm:text-sm"
+                className="w-full rounded-2xl bg-[var(--color-primary)] py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-lg shadow-[var(--color-primary)]/30 transition-all hover:brightness-95 active:scale-[0.98] disabled:opacity-60 sm:text-sm"
               >
                 {sending ? 'Creating Account...' : 'Create Account'}
               </button>
-            </div>
-          )}
-
-          {step === 'login' && (
-            <>
-              <div className="my-4 flex items-center gap-3">
-                <div className="flex-1 border-t border-neutral-200" />
-                <span className="text-[11px] text-neutral-400 sm:text-xs">Or</span>
-                <div className="flex-1 border-t border-neutral-200" />
-              </div>
 
               <button
-                onClick={onGuestContinue}
-                className="w-full rounded-lg border-2 border-[#ffffff] bg-[#ffffff]/10 py-2.5 text-xs font-bold text-[#b8860b] hover:bg-[#ffffff]/20 transition-colors sm:py-3.5 sm:text-sm"
+                onClick={() => { setStep('login'); setError('') }}
+                className="w-full text-center text-[11px] text-neutral-500 hover:text-neutral-700 sm:text-xs"
               >
-                Order as Guest
+                Already have an account? <span className="font-bold text-[var(--color-primary)]">Login →</span>
               </button>
-            </>
-          )}
-
-          {step === 'register' && (
-            <button
-              onClick={() => { setStep('login'); setError('') }}
-              className="mt-4 w-full text-center text-[11px] text-neutral-500 hover:text-neutral-700 sm:text-xs"
-            >
-              Already have an account? <span className="text-[var(--color-primary)] font-semibold">Login →</span>
-            </button>
+            </div>
           )}
         </div>
       </div>

@@ -62,7 +62,7 @@ export function SearchBar({ value, onChange, placeholder = 'Search products...' 
   const animatedPlaceholder = value ? placeholder : displayText
 
   return (
-    <div className="mx-auto max-w-[1400px] px-3 pt-5 sm:px-4 sm:pt-6 md:px-8">
+    <div id="search-bar" className="mx-auto max-w-[1400px] px-3 pt-5 sm:px-4 sm:pt-6 md:px-8">
       <div
         className={`mx-auto flex min-w-[250px] max-w-full items-center overflow-hidden rounded-full border bg-white transition-[width,box-shadow,border-color] duration-500 ease-in-out ${
           expanded

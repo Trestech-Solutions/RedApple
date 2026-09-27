@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Check, Minus, Plus } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
+import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 
 export interface SizeMeta {
   sizeId: number
@@ -68,6 +69,7 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
   const { settings } = useStoreSettings()
   const { isOpen: storeOpen, closedMessage } = useBusinessHours()
+  const { triggerFly } = useCartAnimation()
   const [added, setAdded] = useState(false)
 
   const hasSizes    = !!product.sizes && product.sizes.length > 0
@@ -141,6 +143,8 @@ function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
       sizeFk:    defaultSize ? defaultSize.sizeFk  : undefined,
       cartStyle: product.cartStyle || undefined,
     })
+    // Fly-to-cart animation
+    triggerFly(e.currentTarget as HTMLElement, product.image)
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
   }

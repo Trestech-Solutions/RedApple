@@ -97,16 +97,13 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="group flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200/80 bg-white text-neutral-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:shadow-md hover:shadow-[var(--color-primary)]/20"
+      className="group flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/70 bg-white text-neutral-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:rotate-3 hover:rounded-2xl hover:border-transparent hover:bg-[var(--color-primary)] hover:text-[var(--color-secondary)] hover:shadow-lg hover:shadow-[var(--color-primary)]/25 sm:h-10 sm:w-10"
     >
       {icon}
     </a>
   )
 }
 
-// Social links from Footer.social_links JSON (keys: facebook, instagram, twitter, youtube, tiktok, linkedin, snapchat, pinterest, whatsapp)
-// AND from MenuResponse.social_media_links (keys: facebook_link, instagram_link, etc.)
-// We merge both — footer.social_links takes priority.
 function mergeSocial(
   footerLinks: Record<string, string> | undefined,
   menuLinks: { facebook_link?: string; instagram_link?: string; twitter_link?: string; youtube_link?: string; tiktok_link?: string; linkedin_link?: string; snapchat_link?: string; pinterest_link?: string; whatsapp_link?: string } | undefined
@@ -124,48 +121,46 @@ function mergeSocial(
   }
 }
 
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h4 className="relative inline-block text-xs font-bold uppercase tracking-wider text-neutral-400">
+      {children}
+      <span className="absolute -bottom-1.5 left-0 h-[3px] w-6 rounded-full bg-[var(--color-primary)] sm:left-1/2 sm:-translate-x-1/2" />
+    </h4>
+  )
+}
+
 export function WebsiteFooter() {
   const [expanded, setExpanded] = useState(false)
   const { settings } = useStoreSettings()
   const { branchId, areaId } = useStoreLocation()
   const { data: menuData } = useGetMenu({ branchId, areaId })
 
-  // ── Data from API ──────────────────────────────────────────────────────────
   const footer = menuData?.footer
   const branchContact = menuData?.footer_branch_contact
 
-  // Restaurant name: footer.title → branch.name → fallback
   const restaurantName = footer?.title?.trim() || (menuData?.branch as any)?.name || 'Restaurant'
 
-  // SEO text blocks from footer
-  const seoTitle    = footer?.subtitle?.trim() || ''
-  const seoDesc     = footer?.description?.trim() || ''
+  const seoTitle = footer?.subtitle?.trim() || ''
+  const seoDesc  = footer?.description?.trim() || ''
 
-  // Address: branch contact has no address; use footer.address → branch.address
   const address = footer?.address?.trim() || (menuData?.branch as any)?.address?.trim() || ''
 
-  // Phone/email from FooterBranchContact first, fallback to branch
   const phone = branchContact?.phone?.trim() || (menuData?.branch as any)?.phone?.trim() || ''
   const email = branchContact?.email?.trim() || ''
 
-  // Link groups from Footer.link_groups
   const linkGroups = Array.isArray(footer?.link_groups) ? footer!.link_groups : []
-
-  // Dynamic buttons (app download links from footer or settings)
   const footerButtons = Array.isArray(footer?.buttons) ? footer!.buttons : []
 
-  // App store badges from settings (takes priority over footer buttons)
   const androidIcon = resolveMediaUrl(settings.android_icon)
   const iosIcon     = resolveMediaUrl(settings.ios_icon)
   const androidLink = settings.android_app_link?.trim() || ''
   const iosLink     = settings.ios_app_link?.trim() || ''
   const showApps    = (androidLink || iosLink) && Boolean(settings.android_icon || settings.ios_icon)
 
-  // Logo: footer.logo → settings.merchant_logo
   const footerLogoRaw = footer?.logo?.trim() ? footer.logo : null
   const merchantLogo  = resolveMediaUrl(footerLogoRaw || settings.merchant_logo)
 
-  // Social links — merge Footer.social_links + MenuResponse.social_media_links
   const social    = mergeSocial(footer?.social_links, menuData?.social_media_links)
   const hasSocial = Object.values(social).some((v) => v.trim() !== '')
 
@@ -174,17 +169,19 @@ export function WebsiteFooter() {
   return (
     <footer className="relative overflow-hidden bg-[var(--color-tertiary)]">
       {/* soft ambient glow accents */}
-      <div className="pointer-events-none absolute -top-24 left-1/4 h-64 w-64 rounded-full bg-[var(--color-primary)]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 right-1/4 h-64 w-64 rounded-full bg-[var(--color-primary)]/5 blur-3xl" />
+      <div className="pointer-events-none absolute -top-24 left-1/4 h-56 w-56 rounded-full bg-[var(--color-primary)]/10 blur-3xl sm:h-72 sm:w-72" />
+      <div className="pointer-events-none absolute -bottom-24 right-1/4 h-56 w-56 rounded-full bg-[var(--color-primary)]/5 blur-3xl sm:h-72 sm:w-72" />
 
-      {/* top hairline accent */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[var(--color-primary)]/60 to-transparent" />
+      {/* top curved accent strip */}
+      <div className="relative h-1.5 w-full overflow-hidden sm:h-2">
+        <div className="h-full w-full rounded-b-[1.25rem] bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent sm:rounded-b-[2rem]" />
+      </div>
 
-      {/* SEO content block — shown only when footer has description */}
+      {/* SEO content block */}
       {(seoTitle || seoDesc) && (
-        <div className="relative mx-auto max-w-[1400px] px-4 pt-12 sm:px-5 sm:pt-16 md:px-8">
+        <div className="relative mx-auto max-w-[1400px] px-4 pt-10 sm:px-5 sm:pt-16 sm:text-center md:px-8">
           {seoTitle && (
-            <h2 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl md:text-[28px]">
+            <h2 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-2xl md:text-[28px]">
               {seoTitle}
             </h2>
           )}
@@ -192,11 +189,11 @@ export function WebsiteFooter() {
           {seoDesc && (
             <>
               <div
-                className={`relative mt-4 overflow-hidden text-sm leading-relaxed text-neutral-500 transition-all duration-300 ease-in-out sm:text-[15px] ${
+                className={`relative mt-4 max-w-3xl overflow-hidden text-sm leading-relaxed text-neutral-500 transition-all duration-300 ease-in-out sm:mx-auto sm:text-[15px] ${
                   expanded ? 'max-h-[2000px]' : 'max-h-[3.2rem]'
                 }`}
               >
-                <p className="max-w-3xl">{seoDesc}</p>
+                <p>{seoDesc}</p>
                 {!expanded && (
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[var(--color-tertiary)] to-transparent" />
                 )}
@@ -204,7 +201,7 @@ export function WebsiteFooter() {
 
               <button
                 onClick={() => setExpanded((v) => !v)}
-                className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-75"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)]/10 px-3.5 py-1.5 text-sm font-semibold text-[var(--color-primary)] transition-all hover:bg-[var(--color-primary)]/20"
               >
                 {expanded ? 'Show Less' : 'Show More'}
                 <ChevronDown
@@ -217,15 +214,11 @@ export function WebsiteFooter() {
         </div>
       )}
 
-      {/* divider */}
-      <div className="relative mt-10 h-px w-full bg-gradient-to-r from-transparent via-neutral-900/10 to-transparent sm:mt-14" />
+      {/* Main footer band as a floating rounded card */}
+      <div className="relative mx-auto max-w-[1400px] px-3 pb-4 pt-8 sm:px-5 sm:pt-10 md:px-8">
+        <div className="relative rounded-[1.5rem] border border-neutral-900/5 bg-white/60 p-5 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] backdrop-blur-sm sm:rounded-[2rem] sm:p-8 md:p-10">
 
-      {/* Main footer band */}
-      <div className="relative bg-[var(--color-tertiary)]">
-        <div className="mx-auto max-w-[1400px] px-4 py-14 sm:px-5 sm:py-16 md:px-8">
-
-          {/* Dynamic grid: always show brand; add columns for contact, link groups, social */}
-          <div className={`grid grid-cols-1 gap-12 sm:grid-cols-2 ${
+          <div className={`grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12 sm:text-center ${
             linkGroups.length > 0
               ? 'lg:grid-cols-[1.3fr_1fr_repeat(var(--lg-cols,1),0.8fr)_1fr]'
               : 'lg:grid-cols-[1.3fr_1fr_1fr]'
@@ -234,9 +227,9 @@ export function WebsiteFooter() {
           >
 
             {/* ── Brand ── */}
-            <div>
-              <div className="flex items-center gap-3.5">
-                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
+            <div className="flex flex-col items-start sm:items-center">
+              <div className="flex items-center gap-3 sm:gap-3.5">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl shadow-md ring-2 ring-[var(--color-primary)]/10 sm:h-14 sm:w-14">
                   <Image
                     src={merchantLogo}
                     alt={restaurantName}
@@ -245,7 +238,7 @@ export function WebsiteFooter() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <span className="text-xl font-bold tracking-tight text-neutral-900">
+                <span className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">
                   {restaurantName}
                 </span>
               </div>
@@ -256,18 +249,17 @@ export function WebsiteFooter() {
                 </p>
               )}
 
-              {/* App store badges from settings */}
               {showApps && (
-                <div className="mt-6 flex items-center gap-3">
+                <div className="mt-6 flex flex-wrap items-center gap-3 sm:justify-center">
                   {androidLink && (
                     <a
                       href={androidLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Get it on Google Play"
-                      className="overflow-hidden rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
+                      className="overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                     >
-                      <Image src={androidIcon} alt="Google Play" width={106} height={106} className="object-contain" />
+                      <Image src={androidIcon} alt="Google Play" width={106} height={106} className="h-20 w-20 object-contain sm:h-[106px] sm:w-[106px]" />
                     </a>
                   )}
                   {iosLink && (
@@ -276,24 +268,23 @@ export function WebsiteFooter() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Download on the App Store"
-                      className="overflow-hidden rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
+                      className="overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                     >
-                      <Image src={iosIcon} alt="App Store" width={106} height={106} className="object-contain" />
+                      <Image src={iosIcon} alt="App Store" width={106} height={106} className="h-20 w-20 object-contain sm:h-[106px] sm:w-[106px]" />
                     </a>
                   )}
                 </div>
               )}
 
-              {/* Footer buttons (e.g. "Download App") when no settings app links */}
               {!showApps && footerButtons.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-6 flex flex-wrap gap-2 sm:justify-center">
                   {footerButtons.map((btn) => (
                     <a
                       key={btn.url}
                       href={btn.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs font-semibold text-neutral-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)] hover:shadow-md"
+                      className="inline-flex items-center rounded-full border-2 border-[var(--color-primary)]/15 bg-[var(--color-primary)]/5 px-4 py-2 text-xs font-semibold text-[var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--color-primary)]/10"
                     >
                       {btn.text}
                     </a>
@@ -304,9 +295,9 @@ export function WebsiteFooter() {
 
             {/* ── Contact ── */}
             {(phone || email) && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Contact</h4>
-                <ul className="mt-5 space-y-3 text-sm text-neutral-600">
+              <div className="flex flex-col items-start sm:items-center">
+                <SectionHeading>Contact</SectionHeading>
+                <ul className="mt-6 space-y-3 text-sm text-neutral-600">
                   {phone && (
                     <li>
                       <a href={`tel:${phone}`} className="transition-colors hover:text-[var(--color-primary)]">
@@ -325,11 +316,11 @@ export function WebsiteFooter() {
               </div>
             )}
 
-            {/* ── Dynamic link groups from Footer.link_groups ── */}
+            {/* ── Dynamic link groups ── */}
             {linkGroups.map((group) => (
-              <div key={group.heading}>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400">{group.heading}</h4>
-                <ul className="mt-5 space-y-3 text-sm text-neutral-600">
+              <div key={group.heading} className="flex flex-col items-start sm:items-center">
+                <SectionHeading>{group.heading}</SectionHeading>
+                <ul className="mt-6 space-y-3 text-sm text-neutral-600">
                   {group.links.map((link) => (
                     <li key={link.url}>
                       <Link href={link.url} className="transition-colors hover:text-[var(--color-primary)]">
@@ -343,9 +334,9 @@ export function WebsiteFooter() {
 
             {/* ── Social ── */}
             {hasSocial && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Follow Us</h4>
-                <div className="mt-5 flex flex-wrap gap-2.5">
+              <div className="flex flex-col items-start sm:items-center">
+                <SectionHeading>Follow Us</SectionHeading>
+                <div className="mt-6 flex flex-wrap gap-2.5 sm:justify-center">
                   <SocialLink href={social.facebook}  label="Facebook"  icon={<FacebookIcon />} />
                   <SocialLink href={social.instagram} label="Instagram" icon={<InstagramIcon />} />
                   <SocialLink href={social.twitter}   label="Twitter"   icon={<TwitterIcon />} />
@@ -359,23 +350,25 @@ export function WebsiteFooter() {
               </div>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Bottom bar */}
-          <div className="mt-12 flex flex-col items-center justify-center gap-2 border-t border-neutral-900/10 pt-7 text-xs text-neutral-500 sm:flex-row sm:gap-2">
-            <span>© {currentYear} {restaurantName}. All Rights Reserved.</span>
-            <span className="hidden text-neutral-300 sm:inline">·</span>
-            <span>
-              Powered by{' '}
-              <Link
-                href="https://trestechsolutions.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-neutral-700 transition-colors hover:text-[var(--color-primary)]"
-              >
-                Trestech
-              </Link>
-            </span>
-          </div>
+      {/* Bottom bar */}
+      <div className="relative mx-auto max-w-[1400px] px-4 pb-8 sm:px-5 md:px-8">
+        <div className="flex flex-col items-start justify-center gap-2 border-t border-neutral-900/10 pt-7 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-center sm:text-center">
+          <span>© {currentYear} {restaurantName}. All Rights Reserved.</span>
+          <span className="hidden text-neutral-300 sm:inline">·</span>
+          <span>
+            Powered by{' '}
+            <Link
+              href="https://trestechsolutions.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-neutral-700 transition-colors hover:text-[var(--color-primary)]"
+            >
+              Trestech
+            </Link>
+          </span>
         </div>
       </div>
     </footer>
