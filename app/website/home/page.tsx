@@ -23,6 +23,7 @@ import { isDealActiveNowPKT } from '@/utils/dealTime'
 import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
 import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
 import { getRestaurantId } from '@/api/utils'
+import { HeroCarousel } from '@/components/website/HeroCarousel'
 
 const DEFAULT_ICON = 'solar:cup-hot-bold-duotone'
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop'
@@ -546,64 +547,83 @@ function transformMenu(menu: MenuResponse | undefined): {
 
   return { categories, products, idPairs, popularProducts }
 }
-// const POPULAR_LIMIT = 4
-/** Wrapper for the popular grid that owns the modal state. */
-/** Arrow styling — primary = background, secondary = icon + border.
- *  Replace the CSS var names below with your project's actual theme tokens. */
-const ARROW_CLASS =
-  'absolute top-1/2 z-20 -translate-y-1/2 hidden sm:flex h-10 w-10 items-center justify-center rounded-full ' +
-  'border-2 shadow-lg transition-all hover:scale-105 hover:brightness-110 active:scale-95 ' +
-  'bg-[var(--color-primary,#171717)] text-[var(--color-secondary,#ffffff)] border-[var(--color-secondary,#ffffff)]'
 
-/** Wrapper for the popular carousel — same carousel on mobile, tablet and laptop. */
+/** Wrapper for the popular carousel — same carousel on mobile, tablet and laptop.
+ *  Pure Tailwind: glass arrows fade out at scroll ends, edge fade masks. */
 function PopularSection({ products }: { products: ProductData[] }) {
   const [selected, setSelected] = useState<ProductData | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
 
   const items = products.slice(0, 50)
 
-  const scroll = (dir: 'left' | 'right') => {
-    if (!scrollRef.current) return
+  const updateEdges = () => {
     const el = scrollRef.current
-    const scrollAmount = el.clientWidth * 0.75
-    el.scrollBy({ left: dir === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setAtStart(el.scrollLeft <= 4)
+    setAtEnd(el.scrollLeft >= max - 4)
+  }
+
+  reactUseEffect(() => {
+    updateEdges()
+    const el = scrollRef.current
+    if (!el) return
+    el.addEventListener('scroll', updateEdges, { passive: true })
+    window.addEventListener('resize', updateEdges)
+    return () => {
+      el.removeEventListener('scroll', updateEdges)
+      window.removeEventListener('resize', updateEdges)
+    }
+  }, [items.length])
+
+  const scroll = (dir: 'left' | 'right') => {
+    const el = scrollRef.current
+    if (!el) return
+    const amount = el.clientWidth * 0.8
+    el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' })
   }
 
   return (
     <>
       <div className="relative">
-        {/* Left arrow — always visible on sm+ */}
+        {/* Edge fade masks */}
+        <div className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-white to-transparent transition-opacity duration-300 sm:w-12 ${atStart ? 'opacity-0' : 'opacity-100'}`} />
+        <div className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-white to-transparent transition-opacity duration-300 sm:w-12 ${atEnd ? 'opacity-0' : 'opacity-100'}`} />
+
         <button
           type="button"
           onClick={() => scroll('left')}
           aria-label="Scroll left"
-          className={`${ARROW_CLASS} -left-4`}
+          disabled={atStart}
+          className="absolute -left-1 top-[38%] z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/70 text-neutral-900 shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none disabled:opacity-0 sm:flex sm:h-11 sm:w-11 lg:-left-5"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
 
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory pb-2 sm:gap-4 lg:gap-5"
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth scrollbar-hide pb-2 sm:gap-4 lg:gap-5"
         >
           {items.map((product) => (
             <div
               key={product.id}
-              className="snap-start shrink-0 w-[44vw] sm:w-[28vw] md:w-[22vw] min-w-[160px] max-w-[240px] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0"
+              className="w-[42vw] min-w-[152px] max-w-[220px] shrink-0 snap-start sm:w-[26vw] md:w-[21vw] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0 xl:w-[calc((100%-5rem)/5)]"
             >
               <PopularItemCard product={product} onOpen={setSelected} />
             </div>
           ))}
         </div>
 
-        {/* Right arrow — always visible on sm+ */}
         <button
           type="button"
           onClick={() => scroll('right')}
           aria-label="Scroll right"
-          className={`${ARROW_CLASS} -right-4`}
+          disabled={atEnd}
+          className="absolute -right-1 top-[38%] z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/70 text-neutral-900 shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none disabled:opacity-0 sm:flex sm:h-11 sm:w-11 lg:-right-5"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={20} strokeWidth={2.5} />
         </button>
       </div>
 
@@ -626,6 +646,7 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
     ? (defaultSize.originalPrice != null ? String(defaultSize.originalPrice) : undefined)
     : product.originalPrice
   const hasOrig       = !!origPriceStr && parseInt(origPriceStr, 10) > priceNum
+  const savePct       = hasOrig ? Math.round(((parseInt(origPriceStr!, 10) - priceNum) / parseInt(origPriceStr!, 10)) * 100) : 0
 
   const needsSelection = hasSizes && product.sizes!.length > 1
   const isOrderable    = priceNum > 0 && product.productId != null
@@ -659,56 +680,69 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
 
   return (
     <div
-      className="group relative flex flex-col overflow-visible rounded-2xl bg-transparent  transition-shadow duration-300  cursor-pointer"
+      className="group relative flex cursor-pointer flex-col overflow-visible rounded-2xl transition-all duration-300"
       onClick={() => onOpen(product)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(product) } }}
     >
       {/* Image */}
-<div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 xs:h-44 sm:h-56 md:h-64 lg:h-72">        <Image
+      <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-black/5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:ring-black/10 xs:h-44 sm:h-56 md:h-64 lg:h-72">
+        <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
         />
 
-        {/* Dark + button — bottom-right, partially overlapping the card edge */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+        {hasOrig && savePct > 0 && (
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-md sm:text-xs">
+            {savePct}% OFF
+          </span>
+        )}
+        {product.tag && !hasOrig && (
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-neutral-900/85 px-2 py-0.5 text-[10px] font-semibold text-white shadow-md backdrop-blur-sm sm:text-xs">
+            {product.tag}
+          </span>
+        )}
+
         {isOrderable && (
           cartQty > 0 && !needsSelection ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900 px-1.5 py-1 shadow-lg"
+              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900/90 px-1.5 py-1 shadow-lg backdrop-blur-sm ring-1 ring-white/10"
             >
               <button type="button" onClick={handleDecrease} aria-label="Decrease"
-                className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
+                className="flex h-6 w-6 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20">
                 <Minus size={12} />
               </button>
               <span className="w-5 text-center text-xs font-bold text-white">{cartQty}</span>
-          <button type="button" onClick={handleIncrease} aria-label="Increase"
-  className="flex h-6 w-6 items-center justify-center rounded-full text-white hover:bg-white/20">
-  <Plus size={12} />
-</button>
+              <button type="button" onClick={handleIncrease} aria-label="Increase"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20">
+                <Plus size={12} />
+              </button>
             </div>
           ) : (
-    <button
-  type="button"
-  onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
-  aria-label="Add to cart"
-  disabled={!storeOpen}
-  title={!storeOpen ? (closedMessage ?? 'Store is currently closed') : undefined}
-  className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg transition-all ${added ? 'bg-green-600 text-white' : !storeOpen ? 'cursor-not-allowed bg-neutral-400 text-white opacity-50' : 'bg-neutral-900 text-white hover:bg-neutral-700'}`}
->
-  {added ? <Check size={16} /> : <Plus size={18} />}
-</button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleAdd(e) }}
+              aria-label="Add to cart"
+              disabled={!storeOpen}
+              title={!storeOpen ? (closedMessage ?? 'Store is currently closed') : undefined}
+              className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-200 ${added ? 'bg-green-600 text-white' : !storeOpen ? 'cursor-not-allowed bg-neutral-400 text-white opacity-50' : 'bg-neutral-900 text-white hover:scale-105 hover:bg-neutral-700 active:scale-95'}`}
+            >
+              {added ? <Check size={16} /> : <Plus size={18} />}
+            </button>
           )
         )}
       </div>
 
       {/* Text */}
-      <div className="px-1 pt-2.5 pb-3">
-        <h3 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-2">{product.name}</h3>
+      <div className="px-1 pb-3 pt-2.5">
+        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900">{product.name}</h3>
         <div className="mt-1 flex items-baseline gap-1.5">
           {hasOrig && (
             <span className="text-xs text-neutral-400 line-through">
@@ -777,7 +811,7 @@ function ContentSkeleton() {
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="overflow-hidden rounded-lg border border-neutral-100">
+          <div key={i} className="overflow-hidden rounded-2xl border border-neutral-100">
             <div className="h-32 w-full animate-pulse bg-neutral-100 sm:h-40" />
             <div className="space-y-2 p-3">
               <div className="h-3 w-3/4 animate-pulse rounded bg-neutral-200" />
@@ -850,12 +884,25 @@ function buildHeroSlides(
   return fromSettings
 }
 
+// Small reusable section-label with accent dot — consistent premium language
+function SectionHeader({ title, subtitle, emoji }: { title: string; subtitle?: string; emoji?: string }) {
+  return (
+    <div className="mb-5">
+      <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-neutral-900 sm:text-2xl">
+        {emoji && <span>{emoji}</span>}
+        <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
+        {title}
+      </h2>
+      {subtitle && <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>}
+    </div>
+  )
+}
+
 export default function HomePage() {
   const { branch } = useCart()
   const { branchId: reduxBranchId, areaId: reduxAreaId } = useStoreLocation()
   const { settings } = useStoreSettings()
   const registerProductId = useRegisterProductId()
-  const [currentSlide, setCurrentSlide] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
 
   // Use storeLocationSlice as canonical source for branchId/areaId
@@ -896,20 +943,6 @@ export default function HomePage() {
       setActiveCategoryId(categories[0].id)
     }
   }, [categories, activeCategoryId])
-
-  const goToSlide = useCallback((index: number) => {
-    if (HERO_SLIDES.length === 0) return
-    setCurrentSlide((index + HERO_SLIDES.length) % HERO_SLIDES.length)
-  }, [HERO_SLIDES.length])
-
-  reactUseEffect(() => {
-    if (HERO_SLIDES.length === 0) {
-      setCurrentSlide(0)
-      return
-    }
-    const t = setInterval(() => setCurrentSlide((p) => (p + 1) % HERO_SLIDES.length), 4500)
-    return () => clearInterval(t)
-  }, [HERO_SLIDES.length])
 
   const handleCategoryChange = (catId: string) => {
     const cat = categories.find((c) => c.id === catId)
@@ -955,7 +988,7 @@ export default function HomePage() {
   const resolvedBgImage = resolveMediaUrl(settings.menu_page_background_image)
 
   return (
-    <div className="min-h-screen font-sans text-neutral-800">
+    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50/60 font-sans text-neutral-800">
       {/* Popup banner — shown once per session after menu loads */}
       {!isLoading && popupBanners.length > 0 && (
         <PopupBannerModal banners={popupBanners} />
@@ -963,260 +996,155 @@ export default function HomePage() {
 
       {/* Hero carousel — only rendered when banners or legacy slides are available */}
       {heroActive && (
-        <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8" style={{
-          backgroundColor: settings.background_color || '',
-          backgroundImage: resolvedBgImage ? `url("${resolvedBgImage}")` : '',
-          backgroundRepeat: 'repeat',
-          backgroundSize: 'auto',
-          backgroundAttachment: 'fixed',
-        }}>
-<div className="relative mx-auto w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 aspect-[3.30/1] sm:rounded-3xl bg-black">
-          {HERO_SLIDES.map((s, i) => {
-            const isActive = i === currentSlide
-            const isExternal = s.link && /^https?:\/\//i.test(s.link)
-            const Wrapper: React.FC<{ children: React.ReactNode }> = s.link
-              ? ({ children }) =>
-                  isExternal
-                    ? (
-                        <a href={s.link!} target="_blank" rel="noopener noreferrer" className="absolute inset-0 block">{children}</a>
-                      )
-                    : (
-                        <a href={s.link!} className="absolute inset-0 block">{children}</a>
-                      )
-              : ({ children }) => <>{children}</>
-            return (
-              <div
-                key={s.id}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                }`}
-              >
-                <Wrapper>
-                  <Image src={s.image} alt={s.title || s.heading || 'slide'} fill priority={i === 0} className="object-contain object-center" />
-                  {(s.heading || s.description) && (
-                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent px-6 pb-10 sm:px-12 sm:pb-16 md:px-16">
-                      {s.heading && (
-                        <h2
-                          className="text-2xl font-extrabold tracking-tight drop-shadow-lg sm:text-3xl md:text-5xl"
-                          style={{ color: s.headingColor || '#ffffff' }}
-                        >
-                          {s.heading}
-                        </h2>
-                      )}
-                      {s.description && (
-                        <p
-                          className="mt-2 max-w-2xl text-sm font-medium leading-snug drop-shadow sm:text-base md:text-lg"
-                          style={{ color: s.descriptionColor || '#f5f5f5' }}
-                        >
-                          {s.description}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </Wrapper>
-              </div>
-            )
-          })}
-
-          {/* Prev / Next arrows — floating circular, inset from the card edges */}
-          <button
-            onClick={() => goToSlide(currentSlide - 1)}
-            aria-label="Previous"
-            className="absolute left-3 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 sm:left-6 sm:h-11 sm:w-11 md:h-12 md:w-12"
-          >
-            <ChevronLeft size={18} className="sm:hidden" />
-            <ChevronLeft size={20} className="hidden sm:block md:hidden" />
-            <ChevronLeft size={24} className="hidden md:block" />
-          </button>
-          <button
-            onClick={() => goToSlide(currentSlide + 1)}
-            aria-label="Next"
-            className="absolute right-3 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 sm:right-6 sm:h-11 sm:w-11 md:h-12 md:w-12"
-          >
-            <ChevronRight size={18} className="sm:hidden" />
-            <ChevronRight size={20} className="hidden sm:block md:hidden" />
-            <ChevronRight size={24} className="hidden md:block" />
-          </button>
-
-          {/* Pagination dots — centered pill style at bottom */}
-          <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
-            {HERO_SLIDES.map((s, i) => (
-              <button
-                key={s.id}
-                onClick={() => goToSlide(i)}
-                aria-label={`Go to slide ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentSlide ? 'w-6 bg-white sm:w-8' : 'w-1.5 bg-white/40 hover:bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Secure payments badge — respect hide_payment_card_logo_from_banner */}
-          {settings.hide_payment_card_logo_from_banner !== true && (
-            <div className="absolute bottom-4 right-3 z-20 hidden rounded-md bg-white/95 px-2 py-1 shadow-md sm:bottom-6 sm:right-6 sm:flex sm:flex-col sm:gap-1 sm:px-4 sm:py-2">
-              <span className="text-[8px] font-bold tracking-wide text-neutral-700 sm:text-[10px]">SECURE PAYMENTS</span>
-              <div className="flex gap-1 sm:gap-2">
-                <span className="rounded border border-neutral-300 px-1.5 py-0.5 text-[8px] font-bold text-blue-700 sm:px-2 sm:text-[10px]">VISA</span>
-                <span className="rounded border border-neutral-300 px-1.5 py-0.5 text-[8px] font-bold text-orange-600 sm:px-2 sm:text-[10px]">MasterCard</span>
-              </div>
-            </div>
-          )}
-        </div>
-        </section>
+        <HeroCarousel
+          slides={HERO_SLIDES}
+          backgroundColor={settings.background_color}
+          backgroundImage={resolvedBgImage}
+          hidePaymentBadge={settings.hide_payment_card_logo_from_banner === true}
+        />
       )}
 
       {/* Category nav — sticks right below hero */}
-      <CategoryNav
-        categories={categories}
-        activeCategoryId={activeCategoryId}
-        onSelect={handleCategoryChange}
-      />
+      <div className="sticky top-0 z-30 border-b border-neutral-100 bg-white/90 shadow-sm backdrop-blur-md">
+        <CategoryNav
+          categories={categories}
+          activeCategoryId={activeCategoryId}
+          onSelect={handleCategoryChange}
+        />
+      </div>
 
-      {/* ── Offers strip — scrollable pill row below CategoryNav ── */}
-  {/* ── Offers strip — full-width sleek banner cards, centered ── */}
-{(() => {
-  const activeOffers: MenuOffer[] = (menu?.offers ?? []).filter(
-    (o) => o.status && o.is_available_now,
-  )
-  if (activeOffers.length === 0) return null
- 
-  {console.log("restsurant id", getRestaurantId)}
-  return (
-    <section className="mx-auto max-w-[1400px] px-4 py-4 md:px-8">
-      <div className="flex justify-center">
-        <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-hide md:justify-center">
-          {activeOffers.map((offer) => {
-            const amt        = parseFloat(offer.amount || '0')
-            const isPercent  = offer.discount_type === 'percentage'
-            // Only show a value badge when explicitly enabled AND there's a real number
-            const showValue  = offer.show_percentage_text === true && amt > 0
-            const valueStr   = showValue ? (isPercent ? `${Math.round(amt)}%` : `Rs.${Math.round(amt)}`) : ''
-            const bannerUrl  = resolveMediaUrl(offer.banner_image)
+      {/* ── Offers strip — premium banner cards, centered ── */}
+      {(() => {
+        const activeOffers: MenuOffer[] = (menu?.offers ?? []).filter(
+          (o) => o.status && o.is_available_now,
+        )
+        if (activeOffers.length === 0) return null
 
-            // ── NO IMAGE: light cream strip → [icon] Flat (20) % Off ────────────
-            if (!bannerUrl) {
-              const label = offer.discount_text || 'Flat'
-              return (
-                <div
-                  key={offer.id}
-                  className="relative flex min-h-16 w-[92vw] shrink-0 snap-center items-center overflow-hidden rounded-2xl px-4 py-2 shadow-md ring-1 ring-black/5 sm:min-h-[68px] sm:px-6 md:w-full"
-                  style={{ backgroundColor: 'var(--color-primary, #171717)' }}
-                >
-                  <div
-                    className="flex min-w-0 items-center gap-3"
-                    style={{ color: 'var(--color-secondary, #ffffff)' }}
-                  >
-                    {/* Badge-percent icon */}
-                    <svg
-                      width="26"
-                      height="26"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="shrink-0"
-                    >
-                      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-                      <path d="m15 9-6 6" />
-                      <path d="M9 9h.01" />
-                      <path d="M15 15h.01" />
-                    </svg>
+        return (
+          <section className="mx-auto max-w-[1400px] px-4 py-4 md:px-8">
+            <div className="flex justify-center">
+              <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-hide md:justify-center">
+                {activeOffers.map((offer) => {
+                  const amt        = parseFloat(offer.amount || '0')
+                  const isPercent  = offer.discount_type === 'percentage'
+                  const showValue  = offer.show_percentage_text === true && amt > 0
+                  const valueStr   = showValue ? (isPercent ? `${Math.round(amt)}%` : `Rs.${Math.round(amt)}`) : ''
+                  const bannerUrl  = resolveMediaUrl(offer.banner_image)
 
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 sm:gap-2.5">
-                        <span className="text-xl font-extrabold leading-none sm:text-2xl">
-                          {label}{showValue && !isPercent ? ' Rs.' : ''}
-                        </span>
-
-                        {showValue && (
-                          <span
-                            className="-translate-y-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-extrabold sm:h-10 sm:w-10 sm:text-xl"
-                            style={{
-                              backgroundColor: 'var(--color-secondary, #ffffff)',
-                              color: 'var(--color-primary, #171717)',
-                              boxShadow:
-                                '0 6px 16px color-mix(in srgb, var(--color-secondary, #ffffff) 35%, transparent)',
-                            }}
+                  // ── NO IMAGE: dark strip → [icon] Flat (20) % Off ────────────
+                  if (!bannerUrl) {
+                    const label = offer.discount_text || 'Flat'
+                    return (
+                      <div
+                        key={offer.id}
+                        className="relative flex min-h-16 w-[92vw] shrink-0 snap-center items-center overflow-hidden rounded-3xl px-4 py-2 shadow-lg ring-1 ring-black/5 transition-transform duration-300 hover:scale-[1.01] sm:min-h-[68px] sm:px-6 md:w-full"
+                        style={{ backgroundColor: 'var(--color-primary, #171717)' }}
+                      >
+                        <div
+                          className="flex min-w-0 items-center gap-3"
+                          style={{ color: 'var(--color-secondary, #ffffff)' }}
+                        >
+                          <svg
+                            width="26" height="26" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                            className="shrink-0"
                           >
-                            {Math.round(amt)}
+                            <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                            <path d="m15 9-6 6" />
+                            <path d="M9 9h.01" />
+                            <path d="M15 15h.01" />
+                          </svg>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 sm:gap-2.5">
+                              <span className="text-xl font-extrabold leading-none sm:text-2xl">
+                                {label}{showValue && !isPercent ? ' Rs.' : ''}
+                              </span>
+
+                              {showValue && (
+                                <span
+                                  className="-translate-y-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-extrabold sm:h-10 sm:w-10 sm:text-xl"
+                                  style={{
+                                    backgroundColor: 'var(--color-secondary, #ffffff)',
+                                    color: 'var(--color-primary, #171717)',
+                                    boxShadow: '0 6px 16px color-mix(in srgb, var(--color-secondary, #ffffff) 35%, transparent)',
+                                  }}
+                                >
+                                  {Math.round(amt)}
+                                </span>
+                              )}
+
+                              <span className="text-lg font-bold leading-none sm:text-2xl">
+                                {showValue && isPercent ? '% Off' : 'Off'}
+                              </span>
+                            </div>
+
+                            {offer.discount_message && (
+                              <p className="mt-1 truncate text-xs opacity-80 sm:text-sm">
+                                {offer.discount_message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  // ── WITH IMAGE: banner + gradient + white text ───────────────────────
+                  return (
+                    <div
+                      key={offer.id}
+                      className="relative flex h-24 w-[92vw] max-w-3xl shrink-0 snap-center items-center overflow-hidden rounded-3xl shadow-xl ring-1 ring-black/5 transition-transform duration-300 hover:scale-[1.01] sm:h-28 md:h-32 md:w-full"
+                      style={{ backgroundColor: 'var(--color-primary,#171717)' }}
+                    >
+                      <Image
+                        src={bannerUrl}
+                        alt={offer.discount_text || 'Offer'}
+                        fill
+                        priority={false}
+                        sizes="(max-width: 768px) 92vw, 900px"
+                        className="object-cover"
+                      />
+
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
+
+                      <div className="relative z-10 flex w-full items-center justify-between gap-4 px-5 sm:px-8">
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white shadow-inner backdrop-blur-sm sm:h-11 sm:w-11">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                            </svg>
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-white sm:text-base md:text-lg">
+                              {offer.discount_text || 'Flat'}{valueStr ? ` ${valueStr}` : ''} Off
+                            </p>
+                            {offer.discount_message && (
+                              <p className="mt-0.5 truncate text-xs text-white/80 sm:text-sm">
+                                {offer.discount_message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {valueStr && (
+                          <span
+                            className="hidden shrink-0 animate-pulse items-center justify-center rounded-full px-4 py-1.5 text-sm font-extrabold text-white shadow-md sm:flex sm:text-base"
+                            style={{ backgroundColor: 'var(--color-secondary,#e11d48)' }}
+                          >
+                            {valueStr}
                           </span>
                         )}
-
-                        <span className="text-lg font-bold leading-none sm:text-2xl">
-                          {showValue && isPercent ? '% Off' : 'Off'}
-                        </span>
                       </div>
-
-                      {offer.discount_message && (
-                        <p className="mt-1 truncate text-xs opacity-80 sm:text-sm">
-                          {offer.discount_message}
-                        </p>
-                      )}
                     </div>
-                  </div>
-                </div>
-              )
-            }
-
-            // ── WITH IMAGE: banner + gradient + white text ───────────────────────
-            return (
-              <div
-                key={offer.id}
-                className="relative flex h-24 w-[92vw] max-w-3xl shrink-0 snap-center items-center overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 transition-transform duration-300 hover:scale-[1.01] sm:h-28 md:h-32 md:w-full"
-                style={{ backgroundColor: 'var(--color-primary,#171717)' }}
-              >
-                {/* Banner image fills the whole strip */}
-                <Image
-                  src={bannerUrl}
-                  alt={offer.discount_text || 'Offer'}
-                  fill
-                  priority={false}
-                  sizes="(max-width: 768px) 92vw, 900px"
-                  className="object-cover"
-                />
-
-                {/* Gradient so text stays legible over any image */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
-
-                <div className="relative z-10 flex w-full items-center justify-between gap-4 px-5 sm:px-8">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm sm:h-11 sm:w-11">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                      </svg>
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-white sm:text-base md:text-lg">
-                        {offer.discount_text || 'Flat'}{valueStr ? ` ${valueStr}` : ''} Off
-                      </p>
-                      {offer.discount_message && (
-                        <p className="mt-0.5 truncate text-xs text-white/80 sm:text-sm">
-                          {offer.discount_message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {valueStr && (
-                    <span
-                      className="hidden shrink-0 items-center justify-center rounded-full px-4 py-1.5 text-sm font-extrabold text-white shadow-md sm:flex sm:text-base"
-                      style={{ backgroundColor: 'var(--color-secondary,#e11d48)' }}
-                    >
-                      {valueStr}
-                    </span>
-                  )}
-                </div>
+                  )
+                })}
               </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-})()}
+            </div>
+          </section>
+        )
+      })()}
+
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
@@ -1247,15 +1175,7 @@ export default function HomePage() {
               id="category-popular"
               className="mx-auto max-w-[1400px] px-4 pt-8 pb-2 md:px-8 scroll-mt-28"
             >
-              {/* Header — plain, no coloured box */}
-              <div className="mb-5">
-                <h2 className="flex items-center gap-2 text-xl font-extrabold text-neutral-900 sm:text-2xl">
-                  🔥 Popular 
-                </h2>
-                <p className="mt-0.5 text-sm text-neutral-500">Most ordered right now</p>
-              </div>
-
-              {/* Card row — fixed 4-column grid, horizontal scroll on mobile */}
+              <SectionHeader title="Popular" subtitle="Most ordered right now" emoji="🔥" />
               <PopularSection products={popularProducts} />
             </section>
           )}
@@ -1271,32 +1191,18 @@ export default function HomePage() {
                 className="mx-auto max-w-[1400px] px-4 py-8 md:px-8 scroll-mt-28"
               >
                 {/* Category Banner */}
-                            {/* Category Banner */}
-                             {/* Category Banner */}
                 <div className="mb-6">
                   {cat.banner ? (
-                    <div className="relative overflow-hidden rounded-2xl shadow-md">
+                    <div className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-2xl">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={cat.banner}
                         alt={cat.label}
-                        className="block w-full h-auto"
+                        className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      {/* Gradient overlay + text — commented out for now */}
-                      {/*
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                      <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8">
-                        <h2 className="text-xl font-bold text-white drop-shadow-sm sm:text-2xl md:text-3xl lg:text-4xl">
-                          {cat.label}
-                        </h2>
-                        <p className="mt-1 text-xs text-white/90 drop-shadow sm:text-sm md:text-base">
-                          {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      */}
                     </div>
                   ) : (
-                    <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4 sm:px-8 sm:py-5 shadow-md" style={{
+                    <div className="mb-6 flex items-center justify-between rounded-3xl px-5 py-4 shadow-lg ring-1 ring-black/5 sm:px-8 sm:py-5" style={{
                       backgroundColor: settings.background_color || '#1f1f1f',
                       backgroundImage: resolvedBgImage ? `url("${resolvedBgImage}")` : '',
                       backgroundRepeat: 'repeat',
@@ -1305,25 +1211,26 @@ export default function HomePage() {
                       backgroundBlendMode: 'overlay',
                     }}>
                       <div>
-                        <h2 className="text-lg font-bold text-white sm:text-xl md:text-2xl">
+                        <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-white sm:text-xl md:text-2xl">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
                           {cat.label}
                         </h2>
                         <p className="mt-1 text-xs text-white/90 sm:text-sm">
                           {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
                         </p>
                       </div>
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm sm:h-16 sm:w-16">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 shadow-inner backdrop-blur-sm sm:h-16 sm:w-16">
                         {cat.icon.type === 'image' ? (
                           <Image
                             src={cat.icon.value}
                             alt={cat.label}
                             width={48}
                             height={48}
-                            className="h-10 w-10 rounded-full object-cover sm:h-12 sm:w-12"
+                            className="h-10 w-10 rounded-full object-cover shadow-md sm:h-12 sm:w-12"
                           />
                         ) : (
                           <span
-                            className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-3xl text-white sm:text-4xl"
+                            className="flex h-10 w-10 items-center justify-center text-3xl text-white sm:h-12 sm:w-12 sm:text-4xl"
                             style={{ fontFamily: 'sans-serif' }}
                           >
                             🍽️
@@ -1341,16 +1248,6 @@ export default function HomePage() {
           })}
         </div>
       )}
-{/* 
-      <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-8">
-        <h3 className="font-serif text-2xl font-bold text-neutral-900 sm:text-3xl">
-          Discover the Delightful Range at United King
-        </h3>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-neutral-600">
-          United King is Karachi&apos;s premier bakery, offering a wide selection of cakes,
-          sweets, mithai, frozen food and fast food.
-        </p>
-      </section> */}
     </div>
   )
 }

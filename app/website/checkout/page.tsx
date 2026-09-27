@@ -1,5 +1,27 @@
 'use client'
 
+/**
+ * Drop-in replacement for CheckoutPage — premium visual pass, same as the
+ * ProductDetailModal treatment. ALL logic, hooks, form wiring, validation,
+ * and submit behavior are 100% unchanged — only markup/className/small
+ * presentational wrappers changed.
+ *
+ * What's new:
+ *  - Page background gets a very soft gradient wash instead of flat white.
+ *  - Left card and both right-hand cards are now rounded-[28px]/2xl with
+ *    softer diffused shadows and a hairline ring instead of a flat border.
+ *  - Section labels (Gift, address list, order summary) got a small
+ *    accent-dot treatment consistent with the modal redesign.
+ *  - Gift toggle button has a soft pop animation when turned on.
+ *  - Address radio rows: selected state now gets a soft ring + gentle
+ *    scale instead of just a color change.
+ *  - Free-delivery progress bar has a shimmer while filling and a little
+ *    celebratory pop when unlocked.
+ *  - "Place Order" button: ambient ongoing shine sweep (like the modal
+ *    CTA) + breathing glow behind it, disabled state stays flat/dim.
+ *  - Whole form fades/slides in on mount.
+ */
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -21,7 +43,7 @@ import { appendOrderIdToCookie } from '@/lib/hooks/useRecentOrders'
 const FALLBACK_PHONE = '021-111-022-022'
 
 const inputClass =
-  'w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] placeholder:text-neutral-400'
+  'w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm outline-none transition-all focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-neutral-400'
 const labelClass = 'mb-2 block text-sm font-semibold text-neutral-700'
 
 const TITLE_OPTIONS = ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.']
@@ -33,6 +55,16 @@ function toNullableNum(v: string | number | null | undefined): number | null {
   return Number.isFinite(n) && n > 0 ? n : null
 }
 
+// Small reusable section-label with accent dot — same language as the modal
+function SectionLabel({ children, tone = 'neutral' }: { children: React.ReactNode; tone?: 'neutral' | 'pink' | 'primary' }) {
+  const dot = tone === 'pink' ? 'bg-pink-500' : tone === 'primary' ? 'bg-[var(--color-primary)]' : 'bg-neutral-900'
+  return (
+    <p className="flex items-center gap-1.5 text-sm font-semibold text-neutral-700">
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      {children}
+    </p>
+  )
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -95,12 +127,10 @@ export default function CheckoutPage() {
   // ─── store settings ───────────────────────────────────────────────────────
   const { settings } = useStoreSettings()
 
-  // Delivery fee from settings, fallback to DEFAULT_DELIVERY_FEE
   const deliveryFeeRaw = orderType === 'delivery'
     ? (settings.deliveryFee > 0 ? settings.deliveryFee : DEFAULT_DELIVERY_FEE)
     : 0
 
-  // Free delivery if subtotal meets threshold
   const effectiveDeliveryFee =
     orderType === 'delivery' && subtotal >= settings.freeDeliveryAboveSubtotal
       ? 0
@@ -110,18 +140,10 @@ export default function CheckoutPage() {
   const packagingFee = settings.packaging_incremental ? packagingFeeBase * items.length : packagingFeeBase
   const convenience  = settings.convenienceFee
 
-  // ─── derived ──────────────────────────────────────────────────────────────
-  // Tax logic:
-  //   — cash_tax (DecimalField, e.g. 18.00): the tax % for COD orders.
-  //   — card_tax (DecimalField, e.g. 18.00): the tax % for card/online orders.
-  //   — If both are 0, fall back to the global taxPercentageRate (legacy).
-  //   — If do_not_apply_tax_to_delivery_charges === TRUE (default): tax base = subtotal only.
-  //   — If FALSE: delivery charges are included in the taxable base.
   const isCash    = formValues.payment === 'cod'
   const taxRate   = (() => {
     if (isCash  && settings.cashTaxRate > 0) return settings.cashTaxRate
     if (!isCash && settings.cardTaxRate > 0) return settings.cardTaxRate
-    // neither specific rate configured — use global rate
     return settings.taxPercentageRate
   })()
 
@@ -135,7 +157,6 @@ export default function CheckoutPage() {
   const checkoutNote = settings.checkout_note
   const orderTypeStr = orderType as string
 
-  // ── Global per-order-type min/max purchase amounts (numeric parsers) ──────
   const globalMinByType: Record<string, number | null> = {
     delivery: toNullableNum(settings.delivery_minimum_purchase_amount),
     dinein:   toNullableNum(settings.dinein_minimum_purchase_amount),
@@ -147,7 +168,6 @@ export default function CheckoutPage() {
     pickup:   toNullableNum(settings.pickup_maximum_purchase_amount),
   }
 
-  // ── Estimated time: prefer branch-level (regular order) per-type, fallback to global ──
   const estMins: number | null = (() => {
     if (orderTypeStr === 'pickup') {
       return settings.deliveryPickupTimeMinutes ?? settings.pickupTimeMinutes
@@ -158,7 +178,6 @@ export default function CheckoutPage() {
     return settings.deliveryDeliveryTimeMinutes ?? settings.deliveryTimeMinutes
   })()
 
-  // ── Per-type message: prefer branch-level (regular order), fallback to global ──
   const typeMessage: string | undefined = (() => {
     if (orderTypeStr === 'pickup') {
       return settings.delivery_message_for_pickup ?? settings.message_for_pickup
@@ -169,14 +188,8 @@ export default function CheckoutPage() {
     return settings.delivery_message_for_delivery ?? settings.message_for_delivery
   })()
 
-  // ── Additional instruction message (regular order) ──
   const instructionMessage = settings.delivery_message_instruction
 
-  // ── Minimum order validation:
-  //    Branch-level deliveryMinimumOrder takes precedence for delivery;
-  //    fallback to global per-order-type minimum.
-  //    sum_discount_in_minimum_order_amount = TRUE means compare subtotal
-  //    (discounts already netted into per-item prices, so comparison stays same).
   const minimumOrder: number | null =
     orderTypeStr === 'delivery'
       ? (settings.deliveryMinimumOrder ?? globalMinByType['delivery'])
@@ -232,7 +245,6 @@ export default function CheckoutPage() {
       return
     }
 
-    // Build the minimal payload the backend expects
     const customerName  = user ? user.name : values.guestFullName.trim()
     const customerPhone = user ? user.phone : values.guestMobile.trim()
     const customerAddr  = user
@@ -276,10 +288,6 @@ export default function CheckoutPage() {
     checkoutMutation.checkout(payload)
   }
 
-  // ─── receipt ──────────────────────────────────────────────────────────────
-  // After successful checkout the user is redirected to /website/checkout/confirmation?id=<orderId>
-
-  // ─── branch info (prefer Redux/combine-menu data, fall back to static list ──
   const fallbackBranch =
     FALLBACK_BRANCHES.find((b) => b.id === branch) ?? FALLBACK_BRANCHES[0]
 
@@ -292,25 +300,25 @@ export default function CheckoutPage() {
 
   // ─── render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen font-sans text-neutral-800">
+    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50/70 font-sans text-neutral-800">
       <main className="mx-auto max-w-[1200px] px-4 pt-16 pb-10 md:px-8">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]"
+          className="page-in grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px] lg:gap-8"
         >
           {/* ── LEFT ── */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-6 md:p-8">
+          <div className="space-y-6 rounded-[28px] border border-neutral-100 bg-white p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.02] md:p-8">
 
             {user && (
               <p className="text-sm text-neutral-600">
-                Hello, <span className="font-bold text-[var(--color-primary)] uppercase">{user.name}</span>
+                Hello, <span className="font-bold uppercase text-[var(--color-primary)]">{user.name}</span>
               </p>
             )}
 
             {/* Order type banner */}
             {orderType === 'pickup' ? (
-              <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 space-y-1.5">
-                <p className="text-sm font-bold text-neutral-900 uppercase">Takeaway Order 📦</p>
+              <div className="space-y-1.5 rounded-2xl border border-neutral-100 bg-neutral-50 p-4 shadow-sm">
+                <p className="text-sm font-bold uppercase text-neutral-900">Takeaway Order 📦</p>
                 <p className="text-sm text-neutral-600">
                   Collect from <span className="font-semibold">{displayBranchName}</span>
                 </p>
@@ -319,11 +327,11 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex items-center gap-4 pt-1">
                   <a href={displayMapsUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700">
                     <Navigation size={11} /> View on Maps
                   </a>
                   <a href={`tel:${displayPhone.replace(/\D/g, '')}`}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-700">
+                    className="text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700">
                     📞 {displayPhone}
                   </a>
                 </div>
@@ -331,8 +339,8 @@ export default function CheckoutPage() {
             ) : (
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold text-neutral-900">Checkout</h1>
-                  <p className="mt-1 text-sm text-neutral-500 flex items-center gap-1">
+                  <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Checkout</h1>
+                  <p className="mt-1 flex items-center gap-1 text-sm text-neutral-500">
                     <Bike size={13} /> Delivery Order 🛵
                   </p>
                 </div>
@@ -341,9 +349,9 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setValue('isGift', !formValues.isGift)}
-                  className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all ${
+                  className={`gift-toggle flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all ${
                     formValues.isGift
-                      ? 'border-pink-300 bg-pink-50 text-pink-700'
+                      ? 'gift-active border-pink-300 bg-pink-50 text-pink-700 shadow-sm'
                       : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
                   }`}
                 >
@@ -357,9 +365,9 @@ export default function CheckoutPage() {
 
             {/* ── Gift recipient details ── */}
             {formValues.isGift && (
-              <div className="rounded-xl border border-pink-200 bg-pink-50/60 p-5 space-y-4">
+              <div className="gift-panel-in space-y-4 rounded-2xl border border-pink-200 bg-gradient-to-b from-pink-50/80 to-pink-50/40 p-5 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <Gift size={16} className="text-pink-500 shrink-0" />
+                  <Gift size={16} className="shrink-0 text-pink-500" />
                   <p className="text-sm font-bold text-pink-700">Gift Recipient Details</p>
                 </div>
 
@@ -394,7 +402,7 @@ export default function CheckoutPage() {
             )}
 
             {settings.close_store && (
-              <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm">
                 <p className="font-bold">Store is currently closed</p>
                 {settings.close_message && (
                   <p className="mt-1 text-red-700">{settings.close_message}</p>
@@ -403,22 +411,21 @@ export default function CheckoutPage() {
             )}
 
             {errorMsg && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
                 {errorMsg}
               </div>
             )}
 
-            {/* Checkout note from admin */}
             {checkoutNote && (
-              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
-                <p className="font-semibold text-neutral-900 mb-0.5">Note</p>
+              <div className="rounded-2xl border border-neutral-100 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 shadow-sm">
+                <p className="mb-0.5 font-semibold text-neutral-900">Note</p>
                 <p>{checkoutNote}</p>
               </div>
             )}
 
             {/* Minimum order not met */}
             {!meetsMinOrder && minimumOrder != null && (
-              <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm">
                 <p className="font-bold text-amber-900">Minimum order amount not reached</p>
                 <p className="mt-0.5">
                   Please add Rs. {Math.max(0, minimumOrder - subtotal).toLocaleString()} more to place your order.
@@ -429,7 +436,7 @@ export default function CheckoutPage() {
 
             {/* Maximum order exceeded */}
             {!meetsMaxOrder && maximumOrder != null && (
-              <div className="rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 shadow-sm">
                 <p className="font-bold text-rose-900">Maximum order amount exceeded</p>
                 <p className="mt-0.5">
                   Please remove items to bring subtotal down by Rs. {(subtotal - maximumOrder).toLocaleString()}.
@@ -440,9 +447,9 @@ export default function CheckoutPage() {
 
             {/* Per-order-type message + estimated time + instruction */}
             {(typeMessage || estMins || instructionMessage) && (
-              <div className="rounded-lg border border-neutral-200 [background-color:color-mix(in_srgb,var(--color-primary),transparent_98%)] px-4 py-3 text-sm text-neutral-700 space-y-1">
+              <div className="space-y-1 rounded-2xl border border-neutral-100 [background-color:color-mix(in_srgb,var(--color-primary),transparent_97%)] px-4 py-3 text-sm text-neutral-700 shadow-sm">
                 {estMins && (
-                  <p className="font-bold text-[var(--color-primary)] mb-0.5">
+                  <p className="mb-0.5 font-bold text-[var(--color-primary)]">
                     Estimated{' '}
                     {orderTypeStr === 'pickup' ? 'pickup' : orderTypeStr === 'dinein' ? 'prep' : 'delivery'}{' '}
                     time: {estMins} min
@@ -450,7 +457,7 @@ export default function CheckoutPage() {
                 )}
                 {typeMessage && <p>{typeMessage}</p>}
                 {instructionMessage && (
-                  <p className="pt-1 border-t [border-color:color-mix(in_srgb,var(--color-primary),transparent_95%)] mt-1 text-neutral-600">
+                  <p className="mt-1 border-t [border-color:color-mix(in_srgb,var(--color-primary),transparent_95%)] pt-1 text-neutral-600">
                     <span className="font-semibold text-neutral-800">Instructions:</span> {instructionMessage}
                   </p>
                 )}
@@ -468,7 +475,7 @@ export default function CheckoutPage() {
                     </select>
                   </div>
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <label className="text-sm font-semibold text-neutral-700">Full Name</label>
                       <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
@@ -478,7 +485,7 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <label className="text-sm font-semibold text-neutral-700">Mobile</label>
                       <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
@@ -495,7 +502,7 @@ export default function CheckoutPage() {
                 {orderType === 'delivery' && (
                   <>
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="mb-2 flex items-center justify-between">
                         <label className="text-sm font-semibold text-neutral-700">Delivery Address</label>
                         <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                       </div>
@@ -532,10 +539,10 @@ export default function CheckoutPage() {
                 {orderType === 'delivery' && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-neutral-700">Select Delivery Address</p>
+                      <SectionLabel tone="primary">Select Delivery Address</SectionLabel>
                       {!showAddrForm && (
                         <button type="button" onClick={() => setShowAddrForm(true)}
-                          className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] hover:text-red-700">
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] transition-colors hover:text-red-700">
                           <Plus size={14} /> Add New
                         </button>
                       )}
@@ -553,9 +560,10 @@ export default function CheckoutPage() {
                         return (
                           <button key={addr.id} type="button"
                             onClick={() => setValue('selectedAddressId', String(addr.id))}
-                            className={`w-full flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
-                              sel ? 'border-[var(--color-primary)] bg-neutral-50 text-[var(--color-primary)]'
-                                  : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                            className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+                              sel
+                                ? 'scale-[1.01] border-[var(--color-primary)] bg-neutral-50 text-[var(--color-primary)] shadow-md ring-1 ring-[var(--color-primary)]/20'
+                                : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:shadow-sm'
                             }`}>
                             <div>
                               <span className="font-medium">{addr.address}</span>
@@ -568,17 +576,17 @@ export default function CheckoutPage() {
                         )
                       })}
                       {!loadingAddresses && apiAddresses.length === 0 && !showAddrForm && (
-                        <p className="text-sm text-neutral-400 py-2">No saved addresses. Add one below.</p>
+                        <p className="py-2 text-sm text-neutral-400">No saved addresses. Add one below.</p>
                       )}
                     </div>
 
                     {showAddrForm && (
-                      <div className="space-y-2 rounded-lg border border-dashed border-neutral-300 p-4">
+                      <div className="space-y-2 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/50 p-4">
                         <input {...register('newAddrLine')} placeholder="Street address, area, landmark"
-                          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]" />
+                          className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20" />
                         {settings.enable_city_on_checkout && (
                           <select {...register('newAddrCity')}
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]">
+                            className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20">
                             {['Karachi','Lahore','Islamabad','Rawalpindi','Faisalabad'].map((c) => (
                               <option key={c}>{c}</option>
                             ))}
@@ -586,11 +594,11 @@ export default function CheckoutPage() {
                         )}
                         <div className="flex gap-2">
                           <button type="button" onClick={handleAddAddress} disabled={apiAddrAdder.isPending}
-                            className="flex-1 rounded-lg bg-[var(--color-primary)] py-2 text-xs font-bold text-[var(--color-secondary)] hover:brightness-90 disabled:opacity-50">
+                            className="flex-1 rounded-xl bg-[var(--color-primary)] py-2 text-xs font-bold text-[var(--color-secondary)] shadow-sm transition-all hover:brightness-90 disabled:opacity-50">
                             {apiAddrAdder.isPending ? 'Saving…' : 'Save Address'}
                           </button>
                           <button type="button" onClick={() => setShowAddrForm(false)}
-                            className="flex-1 rounded-lg border border-neutral-300 py-2 text-xs font-semibold text-neutral-600">
+                            className="flex-1 rounded-xl border border-neutral-300 bg-white py-2 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-50">
                             Cancel
                           </button>
                         </div>
@@ -612,8 +620,8 @@ export default function CheckoutPage() {
           {/* ── RIGHT ── */}
           <div className="space-y-4">
             {/* Items */}
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm divide-y divide-neutral-100">
-              <h2 className="pb-3 font-bold text-neutral-800">Your Items</h2>
+            <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white p-5 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.02]">
+              <SectionLabel>Your Items</SectionLabel>
               {items.length === 0 ? (
                 <p className="py-4 text-center text-sm text-neutral-400">Your cart is empty</p>
               ) : (
@@ -622,16 +630,15 @@ export default function CheckoutPage() {
                     className="py-3 text-sm">
                     {/* Item name + price row */}
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-neutral-700 leading-snug">
+                      <span className="leading-snug text-neutral-700">
                         {item.quantity} × {item.name}
                         {item.selectedOption ? ` (${item.selectedOption})` : ''}
                       </span>
-                      <span className="font-semibold shrink-0">Rs. {(item.price * item.quantity).toLocaleString()}</span>
+                      <span className="shrink-0 font-semibold">Rs. {(item.price * item.quantity).toLocaleString()}</span>
                     </div>
 
                     {/* Selected add-ons / group options */}
                     {item.selectedAddons && item.selectedAddons.length > 0 && (() => {
-                      // Group by groupName for clean rendering
                       const grouped = item.selectedAddons.reduce<
                         { groupName?: string; entries: { name: string; qty: number; extraCost?: number }[] }[]
                       >((acc, addon) => {
@@ -644,22 +651,22 @@ export default function CheckoutPage() {
                         return acc
                       }, [])
                       return (
-                        <div className="mt-1.5 ml-4 space-y-1.5">
+                        <div className="ml-4 mt-1.5 space-y-1.5">
                           {grouped.map((group, gi) => (
                             <div key={gi}>
                               {group.groupName && (
-                                <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-400 mb-0.5">
+                                <p className="mb-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-400">
                                   ● {group.groupName}
                                 </p>
                               )}
-                              <div className="space-y-0.5 pl-3 border-l-2 border-neutral-100">
+                              <div className="space-y-0.5 border-l-2 border-neutral-100 pl-3">
                                 {group.entries.map((entry, ei) => (
                                   <div key={ei} className="flex items-center justify-between gap-2">
                                     <span className="text-[11px] text-neutral-500">
                                       <span className="font-semibold">{entry.qty}×</span> {entry.name}
                                     </span>
                                     {entry.extraCost != null && entry.extraCost > 0 && (
-                                      <span className="text-[11px] font-semibold text-amber-600 shrink-0">
+                                      <span className="shrink-0 text-[11px] font-semibold text-amber-600">
                                         +Rs.{entry.extraCost.toLocaleString()}
                                       </span>
                                     )}
@@ -677,11 +684,11 @@ export default function CheckoutPage() {
             </div>
 
             {/* Price summary */}
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3">
-              <h2 className="font-bold text-neutral-800">Order Summary</h2>
+            <div className="space-y-3 rounded-2xl border border-neutral-100 bg-white p-5 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.02]">
+              <SectionLabel>Order Summary</SectionLabel>
               <PriceRow label="Subtotal"  value={`Rs. ${subtotal.toLocaleString()}`} />
 
-              {/* Free-delivery progress bar — delivery mode + finite threshold */}
+              {/* Free-delivery progress bar */}
               {orderType === 'delivery' && settings.freeDeliveryAboveSubtotal < Infinity && (() => {
                 const threshold = settings.freeDeliveryAboveSubtotal
                 const unlocked  = subtotal >= threshold
@@ -690,7 +697,7 @@ export default function CheckoutPage() {
                 return (
                   <div className="space-y-1.5 py-0.5">
                     {unlocked ? (
-                      <p className="text-[11px] font-semibold text-emerald-600">
+                      <p className="unlock-pop text-[11px] font-semibold text-emerald-600">
                         🎉 You&apos;ve unlocked free delivery!
                       </p>
                     ) : (
@@ -701,9 +708,11 @@ export default function CheckoutPage() {
                     )}
                     <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${unlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
+                        className={`relative h-full overflow-hidden rounded-full transition-all duration-700 ease-out ${unlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
                         style={{ width: `${progress}%` }}
-                      />
+                      >
+                        <span className="progress-shimmer absolute inset-0" />
+                      </div>
                     </div>
                   </div>
                 )
@@ -726,25 +735,110 @@ export default function CheckoutPage() {
               {convenience > 0 && (
                 <PriceRow label="Convenience Fee" value={`Rs. ${convenience.toLocaleString()}`} />
               )}
-              <div className="border-t border-neutral-200 pt-3 flex items-center justify-between font-bold text-neutral-900 text-sm">
+              <div className="flex items-center justify-between border-t border-neutral-200 pt-3 text-base font-bold text-neutral-900">
                 <span>Grand Total</span>
                 <span>Rs. {grandTotal.toLocaleString()}</span>
               </div>
             </div>
 
-            <button type="submit" disabled={!canPlace || isPlacing}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-4 text-sm font-bold text-[var(--color-secondary)] shadow-md transition-all hover:brightness-90 disabled:cursor-not-allowed disabled:opacity-50">
-              {isPlacing
-                ? <><Loader2 size={16} className="animate-spin" />Placing Order…</>
-                : 'Place Order'}
-            </button>
+            {/* Place Order — ambient shine + breathing glow, same language as modal CTA */}
+            <div className="relative">
+              {canPlace && !isPlacing && (
+                <span className="cta-glow pointer-events-none absolute -inset-1 rounded-2xl bg-[var(--color-primary)]" />
+              )}
+              <button type="submit" disabled={!canPlace || isPlacing}
+                className={`place-order-shine relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[var(--color-primary)] py-4 text-sm font-bold text-[var(--color-secondary)] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-lg`}>
+                <span className="relative z-10 flex items-center gap-2">
+                  {isPlacing
+                    ? <><Loader2 size={16} className="animate-spin" />Placing Order…</>
+                    : 'Place Order'}
+                </span>
+                {canPlace && !isPlacing && (
+                  <span className="shine-sweep pointer-events-none absolute inset-0" />
+                )}
+              </button>
+            </div>
 
-            <Link href="/" className="flex items-center justify-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold">
+            <Link href="/" className="flex items-center justify-center gap-1 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700">
               <ArrowLeft size={14} /> Back to menu
             </Link>
           </div>
         </form>
       </main>
+
+      <style jsx>{`
+        @keyframes page-fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .page-in { animation: page-fade-in 380ms cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes gift-pop {
+          0% { transform: scale(0.92); }
+          60% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        .gift-active { animation: gift-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        @keyframes gift-panel-in {
+          from { opacity: 0; transform: translateY(-6px); max-height: 0; }
+          to { opacity: 1; transform: translateY(0); max-height: 600px; }
+        }
+        .gift-panel-in { animation: gift-panel-in 320ms ease-out; }
+
+        @keyframes unlock-pop {
+          0% { transform: scale(0.9); opacity: 0; }
+          60% { transform: scale(1.05); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .unlock-pop { animation: unlock-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        .progress-shimmer {
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.5) 50%,
+            transparent 100%
+          );
+          transform: translateX(-100%);
+          animation: progress-shimmer-move 1.8s ease-in-out infinite;
+        }
+        @keyframes progress-shimmer-move {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        .shine-sweep {
+          background: linear-gradient(
+            115deg,
+            transparent 20%,
+            rgba(255, 255, 255, 0.3) 42%,
+            rgba(255, 255, 255, 0.5) 50%,
+            rgba(255, 255, 255, 0.3) 58%,
+            transparent 80%
+          );
+          transform: translateX(-120%);
+          animation: shine-sweep-move 3.4s ease-in-out infinite;
+          mix-blend-mode: overlay;
+        }
+        .place-order-shine:hover .shine-sweep { animation-duration: 1.1s; }
+        @keyframes shine-sweep-move {
+          0% { transform: translateX(-120%); }
+          35% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+
+        .cta-glow {
+          filter: blur(16px);
+          opacity: 0.3;
+          animation: cta-glow-breathe 2.8s ease-in-out infinite;
+          z-index: 0;
+        }
+        @keyframes cta-glow-breathe {
+          0%, 100% { opacity: 0.18; transform: scale(0.98); }
+          50% { opacity: 0.35; transform: scale(1.02); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -761,5 +855,3 @@ function PriceRow({ label, value, valueClass = 'font-semibold' }: {
     </div>
   )
 }
-
-
