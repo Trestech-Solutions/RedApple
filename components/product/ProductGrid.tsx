@@ -16,11 +16,11 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
   const { settings } = useStoreSettings()
   const design = (settings.product_card_design as string | undefined) ?? 'card-1'
 
-  // card-1 = horizontal list (1→2→3→4 cols as width grows)
-  // card-2/card-3 = portrait grid (2→3→4→5→6 cols, denser since cards are smaller)
+  // card-1 = horizontal list (1 col on phones → up to 3 cols on desktop)
+  // card-2/card-3 = portrait grid (2 cols on phones → up to 6 cols on large desktop)
   const gridClass = design === 'card-1'
-    ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:grid-cols-3 xl:gap-6'
-    : 'grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6 2xl:grid-cols-6'
+    ? 'grid grid-cols-1 gap-3 min-[400px]:gap-3.5 sm:grid-cols-2 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:gap-6 2xl:gap-7'
+    : 'grid grid-cols-2 gap-2 min-[400px]:gap-2.5 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6 2xl:grid-cols-6 2xl:gap-6'
 
   useEffect(() => {
     if (!selected) return

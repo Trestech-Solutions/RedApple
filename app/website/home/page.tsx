@@ -1271,29 +1271,29 @@ export default function HomePage() {
                 className="mx-auto max-w-[1400px] px-4 py-8 md:px-8 scroll-mt-28"
               >
                 {/* Category Banner */}
+                            {/* Category Banner */}
+                             {/* Category Banner */}
                 <div className="mb-6">
                   {cat.banner ? (
                     <div className="relative overflow-hidden rounded-2xl shadow-md">
-                      <div className="relative h-32 w-full sm:h-44 md:h-52 lg:h-60 xl:h-64">
-                        <Image
-                          src={cat.banner}
-                          alt={cat.label}
-                          fill
-                          priority={false}
-                          className="object-cover object-center"
-                          sizes="(max-width: 768px) 100vw, 1400px"
-                        />
-                        {/* Gradient overlay + text */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                        <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8">
-                          <h2 className="text-xl font-bold text-white drop-shadow-sm sm:text-2xl md:text-3xl lg:text-4xl">
-                            {cat.label}
-                          </h2>
-                          <p className="mt-1 text-xs text-white/90 drop-shadow sm:text-sm md:text-base">
-                            {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
-                          </p>
-                        </div>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={cat.banner}
+                        alt={cat.label}
+                        className="block w-full h-auto"
+                      />
+                      {/* Gradient overlay + text — commented out for now */}
+                      {/*
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                      <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8">
+                        <h2 className="text-xl font-bold text-white drop-shadow-sm sm:text-2xl md:text-3xl lg:text-4xl">
+                          {cat.label}
+                        </h2>
+                        <p className="mt-1 text-xs text-white/90 drop-shadow sm:text-sm md:text-base">
+                          {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
+                        </p>
                       </div>
+                      */}
                     </div>
                   ) : (
                     <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4 sm:px-8 sm:py-5 shadow-md" style={{

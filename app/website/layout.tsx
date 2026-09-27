@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   CartProvider, StoreSettingsProvider, useStoreSettings,
 } from '@/lib/hooks/useCart'
@@ -70,6 +70,19 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
+  const [scrollPct, setScrollPct]                   = useState(0)
+
+  // ── Scroll progress ────────────────────────────────────────────────────────
+  useEffect(() => {
+    function update() {
+      const el  = document.documentElement
+      const scrolled = el.scrollTop  || document.body.scrollTop
+      const total    = el.scrollHeight - el.clientHeight
+      setScrollPct(total > 0 ? (scrolled / total) * 100 : 0)
+    }
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
 
   if (isLoading) return <WebsiteSkeleton />
 
@@ -138,6 +151,24 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         onCorporateClick={() => setCorporateModalOpen(true)}
         onMenuClick={() => setMenuOpen(true)}
       />
+
+      {/* ── Scroll progress bar ───────────────────────────────────────── */}
+      <div
+        aria-hidden
+        className="fixed top-0 left-0 z-[60] h-[3px] w-full pointer-events-none"
+        style={{ background: 'transparent' }}
+      >
+        <div
+          className="h-full transition-[width] duration-75 ease-out"
+          style={{
+            width: `${scrollPct}%`,
+            background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
+            boxShadow: `0 0 8px 1px var(--color-primary)`,
+            opacity: scrollPct > 0 && scrollPct < 100 ? 1 : 0,
+            transition: 'width 80ms linear, opacity 300ms ease',
+          }}
+        />
+      </div>
 
       {children}
 
