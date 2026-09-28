@@ -62,15 +62,20 @@ export function SearchBar({ value, onChange, placeholder = 'Search products...' 
   const animatedPlaceholder = value ? placeholder : displayText
 
   return (
-    <div id="search-bar" className="mx-auto max-w-[1400px] px-3 pt-5 sm:px-4 sm:pt-6 md:px-8">
+    <div id="search-bar" className="mx-auto max-w-[1400px] px-4 pt-5 sm:pt-6 md:px-8">
       <div
-        className={`mx-auto flex min-w-[250px] max-w-full items-center overflow-hidden rounded-full border bg-white transition-[width,box-shadow,border-color] duration-500 ease-in-out ${
+        className={`mx-auto flex h-12 min-w-[260px] max-w-full items-center rounded-full border bg-white/90 backdrop-blur-xl transition-[width,box-shadow,border-color] duration-500 ease-in-out sm:h-14 ${
           expanded
-            ? 'w-full border-[var(--color-primary)] shadow-md'
-            : 'w-[88%] border-neutral-300 shadow-sm sm:w-[60%] md:w-[40%]'
+            ? 'w-full border-[var(--color-primary)] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.28)] ring-4 ring-[color-mix(in_srgb,var(--color-primary)_15%,transparent)]'
+            : 'w-[92%] border-neutral-200/80 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.18)] hover:border-neutral-300 sm:w-[65%] md:w-[48%]'
         }`}
       >
-        <Search className="ml-3 h-3.5 w-3.5 shrink-0 text-neutral-400 sm:ml-4 sm:h-4 sm:w-4" />
+        <Search
+          className={`ml-4 h-4 w-4 shrink-0 transition-colors duration-200 sm:ml-5 sm:h-5 sm:w-5 ${
+            expanded ? 'text-[var(--color-primary)]' : 'text-neutral-400'
+          }`}
+          strokeWidth={2.25}
+        />
         <input
           ref={inputRef}
           type="text"
@@ -79,26 +84,25 @@ export function SearchBar({ value, onChange, placeholder = 'Search products...' 
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-3 sm:py-3 sm:text-sm"
+          aria-label="Search"
+          className="min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-neutral-900 outline-none placeholder:font-normal placeholder:text-neutral-400 sm:px-4 sm:text-[15px]"
         />
         {value && (
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onChange('')}
             aria-label="Clear search"
-            className="mr-1.5 rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors sm:mr-2"
+            className="mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 sm:mr-2"
           >
-            <X size={13} className="sm:hidden" />
-            <X size={14} className="hidden sm:block" />
+            <X className="h-4 w-4" strokeWidth={2.5} />
           </button>
         )}
         <button
           onClick={() => inputRef.current?.focus()}
           aria-label="Search"
-          className="mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-secondary)] hover:brightness-90 transition-colors sm:mr-1.5 sm:h-9 sm:w-9"
+          className="mr-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-secondary)] shadow-md transition-all duration-200 hover:scale-105 hover:brightness-90 active:scale-95 sm:mr-2 sm:h-10 sm:w-10"
         >
-          <Search size={13} className="sm:hidden" />
-          <Search size={15} className="hidden sm:block" />
+          <Search className="h-4 w-4 sm:h-[18px] sm:w-[18px]" strokeWidth={2.5} />
         </button>
       </div>
     </div>
