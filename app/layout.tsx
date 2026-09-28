@@ -113,9 +113,20 @@ export default async function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="top-right"
+              position="top-center"
               richColors
               closeButton
+              toastOptions={{
+                style: {
+                  fontSize: '15px',
+                  padding: '14px 18px',
+                  minWidth: '300px',
+                  maxWidth: '440px',
+                  borderRadius: '14px',
+                  fontWeight: '500',
+                  gap: '10px',
+                },
+              }}
             />
           </AuthProvider>
         </QueryProvider>
