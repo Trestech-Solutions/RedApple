@@ -116,34 +116,34 @@ export default async function RootLayout({
 <Toaster
   position="top-center"
   offset={20}
-  gap={10}
+  gap={12}
   visibleToasts={3}
   duration={3500}
-  style={{ '--width': 'min(400px, calc(100vw - 32px))' } as React.CSSProperties}
+  style={{ '--width': 'min(460px, calc(100vw - 32px))' } as React.CSSProperties}
   icons={{
     success: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 ring-1 ring-emerald-400/30">
-        <Check className="h-4 w-4 text-emerald-400" strokeWidth={3} />
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30">
+        <Check className="h-5 w-5 text-white" strokeWidth={3} />
       </span>
     ),
     error: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/15 ring-1 ring-rose-400/30">
-        <X className="h-4 w-4 text-rose-400" strokeWidth={3} />
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30">
+        <X className="h-5 w-5 text-white" strokeWidth={3} />
       </span>
     ),
     warning: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/15 ring-1 ring-amber-400/30">
-        <AlertTriangle className="h-4 w-4 text-amber-400" strokeWidth={2.5} />
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30">
+        <AlertTriangle className="h-5 w-5 text-white" strokeWidth={2.75} />
       </span>
     ),
     info: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500/15 ring-1 ring-sky-400/30">
-        <Info className="h-4 w-4 text-sky-400" strokeWidth={2.5} />
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30">
+        <Info className="h-5 w-5 text-white" strokeWidth={2.75} />
       </span>
     ),
     loading: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
-        <Loader2 className="h-4 w-4 animate-spin text-white/80" strokeWidth={2.5} />
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
+        <Loader2 className="h-5 w-5 animate-spin text-white/80" strokeWidth={2.5} />
       </span>
     ),
   }}
@@ -151,15 +151,21 @@ export default async function RootLayout({
     unstyled: true,
     classNames: {
       toast:
-        'flex w-full items-center gap-3 rounded-full border border-white/10 bg-neutral-950/90 py-2 pl-2 pr-5 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl',
+        'flex w-full items-center gap-3.5 rounded-[26px] border py-3 pl-3 pr-6 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-2xl',
       icon: 'flex shrink-0 items-center justify-center',
       content: 'flex min-w-0 flex-1 flex-col',
-      title: 'truncate text-[14px] font-semibold leading-tight tracking-tight text-white',
-      description: 'mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-neutral-400',
+      title: 'text-[16px] font-bold leading-tight tracking-tight text-white',
+      description: 'mt-1 line-clamp-2 text-[14px] leading-snug text-white/80',
       actionButton:
-        'ml-2 shrink-0 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-neutral-900 transition hover:bg-neutral-200 active:scale-95',
+        'ml-2 shrink-0 rounded-full bg-white px-4 py-2 text-sm font-bold text-neutral-900 transition hover:bg-neutral-100 active:scale-95',
       cancelButton:
-        'ml-2 shrink-0 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/20',
+        'ml-2 shrink-0 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30',
+      default: 'border-white/10 bg-neutral-900/95',
+      success: 'border-emerald-300/30 bg-emerald-600/95',
+      error:   'border-rose-300/30 bg-rose-600/95',
+      warning: 'border-amber-200/40 bg-amber-500/95',
+      info:    'border-sky-300/30 bg-sky-600/95',
+      loading: 'border-white/10 bg-neutral-900/95',
     },
   }}
 />
