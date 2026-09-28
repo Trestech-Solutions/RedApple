@@ -353,24 +353,25 @@ export function WebsiteFooter() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="relative mx-auto max-w-[1400px] px-4 pb-8 sm:px-5 md:px-8">
-        <div className="flex flex-col items-start justify-center gap-2 border-t border-neutral-900/10 pt-7 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-center sm:text-center">
-          <span>© {currentYear} {restaurantName}. All Rights Reserved.</span>
-          <span className="hidden text-neutral-300 sm:inline">·</span>
-          <span>
-            Powered by{' '}
-            <Link
-              href="https://trestechsolutions.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-neutral-700 transition-colors hover:text-[var(--color-primary)]"
-            >
-              Trestech
-            </Link>
-          </span>
-        </div>
-      </div>
+    {/* Bottom bar */}
+<div className="relative mx-auto max-w-[1400px] px-4 pb-8 sm:px-5 md:px-8">
+  <div className="flex flex-col items-center justify-center gap-2.5 border-t border-neutral-900/10 pt-7 text-center text-xs text-neutral-500 sm:flex-row sm:gap-3 sm:text-sm">
+    <span>© {currentYear} {restaurantName}. All Rights Reserved</span>
+    <span className="flex items-center gap-1.5">
+      Powered by
+      <Link
+        href="https://trestechsolutions.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group relative inline-flex items-center rounded-full bg-gradient-to-r from-sky-500/10 via-blue-500/10 to-indigo-500/10 px-3 py-1 text-sm font-extrabold tracking-tight ring-1 ring-blue-500/20 transition-all duration-300 hover:scale-105 hover:ring-blue-500/50 hover:shadow-[0_6px_20px_-6px_rgba(59,130,246,0.55)]"
+      >
+        <span className="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Trestech
+        </span>
+      </Link>
+    </span>
+  </div>
+</div>
     </footer>
   )
 }
