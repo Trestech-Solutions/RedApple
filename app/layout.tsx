@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/hooks/useAuth";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { Toaster } from "sonner";
+import { AlertTriangle, CheckCircle2, Info, Loader2, XCircle } from "lucide-react";
 
 // ─── SEO from API ─────────────────────────────────────────────────────────────
 
@@ -112,22 +113,42 @@ export default async function RootLayout({
         <QueryProvider>
           <AuthProvider>
             {children}
-            <Toaster
-              position="top-center"
-              richColors
-              closeButton
-              toastOptions={{
-                style: {
-                  fontSize: '15px',
-                  padding: '14px 18px',
-                  minWidth: '300px',
-                  maxWidth: '440px',
-                  borderRadius: '14px',
-                  fontWeight: '500',
-                  gap: '10px',
-                },
-              }}
-            />
+          <Toaster
+  position="top-center"
+  offset={16}
+  gap={10}
+  visibleToasts={3}
+  duration={3500}
+  style={{ '--width': '380px' } as React.CSSProperties}
+  icons={{
+    success: <CheckCircle2 className="h-5 w-5 text-emerald-600" strokeWidth={2.25} />,
+    error:   <XCircle className="h-5 w-5 text-rose-600" strokeWidth={2.25} />,
+    warning: <AlertTriangle className="h-5 w-5 text-amber-600" strokeWidth={2.25} />,
+    info:    <Info className="h-5 w-5 text-sky-600" strokeWidth={2.25} />,
+    loading: <Loader2 className="h-5 w-5 animate-spin text-neutral-500" strokeWidth={2.25} />,
+  }}
+  toastOptions={{
+    unstyled: true,
+    classNames: {
+      toast:
+        'flex w-full max-w-[92vw] items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.25)] backdrop-blur-xl',
+      icon: 'flex shrink-0 items-center justify-center',
+      content: 'flex min-w-0 flex-col',
+      title: 'text-[14px] font-semibold leading-tight tracking-tight',
+      description: 'mt-0.5 text-[13px] leading-snug opacity-70',
+      actionButton:
+        'ml-auto shrink-0 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-700',
+      cancelButton:
+        'ml-auto shrink-0 rounded-lg bg-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-300',
+      default: 'border-neutral-200/80 bg-white/90 text-neutral-900',
+      success: 'border-emerald-200/80 bg-emerald-50/90 text-emerald-950',
+      error:   'border-rose-200/80 bg-rose-50/90 text-rose-950',
+      warning: 'border-amber-200/80 bg-amber-50/90 text-amber-950',
+      info:    'border-sky-200/80 bg-sky-50/90 text-sky-950',
+      loading: 'border-neutral-200/80 bg-white/90 text-neutral-900',
+    },
+  }}
+/>
           </AuthProvider>
         </QueryProvider>
 
