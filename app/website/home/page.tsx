@@ -609,7 +609,7 @@ function PopularSection({ products }: { products: ProductData[] }) {
           {items.map((product) => (
             <div
               key={product.id}
-              className="w-[42vw] min-w-[152px] max-w-[220px] shrink-0 snap-start sm:w-[26vw] md:w-[21vw] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0 xl:w-[calc((100%-5rem)/5)]"
+              className="w-[42vw] min-w-[152px] max-w-[220px] shrink-0 snap-start sm:w-[26vw] md:w-[21vw] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0"
             >
               <PopularItemCard product={product} onOpen={setSelected} />
             </div>
@@ -632,7 +632,6 @@ function PopularSection({ products }: { products: ProductData[] }) {
   )
 }
 
-/** Self-contained popular item card — portrait, image top, name + price below, dark + button. */
 function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p: ProductData) => void }) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
   const { isOpen: storeOpen, closedMessage } = useBusinessHours()
@@ -655,6 +654,11 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
     hasSizes ? i.id === product.id && i.variantId === defaultSize!.sizeId : i.id === product.id
   )
   const cartQty = cartItem?.quantity ?? 0
+
+  const btnStyle = {
+    backgroundColor: 'var(--color-primary, #171717)',
+    color: 'var(--color-secondary, #ffffff)',
+  } as const
 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -713,16 +717,17 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
           cartQty > 0 && !needsSelection ? (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full bg-neutral-900/90 px-1.5 py-1 shadow-lg backdrop-blur-sm ring-1 ring-white/10"
+              style={btnStyle}
+              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full px-1.5 py-1 shadow-lg ring-1 ring-white/10 lg:bottom-3 lg:right-3 lg:gap-2 lg:px-2 lg:py-1.5"
             >
               <button type="button" onClick={handleDecrease} aria-label="Decrease"
-                className="flex h-6 w-6 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20">
-                <Minus size={12} />
+                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 lg:h-9 lg:w-9">
+                <Minus className="h-3 w-3 lg:h-5 lg:w-5" strokeWidth={2.5} />
               </button>
-              <span className="w-5 text-center text-xs font-bold text-white">{cartQty}</span>
+              <span className="w-5 text-center text-xs font-bold lg:w-7 lg:text-base">{cartQty}</span>
               <button type="button" onClick={handleIncrease} aria-label="Increase"
-                className="flex h-6 w-6 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20">
-                <Plus size={12} />
+                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 lg:h-9 lg:w-9">
+                <Plus className="h-3 w-3 lg:h-5 lg:w-5" strokeWidth={2.5} />
               </button>
             </div>
           ) : (
@@ -732,9 +737,12 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
               aria-label="Add to cart"
               disabled={!storeOpen}
               title={!storeOpen ? (closedMessage ?? 'Store is currently closed') : undefined}
-              className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-200 ${added ? 'bg-green-600 text-white' : !storeOpen ? 'cursor-not-allowed bg-neutral-400 text-white opacity-50' : 'bg-neutral-900 text-white hover:scale-105 hover:bg-neutral-700 active:scale-95'}`}
+              style={added ? { color: '#ffffff' } : btnStyle}
+              className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-200 sm:h-11 sm:w-11 lg:bottom-3 lg:right-3 lg:h-14 lg:w-14 ${added ? 'bg-green-600' : !storeOpen ? 'cursor-not-allowed opacity-50' : 'hover:scale-105 active:scale-95'}`}
             >
-              {added ? <Check size={16} /> : <Plus size={18} />}
+              {added
+                ? <Check className="h-4 w-4 sm:h-5 sm:w-5 lg:h-7 lg:w-7" strokeWidth={2.5} />
+                : <Plus className="h-[18px] w-[18px] sm:h-5 sm:w-5 lg:h-7 lg:w-7" strokeWidth={2.5} />}
             </button>
           )
         )}
