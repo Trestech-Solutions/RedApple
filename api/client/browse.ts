@@ -357,8 +357,8 @@ export function useGetCities(options?: {
 
 // ─── Menu ──────────────────────────────────────────────────────────────────────
 
-const FALLBACK_BRANCH = 6;
-const FALLBACK_AREA   = 26;
+const FALLBACK_BRANCH = Number(process.env.NEXT_PUBLIC_FALLBACK_BRANCH) || 6;
+const FALLBACK_AREA   = Number(process.env.NEXT_PUBLIC_FALLBACK_AREA) || 26;
 
 export function useGetMenu(params: {
   branchId: string | number | null;
