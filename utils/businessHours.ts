@@ -23,6 +23,15 @@ export const DAY_LABELS: Record<BranchBusinessHour['day'], string> = {
   sun: 'Sunday',
 }
 
+// ─── Holiday type ─────────────────────────────────────────────────────────────
+
+export type Holiday = {
+  id: number
+  restaurant: number
+  date: string        // "YYYY-MM-DD"
+  close_message: string
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -52,32 +61,67 @@ function inWindow(start: number, end: number, current: number): boolean {
   return current >= start && current <= end
 }
 
+/** Returns today's date string in "YYYY-MM-DD" (local time). */
+function todayDateStr(): string {
+  const d = new Date()
+  const yyyy = d.getFullYear()
+  const mm   = String(d.getMonth() + 1).padStart(2, '0')
+  const dd   = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+/**
+ * Check if today is a holiday.
+ * Returns the matching holiday object or null.
+ */
+export function getTodayHoliday(holidays: Holiday[] | undefined | null): Holiday | null {
+  if (!holidays || holidays.length === 0) return null
+  const today = todayDateStr()
+  return holidays.find((h) => h.date === today) ?? null
+}
+
 // ─── Core logic ───────────────────────────────────────────────────────────────
 
 export type StoreStatus =
   | { open: true }
   | {
       open: false
-      reason: 'day_closed' | 'outside_hours' | 'no_data'
+      reason: 'holiday' | 'day_closed' | 'outside_hours' | 'no_data'
       /** Human-readable label for the current day, e.g. "Monday" */
       dayLabel: string
       /** Formatted opening time string for today, e.g. "10:00 AM" — null when day is closed */
       opensAt: string | null
       /** Next day that IS open, e.g. "Tuesday 10:00 AM" — null when none found */
       nextOpenLabel: string | null
+      /** The custom message from the holiday entry, if reason === 'holiday' */
+      holidayMessage?: string
     }
 
 /**
- * Given the branch_business_hours array from the API, returns whether the
- * store is currently open, and if not, a human-readable explanation.
+ * Given the branch_business_hours array and holidays from the API, returns
+ * whether the store is currently open, and if not, a human-readable explanation.
  *
- * Falls back to `settings.close_store` when no hours data is provided.
+ * Priority: holidays > force_close > business_hours
  */
 export function isStoreOpenNow(
   hours: BranchBusinessHour[] | undefined | null,
   forceClose?: boolean,
+  holidays?: Holiday[] | null,
 ): StoreStatus {
-  // Explicit force-close from settings.close_store
+  // 1. Holiday check — highest priority
+  const todayHoliday = getTodayHoliday(holidays)
+  if (todayHoliday) {
+    return {
+      open: false,
+      reason: 'holiday',
+      dayLabel: getTodayDayLabel(),
+      opensAt: null,
+      nextOpenLabel: null,
+      holidayMessage: todayHoliday.close_message?.trim() || undefined,
+    }
+  }
+
+  // 2. Explicit force-close from settings.close_store
   if (forceClose) {
     return {
       open: false,
@@ -88,7 +132,7 @@ export function isStoreOpenNow(
     }
   }
 
-  // No data → treat as open (don't block customers on missing data)
+  // 3. No business hours data → treat as open
   if (!hours || hours.length === 0) {
     return { open: true }
   }
@@ -124,7 +168,7 @@ export function isStoreOpenNow(
     return { open: true }
   }
 
-  // We're outside today's windows
+  // Outside today's windows
   return {
     open: false,
     reason: 'outside_hours',
@@ -188,6 +232,12 @@ function getNextOpenLabel(
  *   "Closed · Opens Saturday at 10:00 AM"
  */
 export function getClosedMessage(status: StoreStatus & { open: false }): string {
+  if (status.reason === 'holiday') {
+    return status.holidayMessage
+      ? `Holiday: ${status.holidayMessage}`
+      : 'Closed for holiday'
+  }
+
   if (status.reason === 'day_closed') {
     if (status.nextOpenLabel) return `Closed today · Opens ${status.nextOpenLabel}`
     return `Closed today`

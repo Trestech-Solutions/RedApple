@@ -702,6 +702,18 @@ export type MenuResponse = {
   footer?: StorefrontFooter;
   // Branch-level phone / email for the footer
   footer_branch_contact?: StorefrontFooterBranchContact | null;
+  // SEO settings
+  seo?: {
+    id: number;
+    restaurant: number;
+    meta_title: string;
+    meta_description: string;
+    insert_in_header: string;
+    insert_in_body: string;
+    insert_in_footer: string;
+  } | null;
+  // Holidays (dates the store is closed)
+  holidays?: { id: number; restaurant: number; date: string; close_message: string }[];
   // Legacy fallback
   categories?:      MenuCategory[];
 };

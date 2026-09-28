@@ -28,6 +28,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
+import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import type { ProductData } from '../product/ProductCard'
 import type { SelectedAddon, CartGroupSelection } from '@/redux/slices/cartSlice'
 
@@ -81,6 +82,7 @@ function SectionLabel({ children, tone = 'neutral' }: { children: React.ReactNod
 export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
   const { addItem } = useCart()
   const { settings } = useStoreSettings()
+  const { isOpen: storeOpen, closedMessage, isHoliday, holidayMessage } = useBusinessHours()
 
   const btnBg     = settings.item_price_background  || '#171717'
   const btnFg     = settings.item_price_text_color  || '#ffffff'
@@ -208,6 +210,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
   const handleAdd = () => {
     if (!isOrderable) return
+    if (!storeOpen) return   // store closed — button should not be clickable, but guard here too
 
     const includedRows: SelectedAddon[] =
       isDeal
@@ -288,13 +291,13 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
   return (
     <div
-      className="modal-backdrop-in fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-0 backdrop-blur-md sm:p-4"
+      className="modal-backdrop-in fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="modal-panel-in relative flex h-full w-full max-w-[1020px] flex-col overflow-hidden bg-white shadow-[0_40px_100px_-24px_rgba(0,0,0,0.5)] ring-1 ring-black/5 sm:h-[85vh] sm:max-h-[720px] sm:flex-row sm:rounded-[28px] md:h-[75vh] lg:h-[70vh]">
+      <div className="modal-panel-in relative flex w-full max-w-[1020px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_40px_100px_-24px_rgba(0,0,0,0.5)] ring-1 ring-black/5 max-h-[92vh] sm:h-[85vh] sm:max-h-[720px] sm:flex-row sm:rounded-[28px] md:h-[75vh] lg:h-[70vh]">
 
         {/* ── LEFT — image ────────────────────────────────────────── */}
-        <div className="relative h-48 w-full shrink-0 overflow-hidden xs:h-56 sm:h-full sm:w-[42%] md:w-[46%]">
+        <div className="relative h-40 w-full shrink-0 overflow-hidden xs:h-48 sm:h-full sm:w-[42%] md:w-[46%]">
           <div className="ken-burns absolute inset-0">
             <Image src={product.image} alt={product.name} fill className="object-cover" priority />
           </div>
@@ -681,7 +684,20 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
           </div>
 
           {/* ── FOOTER — frosted glass ───────────────────────────── */}
-          {hasPrice && isOrderable ? (
+          {!storeOpen ? (
+            /* ── Store closed / holiday banner ── */
+            <div className={`footer-glass sticky bottom-0 mt-auto bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10`}>
+              <div className={`flex items-center justify-center gap-2 rounded-full px-5 py-3 text-center text-[13px] font-bold text-white sm:px-8 sm:py-3.5 sm:text-sm ${isHoliday ? 'bg-amber-500' : 'bg-red-600'}`}>
+                <span>{isHoliday ? '🎌' : '🔴'}</span>
+                <span>
+                  {isHoliday
+                    ? (holidayMessage ? `Holiday: ${holidayMessage}` : 'Closed for holiday')
+                    : (closedMessage ?? 'Store is currently closed')}
+                </span>
+              </div>
+            </div>
+
+          ) : hasPrice && isOrderable ? (
             <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-4 py-4 backdrop-blur-xl sm:gap-3 sm:px-6 sm:py-5 md:px-10">
               <div className="flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-1 py-1 shadow-sm sm:gap-2 sm:px-1.5 sm:py-1.5">
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label={qty <= 1 ? 'Remove' : 'Decrease'}
