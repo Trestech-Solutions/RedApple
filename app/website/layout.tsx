@@ -80,8 +80,13 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
       const total    = el.scrollHeight - el.clientHeight
       setScrollPct(total > 0 ? (scrolled / total) * 100 : 0)
     }
+    update()
     window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   if (isLoading) return <WebsiteSkeleton />
@@ -113,9 +118,12 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
       } as React.CSSProperties}
     >
       {/* ── Closed / Holiday Banner ───────────────────────────────────────── */}
-      {!isOpen && (
-        <div className={`sticky top-0 z-50 w-full ${isHoliday ? 'bg-amber-500' : 'bg-red-600'} text-white`}>
-          <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+      <div
+        className={` top-0 z-50 w-full text-white overflow-hidden transition-all duration-500 ease-in-out ${
+          isHoliday ? 'bg-amber-500' : 'bg-red-600'
+        } ${!isOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}
+      >
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
 
             {/* Left: icon + main message */}
             <div className="flex items-center gap-2 text-sm font-semibold">
@@ -140,9 +148,8 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-          </div>
         </div>
-      )}
+      </div>
 
       {/* Owns OrderTypeModal (first visit + openLocationModal) */}
       <WebsiteBootstrap />
@@ -154,22 +161,26 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         onMenuClick={() => setMenuOpen(true)}
       />
 
-      {/* ── Scroll progress bar ───────────────────────────────────────── */}
+      {/* ── Scroll progress bar (animated, flows left → right) ─────────── */}
       <div
         aria-hidden
-        className="fixed top-0 left-0 z-[60] h-[3px] w-full pointer-events-none"
-        style={{ background: 'transparent' }}
+        className="pointer-events-none fixed left-0 top-0 z-[60] h-[3px] w-full"
       >
         <div
-          className="h-full transition-[width] duration-75 ease-out"
+          className="relative h-full"
           style={{
             width: `${scrollPct}%`,
-            background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
-            boxShadow: `0 0 8px 1px var(--color-primary)`,
-            opacity: scrollPct > 0 && scrollPct < 100 ? 1 : 0,
-            transition: 'width 80ms linear, opacity 300ms ease',
+            opacity: scrollPct > 0 ? 1 : 0,
+            transition: 'width 120ms ease-out, opacity 300ms ease',
           }}
-        />
+        >
+          {/* flowing gradient, moves left → right continuously */}
+          <div className="progress-flow absolute inset-0 overflow-hidden" />
+          {/* moving light sweep */}
+          <div className="progress-sweep absolute inset-0 overflow-hidden" />
+          {/* glowing head at the leading edge */}
+          <span className="progress-head absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 translate-x-1/2 rounded-full" />
+        </div>
       </div>
 
       {children}
@@ -179,7 +190,6 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* ── Floating action buttons (search + scroll-to-top) ── */}
       <FloatingActions />
-
 <a
       
         href="https://wa.me/923366655786"
@@ -207,6 +217,52 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         onClose={() => setMenuOpen(false)}
         onLoginClick={() => setAuthModalOpen(true)}
       />
+
+      <style jsx>{`
+        .progress-flow {
+          background: linear-gradient(
+            90deg,
+            var(--color-primary),
+            var(--color-secondary),
+            var(--color-primary),
+            var(--color-secondary),
+            var(--color-primary)
+          );
+          background-size: 200% 100%;
+          animation: progress-flow 1.8s linear infinite;
+          box-shadow: 0 0 8px 1px var(--color-primary);
+        }
+        @keyframes progress-flow {
+          from { background-position: 100% 0; }
+          to   { background-position: 0% 0; }
+        }
+
+        .progress-sweep::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: 40%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+          transform: translateX(-100%);
+          animation: progress-sweep 1.4s ease-in-out infinite;
+        }
+        @keyframes progress-sweep {
+          from { transform: translateX(-100%); }
+          to   { transform: translateX(350%); }
+        }
+
+        .progress-head {
+          background: var(--color-primary);
+          box-shadow: 0 0 10px 3px var(--color-primary);
+          animation: progress-head-pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes progress-head-pulse {
+          0%, 100% { transform: translate(50%, -50%) scale(1); opacity: 0.9; }
+          50%      { transform: translate(50%, -50%) scale(1.5); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }
