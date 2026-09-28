@@ -160,7 +160,7 @@ export default async function RootLayout({
         'ml-2 shrink-0 rounded-full bg-white px-4 py-2 text-sm font-bold text-neutral-900 transition hover:bg-neutral-100 active:scale-95',
       cancelButton:
         'ml-2 shrink-0 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30',
-      default: 'border-white/10 bg-neutral-900/95',
+      default: 'border-green bg-neutral-900/95',
       success: 'border-emerald-300/30 bg-emerald-600/95',
       error:   'border-rose-300/30 bg-rose-600/95',
       warning: 'border-amber-200/40 bg-amber-500/95',
