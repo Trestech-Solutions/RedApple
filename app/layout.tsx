@@ -5,7 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/hooks/useAuth";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { Toaster } from "sonner";
-import { AlertTriangle, CheckCircle2, Info, Loader2, XCircle } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Info, Loader2, X, XCircle } from "lucide-react";
 
 // ─── SEO from API ─────────────────────────────────────────────────────────────
 
@@ -113,39 +113,53 @@ export default async function RootLayout({
         <QueryProvider>
           <AuthProvider>
             {children}
-          <Toaster
+<Toaster
   position="top-center"
-  offset={16}
+  offset={20}
   gap={10}
   visibleToasts={3}
   duration={3500}
-  style={{ '--width': '380px' } as React.CSSProperties}
+  style={{ '--width': 'min(400px, calc(100vw - 32px))' } as React.CSSProperties}
   icons={{
-    success: <CheckCircle2 className="h-5 w-5 text-emerald-600" strokeWidth={2.25} />,
-    error:   <XCircle className="h-5 w-5 text-rose-600" strokeWidth={2.25} />,
-    warning: <AlertTriangle className="h-5 w-5 text-amber-600" strokeWidth={2.25} />,
-    info:    <Info className="h-5 w-5 text-sky-600" strokeWidth={2.25} />,
-    loading: <Loader2 className="h-5 w-5 animate-spin text-neutral-500" strokeWidth={2.25} />,
+    success: (
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 ring-1 ring-emerald-400/30">
+        <Check className="h-4 w-4 text-emerald-400" strokeWidth={3} />
+      </span>
+    ),
+    error: (
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/15 ring-1 ring-rose-400/30">
+        <X className="h-4 w-4 text-rose-400" strokeWidth={3} />
+      </span>
+    ),
+    warning: (
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/15 ring-1 ring-amber-400/30">
+        <AlertTriangle className="h-4 w-4 text-amber-400" strokeWidth={2.5} />
+      </span>
+    ),
+    info: (
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500/15 ring-1 ring-sky-400/30">
+        <Info className="h-4 w-4 text-sky-400" strokeWidth={2.5} />
+      </span>
+    ),
+    loading: (
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
+        <Loader2 className="h-4 w-4 animate-spin text-white/80" strokeWidth={2.5} />
+      </span>
+    ),
   }}
   toastOptions={{
     unstyled: true,
     classNames: {
       toast:
-        'flex w-full max-w-[92vw] items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.25)] backdrop-blur-xl',
+        'flex w-full items-center gap-3 rounded-full border border-white/10 bg-neutral-950/90 py-2 pl-2 pr-5 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl',
       icon: 'flex shrink-0 items-center justify-center',
-      content: 'flex min-w-0 flex-col',
-      title: 'text-[14px] font-semibold leading-tight tracking-tight',
-      description: 'mt-0.5 text-[13px] leading-snug opacity-70',
+      content: 'flex min-w-0 flex-1 flex-col',
+      title: 'truncate text-[14px] font-semibold leading-tight tracking-tight text-white',
+      description: 'mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-neutral-400',
       actionButton:
-        'ml-auto shrink-0 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-700',
+        'ml-2 shrink-0 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-neutral-900 transition hover:bg-neutral-200 active:scale-95',
       cancelButton:
-        'ml-auto shrink-0 rounded-lg bg-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-300',
-      default: 'border-neutral-200/80 bg-white/90 text-neutral-900',
-      success: 'border-emerald-200/80 bg-emerald-50/90 text-emerald-950',
-      error:   'border-rose-200/80 bg-rose-50/90 text-rose-950',
-      warning: 'border-amber-200/80 bg-amber-50/90 text-amber-950',
-      info:    'border-sky-200/80 bg-sky-50/90 text-sky-950',
-      loading: 'border-neutral-200/80 bg-white/90 text-neutral-900',
+        'ml-2 shrink-0 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/20',
     },
   }}
 />
