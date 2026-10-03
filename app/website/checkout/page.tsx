@@ -228,7 +228,9 @@ export default function CheckoutPage() {
     onSuccess(res) {
       appendOrderIdToCookie(res.id)
       clearCart()
-      router.push(`/website/checkout/confirmation?id=${res.id}`)
+      // Prefer unique_order_number for the URL (human-readable, safe for sharing)
+      const orderRef = res.unique_order_number ?? res.id
+      router.push(`/website/checkout/confirmation?id=${orderRef}`)
     },
     onError(msg) { setErrorMsg(msg || 'Failed to place order') },
   })

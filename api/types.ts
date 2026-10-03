@@ -1015,6 +1015,10 @@ export type Order = {
   customer?: number | null;
   order_type: 'delivery' | 'pickup' | 'dinein';
   status: string;
+  /** Human-readable restaurant-series number, e.g. "REST-00042". */
+  order_number?: string;
+  /** Globally unique 10-char alphanumeric code, e.g. "K7X2M9QPA4". Used in URLs. */
+  unique_order_number?: string | null;
   customer_name: string;
   customer_phone: string;
   customer_city?: string;

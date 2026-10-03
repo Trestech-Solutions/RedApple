@@ -60,6 +60,7 @@ export function appendOrderIdToCookie(id: number): void {
 
 export interface RecentOrderEntry {
   id: number
+  unique_order_number: string | null
   status: string
   grand_total: string
   order_type: string
@@ -111,20 +112,22 @@ export function useRecentOrders(): UseRecentOrdersResult {
           if (r.status === 'fulfilled') {
             const o = r.value
             return {
-              id:          o.id,
-              status:      o.status,
-              grand_total: o.grand_total,
-              order_type:  o.order_type,
-              created_at:  o.created_at,
+              id:                   o.id,
+              unique_order_number:  o.unique_order_number ?? null,
+              status:               o.status,
+              grand_total:          o.grand_total,
+              order_type:           o.order_type,
+              created_at:           o.created_at,
             }
           }
           // API returned an error for this ID — keep a stub so it still shows
           return {
-            id:          orderIds[i],
-            status:      'unknown',
-            grand_total: '0',
-            order_type:  '',
-            created_at:  '',
+            id:                  orderIds[i]!,
+            unique_order_number: null,
+            status:              'unknown',
+            grand_total:         '0',
+            order_type:          '',
+            created_at:          '',
           }
         })
         // Keep the same order as orderIds (most recent first)

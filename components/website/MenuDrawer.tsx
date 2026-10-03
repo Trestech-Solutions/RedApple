@@ -11,11 +11,13 @@ import {
   MapPin,
   MessageSquareWarning,
   ChevronRight,
+  HelpCircle,
 } from 'lucide-react'
 import { useCart } from '@/lib/hooks/useCart'
 
 const MENU_ITEMS = [
   { label: 'About Us',         href: '/website/about',     icon: Info },
+  { label: 'FAQs',             href: '/website/faqs',      icon: HelpCircle },
   { label: 'Blog',             href: '/website/blog',      icon: BookOpen },
   { label: 'Contact Us',       href: '/website/contact',   icon: Mail },
   { label: 'Our Locations',    href: '/website/locations', icon: MapPin },

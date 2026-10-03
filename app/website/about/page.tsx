@@ -2,164 +2,152 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Star, Award, Users, Globe,
-} from 'lucide-react'
+import { useGetAboutUs } from '@/api/client/content'
+import { useStoreSettings } from '@/lib/hooks/useCart'
 
-const MILESTONES = [
-  {
-    year: '1984',
-    title: 'The Beginning',
-    description:
-      'United King started its journey in Karachi under the brand umbrella of United Sweets Bakers and Nimco — from a small space in Karimabad.',
-  },
-  {
-    year: '1998',
-    title: 'A Brand is Born',
-    description:
-      'The first branch bearing the "United King" name opened in Bahadurabad, officially launching one of Karachi\'s most beloved bakery brands.',
-  },
-  {
-    year: '2009',
-    title: 'Brand of the Year',
-    description:
-      'United King won the prestigious Brand of the Year award — recognition it has earned consecutively year after year since.',
-  },
-  {
-    year: '2015+',
-    title: 'Going International',
-    description:
-      "United King's packaged products crossed borders, now exported to over 15 countries. Distribution across Pakistan also began, reaching leading stores nationwide.",
-  },
-]
+const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? ''
 
-const STATS = [
-  { icon: Star,   value: '250+', label: 'Menu Items' },
-  { icon: Award,  value: '15+',  label: 'Countries Exported To' },
-  { icon: Users,  value: '40+',  label: 'Years of Trust' },
-  { icon: Globe,  value: '50+',  label: 'Outlets in Karachi' },
-]
+function resolveMedia(path?: string | null): string | null {
+  if (!path || path.trim() === '') return null
+  if (path.startsWith('http')) return path
+  const base = MEDIA_BASE.replace(/\/+$/, '').replace(/\/api$/i, '')
+  return base ? `${base}${path}` : null
+}
+
+// ─── Skeleton ──────────────────────────────────────────────────────────────────
+
+function Skeleton() {
+  return (
+    <div className="min-h-screen animate-pulse">
+      <div className="h-64 sm:h-80 bg-neutral-200" />
+      <div className="mx-auto max-w-[860px] px-4 py-14 space-y-4">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="h-4 rounded bg-neutral-100" style={{ width: `${85 - i * 6}%` }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AboutUsPage() {
+  const { data: about, isLoading } = useGetAboutUs()
+  const { settings } = useStoreSettings()
+
+  const primaryColor = settings.primary_color || '#000000'
+
+  if (isLoading) return <Skeleton />
+
+  // If no about us data configured, show a simple fallback
+  if (!about) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-center px-4">
+        <div>
+          <p className="text-neutral-500 text-sm">About Us page is not set up yet.</p>
+          <Link href="/" className="mt-4 inline-block text-sm font-semibold underline" style={{ color: primaryColor }}>
+            Back to menu
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const bannerUrl = resolveMedia(about.banner_image)
+  const imageUrl  = resolveMedia(about.image)
+  const pageTitle = about.page_title || 'About Us'
+  const subtitle  = about.subtitle   || ''
+
   return (
     <div className="min-h-screen font-sans text-neutral-800">
-      <section className="relative h-64 overflow-hidden sm:h-80">
-        <Image
-          src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?q=80&w=1600&auto=format&fit=crop"
-          alt="United King bakery"
-          fill
-          priority
-          className="object-cover object-center brightness-50"
-        />
+
+      {/* ── Hero banner ─────────────────────────────────────────────────── */}
+      <section className="relative h-56 overflow-hidden sm:h-72 md:h-80">
+        {bannerUrl ? (
+          <Image
+            src={bannerUrl}
+            alt={pageTitle}
+            fill
+            priority
+            className="object-cover object-center brightness-50"
+          />
+        ) : (
+          <div className="absolute inset-0" style={{ backgroundColor: primaryColor, opacity: 0.85 }} />
+        )}
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white px-4">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#ffffff] mb-2">
-            Est. 1984 · Karachi
-          </p>
-          <h1 className="text-4xl font-extrabold sm:text-5xl drop-shadow-lg">
-            Brand Story of United King
+          <h1 className="text-3xl font-extrabold sm:text-4xl md:text-5xl drop-shadow-lg">
+            {pageTitle}
           </h1>
-          <p className="mt-3 max-w-xl text-sm text-white/80">
-            Four decades of quality, culture, and the finest flavours — all under one roof.
-          </p>
+          {subtitle && (
+            <p className="mt-3 max-w-xl text-sm text-white/80 sm:text-base">{subtitle}</p>
+          )}
         </div>
       </section>
 
-      <section className="mx-auto max-w-[860px] px-4 py-14 md:px-8">
-        <div className="space-y-5 text-[15px] leading-relaxed text-neutral-700">
-          <p>
-            United King — as we see it today — began its journey in the City of Lights three decades
-            back under the brand umbrella of <strong>United Sweets Bakers and Nimco</strong>, from a
-            small space in Karimabad back in 1984.
-          </p>
-          <p>
-            Being so famous for their exceptional quality of food, United Sweets Bakers and Nimco
-            faced a harsh challenge from other bakeries trying to use their reputation and name. Hence
-            they decided to change the name to <strong>"United King"</strong> and registered it as a
-            brand to protect their rights.
-          </p>
-          <p>
-            The first branch with the name United King was opened at Bahadurabad in 1998 — the
-            official birth of the "United King" brand. Since then, United King has come a long way in
-            terms of its outlets, products, and services, sharing its quality of food across Karachi.
-          </p>
-          <p>
-            Starting from an assortment of a few sweets and bakery items, United King gradually added
-            to their menu and now makes and sells <strong>more than 250 food items</strong> — ranging
-            from sweets and bakery items to breakfast and fast food — all under one roof.
-          </p>
-          <p>
-            The growth in United King&apos;s likeability and customer base has only made a positive impact
-            on quality. They have put great emphasis on maintaining their standards, which is why
-            United King has won the <strong>prestigious Brand of the Year award</strong> consecutively
-            since 2009 to 2013.
-          </p>
-          <p>
-            With decades of continuous growth, United King&apos;s packaged products outgrew the
-            confines of Karachi stores and went international — exported to over{' '}
-            <strong>15 countries</strong>. More recently, United King started distribution across
-            Pakistan; soon their products will be available at all leading stores nationwide.
-          </p>
-        </div>
-      </section>
-
-      <section className="bg-[#000000] py-14">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-8 px-4 text-center text-white sm:grid-cols-4 md:px-8">
-          {STATS.map(({ icon: Icon, value, label }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ffffff] text-neutral-900">
-                <Icon size={26} />
-              </div>
-              <p className="text-3xl font-extrabold">{value}</p>
-              <p className="text-sm font-medium text-white/80">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[860px] px-4 py-14 md:px-8">
-        <h2 className="mb-10 text-center text-3xl font-extrabold text-neutral-900">
-          Our Journey
-        </h2>
-
-        <div className="relative">
-          <div className="absolute left-6 top-0 h-full w-0.5 bg-[#000000]/20 md:left-1/2 md:-translate-x-0.5" />
-
-          <div className="space-y-10">
-            {MILESTONES.map((m, i) => (
+      {/* ── Main content ─────────────────────────────────────────────────── */}
+      {(about.content || imageUrl) && (
+        <section className="mx-auto max-w-[900px] px-4 py-12 md:px-8">
+          <div className={`gap-10 ${imageUrl ? 'md:grid md:grid-cols-[1fr_320px]' : ''}`}>
+            {/* Text */}
+            {about.content && (
               <div
-                key={m.year}
-                className={`relative flex gap-6 md:gap-0 ${
-                  i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                }`}
-              >
-                <div className="absolute left-4 top-4 z-10 h-5 w-5 rounded-full border-4 border-[#000000] bg-white md:left-1/2 md:-translate-x-2.5" />
+                className="prose prose-neutral max-w-none text-[15px] leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: about.content }}
+              />
+            )}
 
-                <div
-                  className={`ml-14 flex-1 rounded-xl bg-white p-5 shadow-md md:ml-0 md:w-[calc(50%-2rem)] ${
-                    i % 2 === 0 ? 'md:mr-auto md:pr-10' : 'md:ml-auto md:pl-10'
-                  }`}
-                >
-                  <span className="inline-block rounded-full bg-[#ffffff] px-3 py-0.5 text-xs font-bold text-neutral-900 mb-2">
-                    {m.year}
-                  </span>
-                  <h3 className="text-base font-bold text-neutral-900">{m.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-neutral-600">{m.description}</p>
+            {/* Side image */}
+            {imageUrl && (
+              <div className="mt-8 md:mt-0">
+                <div className="overflow-hidden rounded-2xl shadow-md">
+                  <Image
+                    src={imageUrl}
+                    alt={pageTitle}
+                    width={320}
+                    height={400}
+                    className="h-auto w-full object-cover"
+                  />
                 </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Extra sections ────────────────────────────────────────────────── */}
+      {about.sections && about.sections.length > 0 && (
+        <section className="mx-auto max-w-[900px] px-4 pb-14 md:px-8">
+          <div className="space-y-10">
+            {about.sections.map((sec, i) => (
+              <div key={i} className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+                {sec.title && (
+                  <h2
+                    className="mb-3 text-xl font-bold"
+                    style={{ color: primaryColor }}
+                  >
+                    {sec.title}
+                  </h2>
+                )}
+                <div
+                  className="prose prose-neutral max-w-none text-[15px] leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: sec.content }}
+                />
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="bg-[#ffffff] py-14 text-center">
-        <h2 className="text-3xl font-extrabold text-neutral-900 sm:text-4xl">
-          Taste the Legacy
-        </h2>
-        <p className="mt-3 text-sm text-neutral-700">
-          Over 250 delicious items crafted with 40+ years of passion.
-        </p>
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section
+        className="py-14 text-center text-white"
+        style={{ backgroundColor: primaryColor }}
+      >
+        <h2 className="text-2xl font-extrabold sm:text-3xl">Taste the difference</h2>
+        <p className="mt-2 text-sm text-white/80">Order now and experience it yourself.</p>
         <Link href="/">
-          <button className="mt-6 rounded-full bg-[#000000] px-8 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors">
+          <button className="mt-6 rounded-full bg-white px-8 py-3 text-sm font-bold transition-opacity hover:opacity-90"
+            style={{ color: primaryColor }}>
             Order Now
           </button>
         </Link>

@@ -40,6 +40,11 @@ const API_ENDPOINTS = {
     deleteAddress:   '/storefront/customers/addresses/{{customer_address_id}}/',
     getOrderHistory: '/storefront/customers/orders/',
   },
+
+  StorefrontContent: {
+    aboutUs: '/storefront/about-us/',   // ?restaurant=<id>
+    faqs:    '/storefront/faqs/',       // ?restaurant=<id>
+  },
 } as const;
 
 export default API_ENDPOINTS;

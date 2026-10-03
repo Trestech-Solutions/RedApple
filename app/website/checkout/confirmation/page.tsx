@@ -228,8 +228,15 @@ export default function OrderConfirmationPage() {
 
             {/* Grand-total header */}
             <div className="rounded-2xl bg-[var(--color-primary)] px-6 py-6 text-center text-[var(--color-secondary)] shadow">
+              <p className="text-xs uppercase tracking-widest [color:color-mix(in_srgb,var(--color-secondary),transparent_40%)] mb-1">
+                Your Order Number
+              </p>
+              <p className="text-2xl font-extrabold tracking-widest font-mono mb-2">
+                {order.unique_order_number ?? `#${order.id}`}
+              </p>
+              <div className="h-px w-16 mx-auto mb-2 [background-color:color-mix(in_srgb,var(--color-secondary),transparent_60%)]" />
               <p className="text-xs uppercase tracking-wider [color:color-mix(in_srgb,var(--color-secondary),transparent_40%)] mb-1">
-                Order #{order.id} · Grand Total
+                Grand Total
               </p>
               <p className="text-3xl md:text-4xl font-extrabold tracking-tight">
                 {formatRs(order.grand_total)}
