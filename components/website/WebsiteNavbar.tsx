@@ -86,18 +86,17 @@ const NAVBAR_CSS = `
 .wn-bump { animation: wn-bump .6s ease; }
 .wn-pop  { animation: wn-pop .4s cubic-bezier(.3,1.7,.5,1); }
 
-/* Glass pills (location, phone): fill on hover */
+/* Pills (location, phone): same contrast as the cart button */
 .wn-pill {
-  background: color-mix(in srgb, var(--wn-fg) 13%, transparent);
-  color: var(--wn-fg);
-  border: 1px solid color-mix(in srgb, var(--wn-fg) 24%, transparent);
-  transition: background-color .3s ease, color .3s ease, transform .3s cubic-bezier(.3,1.7,.5,1), box-shadow .3s ease;
-}
-.wn-pill:hover {
   background: var(--wn-fg);
   color: var(--wn-icon);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--wn-fg) 70%, transparent);
+  transition: transform .3s cubic-bezier(.3,1.7,.5,1), box-shadow .3s ease;
+}
+.wn-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 10px 22px -8px color-mix(in srgb, var(--wn-fg) 70%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--wn-fg) 22%, transparent);
 }
 .wn-pill:active { transform: scale(.96); }
 .wn-pill:hover .wn-pin  { animation: wn-hop .5s ease infinite; }
@@ -297,18 +296,18 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
               type="button"
               onClick={() => openLocationModal()}
               aria-label="Change location"
-              className="wn-pill wn-in wn-focus flex min-w-0 items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 text-left min-[400px]:py-2"
+              className="wn-pill wn-in wn-focus flex min-w-0 items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 text-left ring-1 ring-inset ring-black/5 min-[400px]:py-2"
               style={delay(160)}
             >
               <span
                 className="relative grid h-6 w-6 shrink-0 place-items-center rounded-full min-[400px]:h-7 min-[400px]:w-7"
-                style={{ backgroundColor: 'color-mix(in srgb, var(--wn-fg) 16%, transparent)' }}
+                style={{ backgroundColor: 'color-mix(in srgb, var(--wn-icon) 12%, transparent)' }}
               >
                 <MapPin size={13} className="wn-pin min-[400px]:hidden" />
                 <MapPin size={14} className="wn-pin hidden min-[400px]:block" />
                 <span className="absolute -right-0.5 -top-0.5 flex h-2 w-2">
                   <span className="wn-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 ring-1 ring-black/10" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-black/10" />
                 </span>
               </span>
 
@@ -335,16 +334,16 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
                 target={isWhatsapp ? '_blank' : undefined}
                 rel={isWhatsapp ? 'noopener noreferrer' : undefined}
                 aria-label={isWhatsapp ? 'Chat on WhatsApp' : 'Call us'}
-                className="wn-pill wn-in wn-focus hidden shrink-0 items-center gap-2 rounded-full p-1.5 sm:flex lg:py-1.5 lg:pl-1.5 lg:pr-3.5"
+                className="wn-pill wn-in wn-focus hidden shrink-0 items-center gap-2 rounded-full p-1.5 ring-1 ring-inset ring-black/5 sm:flex lg:py-1.5 lg:pl-1.5 lg:pr-3.5"
                 style={delay(240)}
               >
                 <span
                   className="wn-ring grid h-7 w-7 shrink-0 place-items-center rounded-full"
                   style={{
                     backgroundColor: isWhatsapp
-                      ? 'color-mix(in srgb, #25D366 30%, transparent)'
-                      : 'color-mix(in srgb, var(--wn-fg) 16%, transparent)',
-                    color: isWhatsapp ? '#25D366' : 'inherit',
+                      ? 'color-mix(in srgb, #25D366 22%, transparent)'
+                      : 'color-mix(in srgb, var(--wn-icon) 12%, transparent)',
+                    color: isWhatsapp ? '#128C7E' : 'inherit',
                   }}
                 >
                   {isWhatsapp ? <MessageCircle size={15} /> : <Phone size={15} />}
