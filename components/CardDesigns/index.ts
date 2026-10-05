@@ -1,0 +1,9 @@
+// CardDesigns — individual exports for each card design variant
+// The main ProductCard dispatcher is still at components/product/ProductCard.tsx
+
+export { Card1 } from './Card1'
+export { Card2 } from './Card2'
+export { Card3 } from './Card3'
+export { Card4 } from './Card4'
+export type { ProductData, ProductCardProps, SizeMeta } from './shared'
+export { useCardLogic, CARD_SHELL, FOCUS_RING, Chip } from './shared'
