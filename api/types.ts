@@ -1017,6 +1017,8 @@ export type Order = {
   status: string;
   /** Human-readable restaurant-series number, e.g. "REST-00042". */
   order_number?: string;
+  /** Alternate order-number key returned by some storefront order serializers. */
+  order_no?: string;
   /** Globally unique 10-char alphanumeric code, e.g. "K7X2M9QPA4". Used in URLs. */
   unique_order_number?: string | null;
   customer_name: string;

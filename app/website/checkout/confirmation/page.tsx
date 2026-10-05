@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -22,6 +22,10 @@ import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 function formatRs(value: string | number) {
   const n = parseFloat(String(value))
   return isNaN(n) ? String(value) : `Rs. ${Math.round(n).toLocaleString()}`
+}
+
+function getDisplayOrderNumber(order: Order): string {
+  return order.order_no || order.order_number || order.unique_order_number || 'Unavailable'
 }
 
 function capitalize(s: string) {
@@ -211,73 +215,160 @@ function ProductLine({ line }: { line: Order['items'][number] }) {
 
 // ─── Feedback form ────────────────────────────────────────────────────────────
 
-function FeedbackForm({ orderId, customerPhone }: { orderId: number; customerPhone: string }) {
+function FeedbackForm({
+  orderId,
+  customerPhone,
+  onContinue,
+}: {
+  orderId: number
+  customerPhone: string
+  onContinue: () => void
+}) {
   const [stars,   setStars]   = useState(0)
   const [hover,   setHover]   = useState(0)
   const [comment, setComment] = useState('')
   const [done,    setDone]    = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   const { submitFeedback, isPending } = useSubmitOrderFeedback(orderId, {
     onSuccess: () => setDone(true),
   })
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    const previouslyFocused = document.activeElement
+    document.body.style.overflow = 'hidden'
+    dialogRef.current?.focus()
+
+    function preventDismissal(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        return
+      }
+      if (event.key !== 'Tab' || !dialogRef.current) return
+
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), textarea:not(:disabled)'
+      )
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (!first || !last) {
+        event.preventDefault()
+        dialogRef.current.focus()
+      } else if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === dialogRef.current)
+      ) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', preventDismissal)
+    return () => {
+      document.removeEventListener('keydown', preventDismissal)
+      document.body.style.overflow = previousOverflow
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
+    }
+  }, [])
+
   if (done) {
     return (
-      <div className="rounded-3xl bg-emerald-50 ring-1 ring-emerald-200 p-6 text-center space-y-1">
-        <p className="text-2xl">⭐</p>
-        <p className="font-bold text-emerald-700">Thank you for your feedback!</p>
-        <p className="text-sm text-emerald-600">Your review helps us improve.</p>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/55 p-4 backdrop-blur-md">
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="feedback-dialog-title"
+          tabIndex={-1}
+          className="w-full max-w-md rounded-3xl bg-white p-7 text-center shadow-2xl outline-none"
+        >
+          <p className="text-3xl">⭐</p>
+          <h2 id="feedback-dialog-title" className="mt-2 font-bold text-emerald-700">
+            Thank you for your feedback!
+          </h2>
+          <p className="mt-1 text-sm text-emerald-600">Your review helps us improve.</p>
+          <button
+            type="button"
+            onClick={onContinue}
+            className="mt-6 w-full rounded-2xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-700"
+          >
+            Continue to order
+          </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <SectionCard icon={<Star size={18} />} title="Rate Your Experience">
-      <div className="space-y-4">
-        <div className="flex items-center gap-1">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setStars(n)}
-              onMouseEnter={() => setHover(n)}
-              onMouseLeave={() => setHover(0)}
-              aria-label={`${n} star${n > 1 ? 's' : ''}`}
-              className="transition-transform hover:scale-110"
-            >
-              <Star
-                size={30}
-                className={`transition-colors ${
-                  n <= (hover || stars)
-                    ? 'fill-amber-400 stroke-amber-400'
-                    : 'stroke-neutral-300 fill-transparent'
-                }`}
-              />
-            </button>
-          ))}
-          {stars > 0 && (
-            <span className="ml-2 text-sm font-semibold text-neutral-600">
-              {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][stars]}
-            </span>
-          )}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/55 p-4 backdrop-blur-md">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="feedback-dialog-title"
+        tabIndex={-1}
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl outline-none sm:p-8"
+      >
+        <div className="mb-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+            <Star size={23} />
+          </div>
+          <h2 id="feedback-dialog-title" className="mt-3 text-lg font-bold text-neutral-900">
+            Rate Your Experience
+          </h2>
+          <p className="mt-1 text-sm text-neutral-500">Share your feedback about this order.</p>
         </div>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Tell us more about your experience (optional)"
-          rows={3}
-          className="w-full resize-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-        />
-        <button
-          type="button"
-          disabled={stars === 0 || isPending}
-          onClick={() => submitFeedback({ customer_phone: customerPhone, stars, feed_back_comment: comment })}
-          className="w-full rounded-2xl bg-emerald-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-        >
-          {isPending ? 'Submitting…' : 'Submit Review'}
-        </button>
+        <div className="space-y-4">
+          <div className="flex items-center justify-center gap-1">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setStars(n)}
+                onMouseEnter={() => setHover(n)}
+                onMouseLeave={() => setHover(0)}
+                aria-label={`${n} star${n > 1 ? 's' : ''}`}
+                aria-pressed={stars === n}
+                className="transition-transform hover:scale-110"
+              >
+                <Star
+                  size={32}
+                  className={`transition-colors ${
+                    n <= (hover || stars)
+                      ? 'fill-amber-400 stroke-amber-400'
+                      : 'stroke-neutral-300 fill-transparent'
+                  }`}
+                />
+              </button>
+            ))}
+            {stars > 0 && (
+              <span className="ml-2 text-sm font-semibold text-neutral-600">
+                {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][stars]}
+              </span>
+            )}
+          </div>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Tell us more about your experience (optional)"
+            rows={4}
+            className="w-full resize-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+          />
+          <button
+            type="button"
+            disabled={stars === 0 || isPending}
+            onClick={() => submitFeedback({ customer_phone: customerPhone, stars, feed_back_comment: comment })}
+            className="w-full rounded-2xl bg-emerald-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          >
+            {isPending ? 'Submitting…' : 'Submit Review'}
+          </button>
+        </div>
       </div>
-    </SectionCard>
+    </div>
   )
 }
 
@@ -293,6 +384,7 @@ export default function OrderConfirmationPage() {
   const [order,    setOrder]    = useState<Order | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [errorMsg, setErrorMsg] = useState('')
+  const [feedbackDismissed, setFeedbackDismissed] = useState(false)
 
   const supportPhone =
     branchPhone ||
@@ -372,11 +464,8 @@ export default function OrderConfirmationPage() {
                   Your Order Number
                 </p>
                 <p className="mt-1 font-mono text-3xl font-extrabold tracking-widest sm:text-4xl">
-                  {order.unique_order_number ?? `#${order.id}`}
+                  {getDisplayOrderNumber(order)}
                 </p>
-                {order.order_number && (
-                  <p className="mt-0.5 font-mono text-[11px] text-white/60">{order.order_number}</p>
-                )}
 
                 <div className="mx-auto my-4 h-px w-24 bg-white/30" />
 
@@ -495,8 +584,12 @@ export default function OrderConfirmationPage() {
               </div>
             </SectionCard>
 
-            {order.status?.toLowerCase() === 'completed' && !order.stars && (
-              <FeedbackForm orderId={order.id} customerPhone={order.customer_phone} />
+            {order.status?.toLowerCase() === 'completed' && !order.stars && !feedbackDismissed && (
+              <FeedbackForm
+                orderId={order.id}
+                customerPhone={order.customer_phone}
+                onContinue={() => setFeedbackDismissed(true)}
+              />
             )}
             {order.stars != null && (
               <SectionCard icon={<Star size={18} />} title="Your Review">
@@ -541,7 +634,7 @@ export default function OrderConfirmationPage() {
             </div>
             <ApprovalBanner
               status={order.status}
-              orderNo={order.unique_order_number ?? order.id}
+              orderNo={getDisplayOrderNumber(order)}
               orderHref="/website/profile/myOrders"
             />
           </div>

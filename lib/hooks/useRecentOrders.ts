@@ -60,6 +60,7 @@ export function appendOrderIdToCookie(id: number): void {
 
 export interface RecentOrderEntry {
   id: number
+  order_number: string | null
   unique_order_number: string | null
   status: string
   grand_total: string
@@ -76,6 +77,10 @@ interface UseRecentOrdersResult {
   orderIds: number[]
   /** Prepend a new order ID to the cookie and immediately refresh the list. */
   addOrderId: (id: number) => void
+  /** Remove an order ID from the browser's recent-orders cookie. */
+  removeOrderId: (id: number) => void
+  /** Clear all order IDs from the browser's recent-orders cookie. */
+  clearOrderIds: () => void
 }
 
 export function useRecentOrders(): UseRecentOrdersResult {
@@ -113,6 +118,7 @@ export function useRecentOrders(): UseRecentOrdersResult {
             const o = r.value
             return {
               id:                   o.id,
+              order_number:         o.order_number ?? null,
               unique_order_number:  o.unique_order_number ?? null,
               status:               o.status,
               grand_total:          o.grand_total,
@@ -123,6 +129,7 @@ export function useRecentOrders(): UseRecentOrdersResult {
           // API returned an error for this ID — keep a stub so it still shows
           return {
             id:                  orderIds[i]!,
+            order_number:        null,
             unique_order_number: null,
             status:              'unknown',
             grand_total:         '0',
@@ -144,5 +151,16 @@ export function useRecentOrders(): UseRecentOrdersResult {
     setOrderIds(readOrderIdsCookie())
   }, [])
 
-  return { orders, isLoading, orderIds, addOrderId }
+  const removeOrderId = useCallback((id: number) => {
+    const remaining = readOrderIdsCookie().filter((orderId) => orderId !== id)
+    writeOrderIdsCookie(remaining)
+    setOrderIds(remaining)
+  }, [])
+
+  const clearOrderIds = useCallback(() => {
+    writeOrderIdsCookie([])
+    setOrderIds([])
+  }, [])
+
+  return { orders, isLoading, orderIds, addOrderId, removeOrderId, clearOrderIds }
 }

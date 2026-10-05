@@ -10,7 +10,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ClipboardList, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ClipboardList, Loader2, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useRecentOrders } from '@/lib/hooks/useRecentOrders'
 
 // ─── Status badge colours ─────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ interface RecentOrdersDropdownProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropdownProps) {
-  const { orders, isLoading, orderIds } = useRecentOrders()
+  const { orders, isLoading, orderIds, removeOrderId, clearOrderIds } = useRecentOrders()
   const [open, setOpen]         = useState(false)
   const containerRef            = useRef<HTMLDivElement>(null)
 
@@ -102,23 +102,34 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
         <div className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-2.5">
             <p className="text-xs font-bold uppercase tracking-wide text-neutral-500">Recent Orders</p>
-            {isLoading && <Loader2 size={13} className="animate-spin text-neutral-400" />}
+            <div className="flex items-center gap-2">
+              {isLoading && <Loader2 size={13} className="animate-spin text-neutral-400" />}
+              <button
+                type="button"
+                onClick={clearOrderIds}
+                className="text-[10px] font-semibold text-neutral-400 transition-colors hover:text-red-600"
+                aria-label="Clear recent orders"
+              >
+                Clear
+              </button>
+            </div>
           </div>
+
 
           <ul className="max-h-80 divide-y divide-neutral-100 overflow-y-auto">
             {orders.map((order) => (
-              <li key={order.id}>
+              <li key={order.id} className="flex items-center">
                 <Link
                   href={`/website/checkout/confirmation?id=${order.id}`}
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-neutral-50"
+                  className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-neutral-50"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-neutral-900">
-                      Order #{order.id}
+                      Order #{order.order_number ?? order.unique_order_number ?? 'number unavailable'}
                     </p>
                     {order.grand_total && order.grand_total !== '0' && (
-                      <p className="text-[11px] text-neutral-400 mt-0.5">
+                      <p className="mt-0.5 text-[11px] text-neutral-400">
                         Rs. {Math.round(parseFloat(order.grand_total)).toLocaleString()}
                         {order.order_type ? ` · ${capitalize(order.order_type)}` : ''}
                       </p>
@@ -135,6 +146,14 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
                     {order.status === 'unknown' ? '—' : statusLabel(order.status)}
                   </span>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => removeOrderId(order.id)}
+                  aria-label={`Remove order ${order.order_number ?? order.unique_order_number ?? order.id} from recent orders`}
+                  className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <X size={13} />
+                </button>
               </li>
             ))}
 
