@@ -18,7 +18,7 @@ const GAP = 16    // gap between text and image (px)
 const TITLE = 17  // title font size (px)
 const DESC = 13   // description font size (px)
 const PRICE = 19  // price font size (px)
-const BTN = 36    // add button size (px)
+const BTN = 46    // add button size (px)
 // ──────────────────────────────────────────────
 
 export function Card1({ product, onOpen }: ProductCardProps) {
@@ -97,7 +97,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
           {isOrderable && !needsSelection && cartQty > 0 && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="flex h-8 items-center gap-0.5 rounded-full border px-1"
+              className="flex h-8 items-center gap-0.2 rounded-full border px-1"
               style={{ borderColor: priceBorder || btnColor }}
             >
               <button type="button" onClick={handleDecrease} aria-label={`Remove one ${product.name}`}
@@ -157,8 +157,8 @@ export function Card1({ product, onOpen }: ProductCardProps) {
             }}
           >
             {added
-              ? <Check className="h-4 w-4" strokeWidth={3} />
-              : <Plus className="h-4 w-4" strokeWidth={3} />}
+              ? <Check className="h-6 w-6" strokeWidth={3} />
+              : <Plus className="h-6 w-6" strokeWidth={3} />}
           </button>
         )}
       </div>

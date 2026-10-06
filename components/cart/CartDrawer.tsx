@@ -483,7 +483,7 @@ export function CartDrawer() {
                       <span className="text-neutral-500">Delivery fee</span>
                       <span className="text-neutral-700">
                         {orderType === 'pickup'
-                          ? '—'
+                          ? '0'
                           : deliveryFee === 0
                             ? <span className="font-bold text-emerald-600">FREE</span>
                             : `Rs. ${deliveryFee.toLocaleString()}`}

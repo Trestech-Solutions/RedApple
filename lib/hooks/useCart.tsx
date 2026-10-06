@@ -412,7 +412,7 @@ function deriveSettings(raw: StoreSettings | undefined): StoreSettingsDerived {
   //   we coerce to string first to avoid .trim() TypeError.
   //   Empty, null, or invalid → fall back to DEFAULT_TAX_RATE (0.18).
   const taxPercentNum = (() => {
-    const raw = r.tax_number
+    const raw = r.cash_tax
     if (raw === null || raw === undefined) return NaN
     const s = String(raw).trim()
     if (!s) return NaN

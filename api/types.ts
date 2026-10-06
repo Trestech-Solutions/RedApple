@@ -301,7 +301,6 @@ export type StoreSettings = {
   if_item_not_available?: 'hide' | 'show_disabled' | string
 
   // Pricing & charges
-  tax_number?: string
   free_delivery_above_subtotal?: string | number | null
   close_store?: boolean
   convenience_fee?: string | number | null
