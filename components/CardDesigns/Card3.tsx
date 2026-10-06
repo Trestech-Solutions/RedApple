@@ -1,10 +1,9 @@
 'use client'
 
 /**
- * Card3 — Portrait, 3:2 image
- * 3:2 aspect image with hover scale. Full-width "Add to cart" pill button.
- * Qty stepper replaces button (also full-width pill). Reserved slots for
- * description and time window.
+ * Card3 — Portrait, 3:2 image, full-width add button
+ * 3:2 image with hover scale. Reserved description + time window slots.
+ * Full-width pill button at bottom.
  */
 
 import Image from 'next/image'
@@ -23,9 +22,9 @@ export function Card3({ product, onOpen }: ProductCardProps) {
   const stackTagBg = settings.stack_tag_background_color
   const stackTagFg = settings.stack_tag_color
   const showStack  = Boolean(settings.show_stack_tag_on_item)
-  const btnBg     = settings.item_price_background  || '#c0392b'
-  const btnFg     = settings.item_price_text_color  || '#ffffff'
-  const btnBorder = settings.item_price_border_color || btnBg
+  const btnBg      = settings.item_price_background   || '#c0392b'
+  const btnFg      = settings.item_price_text_color   || '#ffffff'
+  const btnBorder  = settings.item_price_border_color || btnBg
 
   if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
 
@@ -37,12 +36,11 @@ export function Card3({ product, onOpen }: ProductCardProps) {
       onKeyDown={(e) => { if (onOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onOpen(product) } }}
       className={`${CARD_SHELL} flex flex-col overflow-hidden rounded-[clamp(0.75rem,2.2vw,1.125rem)] hover:ring-black/10 hover:shadow-[0_16px_36px_-18px_rgba(0,0,0,0.25)] ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
     >
-      {/* 3:2 image */}
       <div className="relative aspect-[3/2] w-full flex-shrink-0 overflow-hidden bg-neutral-100">
         <Image src={product.image} alt={product.name} fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-        />
+          className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
+
         {product.tag && (
           <span className="absolute left-2 top-2 sm:left-3 sm:top-3">
             <Chip className={showStack ? '' : 'bg-[#f2c14e] text-neutral-900'}
@@ -83,13 +81,15 @@ export function Card3({ product, onOpen }: ProductCardProps) {
           )}
           {(isOrderable || product.dealMeta) && (
             <span className="text-[clamp(0.875rem,2vw,1.125rem)] font-bold tracking-[-0.01em] text-neutral-900">
-              Rs. {isOrderable ? displayPriceNum.toLocaleString() : Math.round(parseFloat(product.dealMeta!.finalPrice)).toLocaleString()}
+              Rs.{' '}
+              {isOrderable
+                ? displayPriceNum.toLocaleString()
+                : Math.round(parseFloat(product.dealMeta!.finalPrice)).toLocaleString()}
             </span>
           )}
         </div>
       </div>
 
-      {/* Full-width button / stepper */}
       <div className="px-[clamp(0.625rem,2vw,1rem)] pb-[clamp(0.625rem,2vw,1rem)]">
         {isOrderable && !needsSelection && cartQty > 0 ? (
           <div onClick={(e) => e.stopPropagation()}

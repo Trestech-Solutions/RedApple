@@ -2,9 +2,7 @@
 
 /**
  * Card2 — Portrait, full-bleed square image top
- * Square aspect-square image at top. Name in uppercase extrabold.
- * Description has a reserved min-h slot. ADD button to the right of price.
- * Inline stepper when item is already in cart.
+ * Uppercase name, reserved description slot, price + ADD button row.
  */
 
 import Image from 'next/image'
@@ -15,8 +13,7 @@ export function Card2({ product, onOpen }: ProductCardProps) {
   const {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
-    cartQty, handleAdd, handleIncrease, handleDecrease,
-    storeClosed,
+    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed,
   } = useCardLogic(product, onOpen)
 
   const discountBg = settings.discount_background_color
@@ -24,9 +21,9 @@ export function Card2({ product, onOpen }: ProductCardProps) {
   const stackTagBg = settings.stack_tag_background_color
   const stackTagFg = settings.stack_tag_color
   const showStack  = Boolean(settings.show_stack_tag_on_item)
-  const btnBg     = settings.item_price_background  || '#d63a2b'
-  const btnFg     = settings.item_price_text_color  || '#ffffff'
-  const btnBorder = settings.item_price_border_color || btnBg
+  const btnBg      = settings.item_price_background   || '#d63a2b'
+  const btnFg      = settings.item_price_text_color   || '#ffffff'
+  const btnBorder  = settings.item_price_border_color || btnBg
 
   if (!product.productId && !product.dealMeta && settings.if_item_not_available === 'hide') return null
 
@@ -58,12 +55,14 @@ export function Card2({ product, onOpen }: ProductCardProps) {
             </Chip>
           </span>
         )}
+
         {displayDiscount && (
           <span className="absolute bottom-1.5 right-1.5 rounded-lg px-[clamp(0.5rem,1.6vw,0.75rem)] py-[clamp(0.25rem,0.9vw,0.375rem)] text-[clamp(0.688rem,1.7vw,0.875rem)] font-extrabold uppercase leading-none"
             style={{ backgroundColor: discountBg || '#f2c14e', color: discountFg || '#171717' }}>
             {displayDiscount}
           </span>
         )}
+
         {!isOrderable && !product.dealMeta && (
           <span className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
             <Chip className="bg-white/95 text-neutral-700">Coming soon</Chip>
@@ -76,16 +75,17 @@ export function Card2({ product, onOpen }: ProductCardProps) {
         <h3 className="line-clamp-1 text-[clamp(0.813rem,2vw,1.125rem)] font-extrabold uppercase leading-tight tracking-[-0.005em] text-neutral-900">
           {product.name}
         </h3>
+
         <p className="mt-[clamp(0.5rem,2.4vw,1.25rem)] line-clamp-2 min-h-[2.8em] text-[clamp(0.688rem,1.6vw,0.938rem)] leading-[1.4] text-neutral-500">
           {product.description || '\u00A0'}
         </p>
+
         {product.dealMeta?.timeWindow && (
           <span className="mt-1 w-fit max-w-full truncate text-[clamp(0.594rem,1.4vw,0.75rem)] font-medium text-amber-600">
             🕐 {product.dealMeta.timeWindow}
           </span>
         )}
 
-        {/* Price + ADD */}
         <div className="mt-auto flex items-center justify-between gap-2 pt-[clamp(0.625rem,2.2vw,1.25rem)]">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
             {isOrderable && displayOriginal && (

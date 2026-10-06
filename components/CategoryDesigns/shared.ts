@@ -1,4 +1,4 @@
-// CategoryDesigns — shared types for all category nav variants
+// Shared types for all CategoryNav design variants
 
 export type CategoryIcon =
   | { type: 'image'; value: string }

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '../axios'
 import API_ENDPOINTS from '../endpoint'
 import { getRestaurantId } from '../utils'
+import type { StorefrontPage, StorefrontPageLink } from '../types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,7 +49,6 @@ export function useGetAboutUs() {
         API_ENDPOINTS.StorefrontContent.aboutUs,
         { params: { restaurant: restaurantId } }
       )
-      // API returns {} when not found
       const data = r.data
       if (!data || Object.keys(data).length === 0) return null
       return data as StorefrontAboutUs
@@ -70,6 +70,56 @@ export function useGetFAQs() {
           params: { restaurant: restaurantId },
         })
         .then((r) => r.data ?? []),
+    staleTime: 1000 * 60 * 10,
+  })
+}
+
+// ─── useGetPages ──────────────────────────────────────────────────────────────
+
+type PagesListOpts = {
+  showInFooter?: boolean
+  showInMenu?: boolean
+}
+
+export function useGetPages(opts: PagesListOpts = {}) {
+  const restaurantId = getRestaurantId()
+  const queryKey = ['storefront-pages', restaurantId, opts.showInFooter, opts.showInMenu]
+
+  return useQuery<StorefrontPageLink[]>({
+    queryKey,
+    queryFn: () => {
+      const params: Record<string, string> = { restaurant: restaurantId }
+      if (opts.showInFooter) params.footer = '1'
+      if (opts.showInMenu) params.menu = '1'
+      return api
+        .get<StorefrontPageLink[]>(API_ENDPOINTS.StorefrontContent.pages, { params })
+        .then((r) => r.data ?? [])
+    },
+    staleTime: 1000 * 60 * 10,
+  })
+}
+
+// ─── useGetPageBySlug ─────────────────────────────────────────────────────────
+
+export function useGetPageBySlug(slug: string | undefined) {
+  const restaurantId = getRestaurantId()
+  const enabled = !!slug
+
+  return useQuery<StorefrontPage | null>({
+    queryKey: ['storefront-page', restaurantId, slug],
+    queryFn: async () => {
+      try {
+        const r = await api.get<StorefrontPage>(
+          API_ENDPOINTS.StorefrontContent.pageDetail(slug!),
+          { params: { restaurant: restaurantId } }
+        )
+        return r.data ?? null
+      } catch (e: any) {
+        if (e?.response?.status === 404) return null
+        throw e
+      }
+    },
+    enabled,
     staleTime: 1000 * 60 * 10,
   })
 }

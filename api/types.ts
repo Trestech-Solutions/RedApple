@@ -291,6 +291,12 @@ export type StoreSettings = {
   cash_tax?: string | number | null
   /** Tax percentage applied on card/online payments (e.g. "18.00" = 18%). 0 or absent = no card tax. */
   card_tax?: string | number | null
+  /** Tax percentage applied when Online Payment (bank transfer) is selected (requires online_tax_status=true). */
+  online_tax?: string | number | null
+  /** Master toggle for enabling online payment option & online tax application at checkout. */
+  online_tax_status?: boolean
+  /** Bank / transfer details shown to customer at checkout when Online Payment is selected. */
+  bank_details?: string | null
 
   if_item_not_available?: 'hide' | 'show_disabled' | string
 
@@ -1295,4 +1301,38 @@ export type OnSpotDealListParams = {
   status?: number;
   page?: number;
   page_size?: number;
+};
+
+// ─── Storefront CMS Pages ─────────────────────────────────────────────────────
+
+export type PageSection = { title?: string; content?: string; [key: string]: any };
+
+export type StorefrontPage = {
+  id: number;
+  restaurant: number;
+  title: string;
+  slug: string;
+  subtitle: string;
+  content: string;
+  banner_image: string | null;
+  image: string | null;
+  sections: PageSection[];
+  meta_title: string;
+  meta_description: string;
+  show_in_menu: boolean;
+  show_in_footer: boolean;
+  sort_order: number;
+  is_active: boolean;
+  date_created?: string;
+  date_updated?: string;
+};
+
+export type StorefrontPageLink = {
+  id: number;
+  title: string;
+  slug: string;
+  subtitle: string;
+  show_in_menu: boolean;
+  show_in_footer: boolean;
+  sort_order: number;
 };

@@ -609,7 +609,7 @@ function PopularSection({ products }: { products: ProductData[] }) {
           {items.map((product) => (
             <div
               key={product.id}
-              className="w-[42vw] min-w-[152px] max-w-[220px] shrink-0 snap-start sm:w-[26vw] md:w-[21vw] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0"
+              className="w-[44vw] min-w-[160px] max-w-[200px] shrink-0 snap-start sm:w-[26vw] sm:max-w-[220px] md:w-[21vw] lg:w-[calc((100%-3.75rem)/4)] lg:max-w-none lg:min-w-0"
             >
               <PopularItemCard product={product} onOpen={setSelected} />
             </div>
@@ -691,7 +691,8 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(product) } }}
     >
       {/* Image */}
-      <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-black/5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:ring-black/10 xs:h-44 sm:h-56 md:h-64 lg:h-72">
+      <div className="relative w-full overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:ring-black/10"
+        style={{ height: 'clamp(9rem, 42vw, 18rem)' }}>
         <Image
           src={product.image}
           alt={product.name}
@@ -703,12 +704,12 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
         {hasOrig && savePct > 0 && (
-          <span className="absolute left-2 top-2 z-10 rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-md sm:text-xs">
+          <span className="absolute left-1.5 top-1.5 z-10 rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-md sm:left-2 sm:top-2 sm:text-xs">
             {savePct}% OFF
           </span>
         )}
         {product.tag && !hasOrig && (
-          <span className="absolute left-2 top-2 z-10 rounded-full bg-neutral-900/85 px-2 py-0.5 text-[10px] font-semibold text-white shadow-md backdrop-blur-sm sm:text-xs">
+          <span className="absolute left-1.5 top-1.5 z-10 rounded-full bg-neutral-900/85 px-2 py-0.5 text-[10px] font-semibold text-white shadow-md backdrop-blur-sm sm:left-2 sm:top-2 sm:text-xs">
             {product.tag}
           </span>
         )}
@@ -718,15 +719,15 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
             <div
               onClick={(e) => e.stopPropagation()}
               style={btnStyle}
-              className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-full px-1.5 py-1 shadow-lg ring-1 ring-white/10 lg:bottom-3 lg:right-3 lg:gap-2 lg:px-2 lg:py-1.5"
+              className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-0.5 rounded-full px-1 py-0.5 shadow-lg ring-1 ring-white/10 sm:bottom-2 sm:right-2 sm:gap-1 sm:px-1.5 sm:py-1 lg:bottom-3 lg:right-3 lg:gap-2 lg:px-2 lg:py-1.5"
             >
               <button type="button" onClick={handleDecrease} aria-label="Decrease"
-                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 lg:h-9 lg:w-9">
+                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 sm:h-7 sm:w-7 lg:h-9 lg:w-9">
                 <Minus className="h-3 w-3 lg:h-5 lg:w-5" strokeWidth={2.5} />
               </button>
-              <span className="w-5 text-center text-xs font-bold lg:w-7 lg:text-base">{cartQty}</span>
+              <span className="w-4 text-center text-xs font-bold sm:w-5 lg:w-7 lg:text-base">{cartQty}</span>
               <button type="button" onClick={handleIncrease} aria-label="Increase"
-                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 lg:h-9 lg:w-9">
+                className="flex h-6 w-6 items-center justify-center rounded-full transition-opacity hover:opacity-70 sm:h-7 sm:w-7 lg:h-9 lg:w-9">
                 <Plus className="h-3 w-3 lg:h-5 lg:w-5" strokeWidth={2.5} />
               </button>
             </div>
@@ -738,26 +739,26 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
               disabled={!storeOpen}
               title={!storeOpen ? (closedMessage ?? 'Store is currently closed') : undefined}
               style={added ? { color: '#ffffff' } : btnStyle}
-              className={`absolute bottom-2 right-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-200 sm:h-11 sm:w-11 lg:bottom-3 lg:right-3 lg:h-14 lg:w-14 ${added ? 'bg-green-600' : !storeOpen ? 'cursor-not-allowed opacity-50' : 'hover:scale-105 active:scale-95'}`}
+              className={`absolute bottom-1.5 right-1.5 z-10 flex h-8 w-8 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-200 sm:bottom-2 sm:right-2 sm:h-10 sm:w-10 lg:bottom-3 lg:right-3 lg:h-14 lg:w-14 ${added ? 'bg-green-600' : !storeOpen ? 'cursor-not-allowed opacity-50' : 'hover:scale-105 active:scale-95'}`}
             >
               {added
                 ? <Check className="h-4 w-4 sm:h-5 sm:w-5 lg:h-7 lg:w-7" strokeWidth={2.5} />
-                : <Plus className="h-[18px] w-[18px] sm:h-5 sm:w-5 lg:h-7 lg:w-7" strokeWidth={2.5} />}
+                : <Plus className="h-4 w-4 sm:h-5 sm:w-5 lg:h-7 lg:w-7" strokeWidth={2.5} />}
             </button>
           )
         )}
       </div>
 
       {/* Text */}
-      <div className="px-1 pb-3 pt-2.5">
-        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-neutral-900">{product.name}</h3>
-        <div className="mt-1 flex items-baseline gap-1.5">
+      <div className="px-0.5 pb-3 pt-2">
+        <h3 className="line-clamp-2 text-[clamp(0.75rem,3vw,0.938rem)] font-bold leading-snug text-neutral-900">{product.name}</h3>
+        <div className="mt-0.5 flex items-baseline gap-1">
           {hasOrig && (
-            <span className="text-xs text-neutral-400 line-through">
+            <span className="text-[clamp(0.625rem,2.5vw,0.75rem)] text-neutral-400 line-through">
               Rs.{parseInt(origPriceStr!, 10).toLocaleString()}
             </span>
           )}
-          <span className="text-sm font-extrabold text-neutral-900">
+          <span className="text-[clamp(0.75rem,3vw,0.938rem)] font-extrabold text-neutral-900">
             Rs. {priceNum.toLocaleString()}
           </span>
         </div>

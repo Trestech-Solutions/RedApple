@@ -3,15 +3,16 @@
 /**
  * useRecentOrders
  *
- * Manages a list of recently placed order IDs stored in a browser cookie
- * (`recent_order_ids`, comma-separated, max 5, 30-day TTL) and fetches the
- * latest status for each from the storefront orders API.
+ * Manages a list of recently placed order references stored in a browser cookie
+ * (`recent_order_ids`, comma-separated `unique_order_number` values, max 5,
+ * 30-day TTL) and fetches the latest status for each from the storefront
+ * orders API (which also keys off `unique_order_number`).
  *
  * Usage:
- *   const { orders, isLoading, addOrderId } = useRecentOrders()
+ *   const { orders, isLoading, addOrderRef } = useRecentOrders()
  *
  *   // after a successful checkout:
- *   addOrderId(res.id)
+ *   addOrderRef(res.unique_order_number ?? String(res.id))
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -25,7 +26,12 @@ const COOKIE_KEY  = 'recent_order_ids'
 const MAX_ORDERS  = 5
 const TTL_DAYS    = 30
 
-function readOrderIdsCookie(): number[] {
+/**
+ * Cookie stores `unique_order_number` (10-char uppercase string) values.
+ * Old cookies with numeric pk IDs are tolerated but we keep them as strings
+ * so the API gets what's stored — only matching orders will resolve.
+ */
+function readOrderRefsCookie(): string[] {
   if (typeof document === 'undefined') return []
   const match = document.cookie
     .split('; ')
@@ -36,29 +42,33 @@ function readOrderIdsCookie(): number[] {
     .slice(1)
     .join('=')
     .split(',')
-    .map((s) => parseInt(s.trim(), 10))
-    .filter((n) => Number.isFinite(n) && n > 0)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
 }
 
-function writeOrderIdsCookie(ids: number[]): void {
+function writeOrderRefsCookie(refs: string[]): void {
   if (typeof document === 'undefined') return
-  const unique = Array.from(new Set(ids)).slice(0, MAX_ORDERS)
+  const unique = Array.from(new Set(refs)).slice(0, MAX_ORDERS)
   const expires = new Date(Date.now() + TTL_DAYS * 24 * 60 * 60 * 1000).toUTCString()
   document.cookie = `${COOKIE_KEY}=${unique.join(',')}; path=/; expires=${expires}; SameSite=Lax`
 }
 
 // ─── Public helpers (for use outside the hook, e.g. in onSuccess) ─────────────
 
-/** Prepend an order ID to the cookie (call right after a successful checkout). */
-export function appendOrderIdToCookie(id: number): void {
-  const existing = readOrderIdsCookie()
-  // Most recent first
-  writeOrderIdsCookie([id, ...existing.filter((x) => x !== id)])
+/** Prepend an order ref (unique_order_number preferred, stringified pk as fallback) to the cookie. */
+export function appendOrderIdToCookie(orderRef: string | number): void {
+  const ref = String(orderRef).trim()
+  if (!ref) return
+  const existing = readOrderRefsCookie()
+  writeOrderRefsCookie([ref, ...existing.filter((x) => x !== ref)])
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export interface RecentOrderEntry {
+  /** Primary identifier for lookups — unique_order_number (or numeric id for legacy cookies) */
+  ref: string
+  /** Numeric pk id — kept for profile/links that still use pk param naming */
   id: number
   order_number: string | null
   unique_order_number: string | null
@@ -69,31 +79,29 @@ export interface RecentOrderEntry {
 }
 
 interface UseRecentOrdersResult {
-  /** Orders fetched from the API, most recent first. Empty while loading or if no IDs stored. */
+  /** Orders fetched from the API, most recent first. Empty while loading or if no refs stored. */
   orders: RecentOrderEntry[]
   /** True while any order fetch is still in-flight. */
   isLoading: boolean
-  /** IDs currently stored in the cookie (even before API responses arrive). */
-  orderIds: number[]
-  /** Prepend a new order ID to the cookie and immediately refresh the list. */
-  addOrderId: (id: number) => void
-  /** Remove an order ID from the browser's recent-orders cookie. */
-  removeOrderId: (id: number) => void
-  /** Clear all order IDs from the browser's recent-orders cookie. */
+  /** Refs currently stored in the cookie (even before API responses arrive). */
+  orderIds: string[]
+  /** Prepend a new order ref to the cookie and immediately refresh the list. */
+  addOrderId: (orderRef: string | number) => void
+  /** Remove an order ref from the browser's recent-orders cookie. */
+  removeOrderId: (orderRef: string | number) => void
+  /** Clear all order refs from the browser's recent-orders cookie. */
   clearOrderIds: () => void
 }
 
 export function useRecentOrders(): UseRecentOrdersResult {
-  const [orderIds, setOrderIds] = useState<number[]>([])
+  const [orderIds, setOrderIds] = useState<string[]>([])
   const [orders,   setOrders]   = useState<RecentOrderEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  // Read cookie on mount (client-only)
   useEffect(() => {
-    setOrderIds(readOrderIdsCookie())
+    setOrderIds(readOrderRefsCookie())
   }, [])
 
-  // Whenever orderIds changes, fetch status for all of them
   useEffect(() => {
     if (orderIds.length === 0) {
       setOrders([])
@@ -105,9 +113,9 @@ export function useRecentOrders(): UseRecentOrdersResult {
     setIsLoading(true)
 
     Promise.allSettled(
-      orderIds.map((id) =>
+      orderIds.map((ref) =>
         api
-          .get<Order>(API_ENDPOINTS.StorefrontOrders.detail(id))
+          .get<Order>(API_ENDPOINTS.StorefrontOrders.detail(ref))
           .then((r) => r.data)
       )
     ).then((results) => {
@@ -117,6 +125,7 @@ export function useRecentOrders(): UseRecentOrdersResult {
           if (r.status === 'fulfilled') {
             const o = r.value
             return {
+              ref:                  o.unique_order_number ?? orderIds[i]!,
               id:                   o.id,
               order_number:         o.order_number ?? null,
               unique_order_number:  o.unique_order_number ?? null,
@@ -126,9 +135,9 @@ export function useRecentOrders(): UseRecentOrdersResult {
               created_at:           o.created_at,
             }
           }
-          // API returned an error for this ID — keep a stub so it still shows
           return {
-            id:                  orderIds[i]!,
+            ref:                 orderIds[i]!,
+            id:                  Number.isFinite(Number(orderIds[i])) ? Number(orderIds[i]) : 0,
             order_number:        null,
             unique_order_number: null,
             status:              'unknown',
@@ -137,8 +146,7 @@ export function useRecentOrders(): UseRecentOrdersResult {
             created_at:          '',
           }
         })
-        // Keep the same order as orderIds (most recent first)
-        .sort((a, b) => orderIds.indexOf(a.id) - orderIds.indexOf(b.id))
+        .sort((a, b) => orderIds.indexOf(a.ref) - orderIds.indexOf(b.ref))
       setOrders(fetched)
       setIsLoading(false)
     })
@@ -146,19 +154,20 @@ export function useRecentOrders(): UseRecentOrdersResult {
     return () => { cancelled = true }
   }, [orderIds])
 
-  const addOrderId = useCallback((id: number) => {
-    appendOrderIdToCookie(id)
-    setOrderIds(readOrderIdsCookie())
+  const addOrderId = useCallback((orderRef: string | number) => {
+    appendOrderIdToCookie(orderRef)
+    setOrderIds(readOrderRefsCookie())
   }, [])
 
-  const removeOrderId = useCallback((id: number) => {
-    const remaining = readOrderIdsCookie().filter((orderId) => orderId !== id)
-    writeOrderIdsCookie(remaining)
+  const removeOrderId = useCallback((orderRef: string | number) => {
+    const ref = String(orderRef)
+    const remaining = readOrderRefsCookie().filter((x) => x !== ref)
+    writeOrderRefsCookie(remaining)
     setOrderIds(remaining)
   }, [])
 
   const clearOrderIds = useCallback(() => {
-    writeOrderIdsCookie([])
+    writeOrderRefsCookie([])
     setOrderIds([])
   }, [])
 

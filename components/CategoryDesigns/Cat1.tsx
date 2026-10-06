@@ -3,8 +3,7 @@
 /**
  * Cat1 — Glass tab strip with animated sliding underline + glow
  * Sticky nav, backdrop-blur. Horizontal scroll of pill buttons.
- * Active: secondary bg / primary text. Shine sweep on hover.
- * Staggered catFadeIn CSS animation on load.
+ * Active: secondary bg / primary text. Staggered catFadeIn on load.
  */
 
 import { useStoreSettings } from '@/lib/hooks/useCart'
@@ -32,12 +31,12 @@ export function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProp
                 color: isActive ? 'var(--color-primary)' : 'var(--color-secondary)',
               }}
               className={`group relative flex-shrink-0 snap-start overflow-hidden whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wide transition-all duration-300 ease-out will-change-transform sm:px-5 sm:py-3 sm:text-sm ${
-                isActive ? 'scale-[1.05] shadow-[0_6px_18px_-6px_rgba(0,0,0,0.4)]' : 'opacity-70 hover:scale-[1.03] hover:opacity-100'
+                isActive
+                  ? 'scale-[1.05] shadow-[0_6px_18px_-6px_rgba(0,0,0,0.4)]'
+                  : 'opacity-70 hover:scale-[1.03] hover:opacity-100'
               }`}
             >
-              {/* shine sweep on hover */}
               <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
-              {/* soft glow when active */}
               {isActive && (
                 <span className="pointer-events-none absolute inset-0 -z-10 rounded-xl blur-md opacity-60"
                   style={{ backgroundColor: 'var(--color-secondary)' }} />
@@ -49,7 +48,6 @@ export function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProp
                 </span>
               )}
               <span className="relative z-10">{cat.label}</span>
-              {/* animated sliding underline */}
               <span
                 className={`absolute bottom-0.5 left-1/2 h-0.5 -translate-x-1/2 rounded-full transition-all duration-300 ease-out ${
                   isActive ? 'w-6 opacity-100' : 'w-0 opacity-0 group-hover:w-3 group-hover:opacity-60'

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Minus, Plus } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
@@ -40,7 +39,12 @@ export interface ProductData {
     finalPrice: string
     timeWindow?: string | null
     isAvailableNow?: boolean
-    includedItems?: { name: string; qty: number; extraCost?: number; availableAddons?: { id: number; name: string; price: string }[] }[]
+    includedItems?: {
+      name: string
+      qty: number
+      extraCost?: number
+      availableAddons?: { id: number; name: string; price: string }[]
+    }[]
     groups?: {
       id: number
       name: string
@@ -62,7 +66,7 @@ export interface ProductCardProps {
   onOpen?: (product: ProductData) => void
 }
 
-// ─── Shared constants ─────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 export const CARD_SHELL =
   'group relative h-full bg-white ring-1 ring-black/[0.06] transition-[box-shadow,transform,border-color] duration-200 motion-reduce:transition-none'
@@ -73,8 +77,14 @@ export const FOCUS_RING =
 // ─── Chip ─────────────────────────────────────────────────────────────────────
 
 export function Chip({
-  children, className = '', style,
-}: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+  children,
+  className = '',
+  style,
+}: {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+}) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-[0.5em] py-[0.25em] text-[clamp(0.5rem,1.6vw,0.688rem)] font-semibold leading-none shadow-sm ${className}`}
@@ -85,7 +95,7 @@ export function Chip({
   )
 }
 
-// ─── Shared cart logic hook ───────────────────────────────────────────────────
+// ─── useCardLogic ─────────────────────────────────────────────────────────────
 
 export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => void) {
   const { addItem, items, updateQuantity, removeItem } = useCart()
@@ -106,17 +116,18 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
   const displayPriceNum = defaultSize
     ? defaultSize.price
     : product.dealMeta
-    ? (Math.round(parseFloat(product.dealMeta.finalPrice)) || 0)
-    : (parseInt(product.price, 10) || 0)
-  const displayPriceStr  = String(displayPriceNum)
-  const displayOriginal  = defaultSize
-    ? (defaultSize.originalPrice != null ? String(defaultSize.originalPrice) : undefined)
+    ? Math.round(parseFloat(product.dealMeta.finalPrice)) || 0
+    : parseInt(product.price, 10) || 0
+
+  const displayOriginal = defaultSize
+    ? defaultSize.originalPrice != null ? String(defaultSize.originalPrice) : undefined
     : product.originalPrice
-  const displayDiscount  = defaultSize
-    ? (defaultSize.hasDiscountTag ? defaultSize.discountLabel : undefined)
+
+  const displayDiscount = defaultSize
+    ? defaultSize.hasDiscountTag ? defaultSize.discountLabel : undefined
     : product.discount
 
-  const hasPrice    = displayPriceStr !== '' && displayPriceNum > 0
+  const hasPrice    = displayPriceNum > 0
   const isOrderable = hasPrice && (
     product.dealMeta
       ? product.dealMeta.dealId != null
@@ -138,22 +149,23 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
     e.stopPropagation()
     if (!isOrderable) return
     if (!storeOpen) {
-      import('sonner').then(({ toast }) => {
-        toast.error(closedMessage ?? 'Store is currently closed')
-      })
+      import('sonner').then(({ toast }) => toast.error(closedMessage ?? 'Store is currently closed'))
       return
     }
     if (needsSelection) { onOpen?.(product); return }
     addItem({
-      id: product.id, productId: product.productId, name: product.name,
-      price: displayPriceNum, image: product.image,
+      id: product.id,
+      productId: product.productId,
+      name: product.name,
+      price: displayPriceNum,
+      image: product.image,
       originalPrice: (() => {
         const orig = displayOriginal ? parseInt(displayOriginal, 10) : undefined
         return orig != null && !isNaN(orig) && orig > displayPriceNum ? orig : undefined
       })(),
       selectedOption: defaultOption || undefined,
-      variantId: defaultSize ? defaultSize.sizeId : undefined,
-      sizeFk:    defaultSize ? defaultSize.sizeFk  : undefined,
+      variantId: defaultSize?.sizeId,
+      sizeFk:    defaultSize?.sizeFk,
       cartStyle: product.cartStyle || undefined,
     })
     triggerFly(e.currentTarget as HTMLElement, product.image)
@@ -178,9 +190,22 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
   }
 
   return {
-    settings, added, hasSizes, defaultSize, defaultOption, needsSelection,
-    displayPriceNum, displayOriginal, displayDiscount, hasPrice, isOrderable,
-    cartItem, cartQty, handleAdd, handleIncrease, handleDecrease,
+    settings,
+    added,
+    hasSizes,
+    defaultSize,
+    defaultOption,
+    needsSelection,
+    displayPriceNum,
+    displayOriginal,
+    displayDiscount,
+    hasPrice,
+    isOrderable,
+    cartItem,
+    cartQty,
+    handleAdd,
+    handleIncrease,
+    handleDecrease,
     storeClosed: !storeOpen,
     closedMessage,
   }

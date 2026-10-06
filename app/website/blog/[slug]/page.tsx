@@ -275,7 +275,7 @@ export default function BlogDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-white/20 px-4 py-4 text-xs text-white/80 md:px-8">
+        <div className="flex items-center mb-20 justify-between border-t border-white/20 px-4 py-4 text-xs text-white/80 md:px-8">
           <button aria-label="Search" className="rounded-full bg-white/10 p-2"><Search size={16} /></button>
           <p className="text-center">
             Powered by Trestech &nbsp;|&nbsp;

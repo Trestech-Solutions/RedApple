@@ -235,7 +235,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       dispatch(reduxAddItem({ ...item, quantity: requestedQty, cartItemId: null }))
       toast.success('Item added to cart')
-      dispatch(reduxOpenCart())
     },
     [dispatch, numericBranchValid]
   )
@@ -354,6 +353,12 @@ export interface StoreSettingsDerived extends StoreSettings {
   cashTaxRate: number
   /** Tax rate for card/online orders as a multiplier (e.g. 0.18 for 18%). 0 = no card tax. */
   cardTaxRate: number
+  /** Master toggle — enables online payment option + online tax application at checkout. */
+  onlineTaxEnabled: boolean
+  /** Tax rate multiplier for Online / Bank Transfer orders. Applied only when onlineTaxEnabled=true. */
+  onlineTaxRate: number
+  /** Bank details raw text shown when Online Payment is chosen (admin-entered, may contain newlines). */
+  bankDetails: string
   /** delivery_time parsed as number (minutes) — global/legacy */
   deliveryTimeMinutes: number | null
   /** pickup_time parsed as number (minutes) — global/legacy */
@@ -436,6 +441,13 @@ function deriveSettings(raw: StoreSettings | undefined): StoreSettingsDerived {
       const n = toNumber(r.card_tax, NaN)
       return Number.isFinite(n) && n > 0 ? n / 100 : 0
     })(),
+    onlineTaxEnabled: r.online_tax_status === true,
+    onlineTaxRate: (() => {
+      if (r.online_tax_status !== true) return 0
+      const n = toNumber(r.online_tax, NaN)
+      return Number.isFinite(n) && n > 0 ? n / 100 : 0
+    })(),
+    bankDetails: typeof r.bank_details === 'string' ? r.bank_details : '',
     deliveryTimeMinutes: toPositiveNumberOrNull(r.delivery_time),
     pickupTimeMinutes:   toPositiveNumberOrNull(r.pickup_time),
     dineinTimeMinutes:   toPositiveNumberOrNull(r.dinein_time),

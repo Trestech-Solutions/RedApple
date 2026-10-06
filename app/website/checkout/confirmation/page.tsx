@@ -586,7 +586,7 @@ export default function OrderConfirmationPage() {
 
             {order.status?.toLowerCase() === 'completed' && !order.stars && !feedbackDismissed && (
               <FeedbackForm
-                orderId={order.id}
+                orderId={order.unique_order_number || order.id}
                 customerPhone={order.customer_phone}
                 onContinue={() => setFeedbackDismissed(true)}
               />

@@ -127,6 +127,15 @@ export default function CheckoutPage() {
   // ─── store settings ───────────────────────────────────────────────────────
   const { settings } = useStoreSettings()
 
+  // If admin disabled online payment & form somehow has "online" selected,
+  // fall back to COD to avoid inconsistent state.
+  useEffect(() => {
+    const showOnline = settings.onlineTaxEnabled || (settings.bankDetails?.length ?? 0) > 0
+    if (!showOnline && getValues('payment') === 'online') {
+      setValue('payment', 'cod')
+    }
+  }, [settings.onlineTaxEnabled, settings.bankDetails]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const deliveryFeeRaw = orderType === 'delivery'
     ? (settings.deliveryFee > 0 ? settings.deliveryFee : DEFAULT_DELIVERY_FEE)
     : 0
@@ -141,8 +150,11 @@ export default function CheckoutPage() {
   const convenience  = settings.convenienceFee
 
   const isCash    = formValues.payment === 'cod'
+  const isOnline  = formValues.payment === 'online'
   const taxRate   = (() => {
     if (isCash  && settings.cashTaxRate > 0) return settings.cashTaxRate
+    if (isOnline && settings.onlineTaxEnabled && settings.onlineTaxRate > 0) return settings.onlineTaxRate
+    if (isOnline && settings.cardTaxRate > 0) return settings.cardTaxRate
     if (!isCash && settings.cardTaxRate > 0) return settings.cardTaxRate
     return settings.taxPercentageRate
   })()
@@ -226,11 +238,10 @@ export default function CheckoutPage() {
   // ─── checkout ──────────────────────────────────────────────────────────────
   const checkoutMutation = useCheckout({
     onSuccess(res) {
-      appendOrderIdToCookie(res.id)
+      const orderRef = res.unique_order_number ?? String(res.id)
+      appendOrderIdToCookie(orderRef)
       clearCart()
-      // Prefer unique_order_number for the URL (human-readable, safe for sharing)
-      const orderRef = res.unique_order_number ?? res.id
-      router.push(`/website/checkout/confirmation?id=${orderRef}`)
+      router.push(`/website/checkout/confirmation?id=${encodeURIComponent(orderRef)}`)
     },
     onError(msg) { setErrorMsg(msg || 'Failed to place order') },
   })
@@ -533,7 +544,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <PaymentSection control={control} register={register} orderType={orderType} />
+                <PaymentSection control={control} register={register} orderType={orderType} settings={settings} />
               </div>
             ) : (
               /* ── LOGGED-IN FORM ── */
@@ -614,7 +625,7 @@ export default function CheckoutPage() {
                   <input {...register('instructions')} placeholder="Any special instructions…" className={inputClass} />
                 </div>
 
-                <PaymentSection control={control} register={register} orderType={orderType} />
+                <PaymentSection control={control} register={register} orderType={orderType} settings={settings} />
               </div>
             )}
           </div>

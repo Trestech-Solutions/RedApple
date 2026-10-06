@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 import { useGetMenu } from '@/api/client/browse'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
+import { useGetPages } from '@/api/client/content'
 
 const MEDIA_BASE = process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? ''
 const FALLBACK_LOGO = '/web/logo.webp'
@@ -92,6 +93,7 @@ export function WebsiteFooter() {
   const { settings } = useStoreSettings()
   const { branchId, areaId } = useStoreLocation()
   const { data: menuData } = useGetMenu({ branchId, areaId })
+  const { data: footerPages = [] } = useGetPages({ showInFooter: true })
 
   const footer = menuData?.footer
   const branchContact = menuData?.footer_branch_contact
@@ -117,6 +119,8 @@ export function WebsiteFooter() {
 
   const social = mergeSocial(footer?.social_links, menuData?.social_media_links as any)
   const activeSocial = SOCIAL_NAMES.filter((n) => social[n]?.trim())
+
+  const hasFooterPages = footerPages.length > 0
 
   return (
     <footer className="border-t border-neutral-200 bg-[var(--color-tertiary)]">
@@ -207,6 +211,22 @@ export function WebsiteFooter() {
             </div>
           )}
 
+          {/* Dynamic pages (show_in_footer=true) */}
+          {hasFooterPages && (
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Information</h4>
+              <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+                {footerPages.map((p) => (
+                  <li key={p.id}>
+                    <Link href={`/website/${p.slug}`} className="hover:text-[var(--color-primary)]">
+                      {p.title || p.slug}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Link groups */}
           {linkGroups.map((group) => (
             <div key={group.heading}>
@@ -244,7 +264,7 @@ export function WebsiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-neutral-200 pt-6 text-xs text-neutral-500 sm:flex-row sm:text-sm">
+        <div className="mb-10 flex flex-col items-center justify-between gap-2 border-t border-neutral-200 pt-6 text-xs text-neutral-500 sm:flex-row sm:text-sm">
           <span>© {new Date().getFullYear()} {restaurantName}. All Rights Reserved</span>
           <span>
             Powered by{' '}

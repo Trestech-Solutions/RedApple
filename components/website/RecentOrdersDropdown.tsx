@@ -117,10 +117,12 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
 
 
           <ul className="max-h-80 divide-y divide-neutral-100 overflow-y-auto">
-            {orders.map((order) => (
-              <li key={order.id} className="flex items-center">
+            {orders.map((order) => {
+              const orderRef = order.unique_order_number ?? order.ref
+              return (
+              <li key={order.ref} className="flex items-center">
                 <Link
-                  href={`/website/checkout/confirmation?id=${order.id}`}
+                  href={`/website/checkout/confirmation?id=${encodeURIComponent(orderRef)}`}
                   onClick={() => setOpen(false)}
                   className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-neutral-50"
                 >
@@ -148,19 +150,20 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
                 </Link>
                 <button
                   type="button"
-                  onClick={() => removeOrderId(order.id)}
-                  aria-label={`Remove order ${order.order_number ?? order.unique_order_number ?? order.id} from recent orders`}
+                  onClick={() => removeOrderId(order.ref)}
+                  aria-label={`Remove order ${order.order_number ?? order.unique_order_number ?? order.ref} from recent orders`}
                   className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   <X size={13} />
                 </button>
               </li>
-            ))}
+              )
+            })}
 
             {/* Skeleton rows while loading (before first fetch resolves) */}
             {isLoading && orders.length === 0 &&
-              orderIds.map((id) => (
-                <li key={id} className="flex items-center justify-between gap-3 px-4 py-3">
+              orderIds.map((ref) => (
+                <li key={ref} className="flex items-center justify-between gap-3 px-4 py-3">
                   <div className="space-y-1.5">
                     <div className="h-3.5 w-24 animate-pulse rounded bg-neutral-100" />
                     <div className="h-2.5 w-16 animate-pulse rounded bg-neutral-100" />

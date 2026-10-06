@@ -44,6 +44,8 @@ const API_ENDPOINTS = {
   StorefrontContent: {
     aboutUs: '/storefront/about-us/',   // ?restaurant=<id>
     faqs:    '/storefront/faqs/',       // ?restaurant=<id>
+    pages:   '/storefront/pages/',      // ?restaurant=<id>[&menu=1][&footer=1]
+    pageDetail: (slug: string) => `/storefront/pages/${slug}/`,  // ?restaurant=<id>
   },
 } as const;
 
