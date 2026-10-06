@@ -1,26 +1,26 @@
 {
     "branch": {
-        "id": 1,
-        "branch_name": "DHA Branch",
+        "id": 33,
+        "branch_name": "Bihar Colony",
         "status": true,
-        "location": "DHA Phase 6, Karachi",
-        "address": "DHA Phase 6, Karachi Near Mohiuddin",
-        "map_location": "24.929018756728233,67.11300881345903",
+        "location": "",
+        "address": "",
+        "map_location": "",
         "is_default": false,
         "pickup_status": true,
         "delivery_status": true
     },
     "area": {
-        "id": 11,
-        "name": "Bahadurabaddd",
+        "id": 53,
+        "name": "Bihar block3",
         "status": true,
-        "branch_id": 1,
+        "branch_id": 33,
         "delivery_charge": "0.00"
     },
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
-        "date_updated": "2026-10-05T12:56:47.515169Z",
+        "date_updated": "2026-10-06T14:52:08.403389Z",
         "merchant_logo": "/media/settings/merchant_logo/ll.webp",
         "menu_header": "default",
         "phone_icon_type": "call",
@@ -38,9 +38,9 @@
         "order_modal_design": "modal-3",
         "card_tax": "8.00",
         "cash_tax": "15.00",
-        "online_tax": "0.00",
-        "online_tax_status": false,
-        "bank_details": null,
+        "online_tax": "5.00",
+        "online_tax_status": true,
+        "bank_details": "BankName: HBL\nETC ETC",
         "slide_image_1": null,
         "heading_text_1": "Weekend Special",
         "heading_color_1": "#FFFFFF",
@@ -150,36 +150,36 @@
         "restaurant": 1
     },
     "branch_settings": {
-        "id": 1,
-        "date_added": "2026-08-11T10:58:01.438900Z",
-        "date_updated": "2026-09-02T23:03:23.276362Z",
+        "id": 9,
+        "date_added": "2026-10-06T16:57:45.873802Z",
+        "date_updated": "2026-10-06T16:57:45.873828Z",
         "enable_city_on_checkout": false,
         "enable_save_my_info": false,
-        "checkout_note": "Enjoy your meal buddy",
-        "days_forward_for_always_preorder": 51,
-        "message_for_always_preorder": "Enjoy your meal buddy",
-        "time_slot_difference_minutes": 22,
-        "delivery_delivery_time": "120",
-        "delivery_pickup_time": "120",
-        "delivery_dinein_time": "136",
+        "checkout_note": "",
+        "days_forward_for_always_preorder": null,
+        "message_for_always_preorder": "",
+        "time_slot_difference_minutes": null,
+        "delivery_delivery_time": "",
+        "delivery_pickup_time": "",
+        "delivery_dinein_time": "",
         "delivery_minimum_order": null,
-        "delivery_message_for_delivery": "Enjoy your meal buddy",
-        "delivery_message_for_pickup": "Enjoy your meal buddy",
-        "delivery_message_for_dinein": "Enjoy your meal buddy",
-        "delivery_message_instruction": "Enjoy your meal buddy",
-        "preorder_delivery_time": "20",
-        "preorder_pickup_time": "20",
-        "preorder_dinein_time": "20",
-        "preorder_minimum_order": "20.00",
-        "preorder_message_for_delivery": "Delivery P MSG NOTHING",
-        "preorder_message_for_pickup": "PICKUP MSG NOTHING",
-        "preorder_message_for_dinein": "dIININ MSG NOTHING",
-        "preorder_message_instruction": "ENJOY YOUR MEAL",
+        "delivery_message_for_delivery": "",
+        "delivery_message_for_pickup": "",
+        "delivery_message_for_dinein": "",
+        "delivery_message_instruction": "",
+        "preorder_delivery_time": "",
+        "preorder_pickup_time": "",
+        "preorder_dinein_time": "",
+        "preorder_minimum_order": null,
+        "preorder_message_for_delivery": "",
+        "preorder_message_for_pickup": "",
+        "preorder_message_for_dinein": "",
+        "preorder_message_instruction": "",
         "apply_offer_discount_as_on_web_ordering": false,
         "apply_item_wise_discount_as_on_web_ordering": false,
         "created_by": null,
         "updated_by": null,
-        "branch": 1,
+        "branch": 33,
         "excluded_categories": [],
         "excluded_items": []
     },
@@ -489,20 +489,7 @@
             ]
         }
     ],
-    "banners": [
-        {
-            "id": 17,
-            "title": "Weekan",
-            "url": "",
-            "banner_image": "/media/banners/33.jpeg",
-            "status": true,
-            "valid_from_date": null,
-            "valid_to_date": null,
-            "start_time": null,
-            "end_time": null,
-            "is_available_now": true
-        }
-    ],
+    "banners": [],
     "popup_banners": [
         {
             "id": 1,
@@ -522,37 +509,7 @@
             "is_available_now": false
         }
     ],
-    "offers": [
-        {
-            "id": 3,
-            "restaurant": 1,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "banner_image": null,
-            "show_percentage_text": true,
-            "amount": "25.00",
-            "discount_type": "percentage",
-            "included_categories": [],
-            "included_categories_detail": [],
-            "orders_over": "300.00",
-            "discount_text": "Flat",
-            "discount_message": "",
-            "valid_from_date": null,
-            "valid_to_date": null,
-            "start_time": null,
-            "end_time": null,
-            "days": [
-                "mon",
-                "tue"
-            ],
-            "status": true,
-            "created_by": null,
-            "updated_by": null,
-            "date_added": "2026-09-10T20:16:08.968000Z",
-            "date_updated": "2026-09-21T12:59:17.766047Z",
-            "is_available_now": true
-        }
-    ],
+    "offers": [],
     "social_media_links": {
         "id": 1,
         "date_added": "2026-09-05T17:29:42.687647Z",
@@ -570,92 +527,7 @@
         "updated_by": null,
         "restaurant": 1
     },
-    "branch_business_hours": [
-        {
-            "id": 5,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "fri",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 1,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "mon",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 6,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "sat",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 7,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "sun",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 4,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "thu",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:50:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 2,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "tue",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 3,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "wed",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:50:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        }
-    ],
+    "branch_business_hours": [],
     "holidays": [
         {
             "id": 2,
@@ -739,14 +611,7 @@
         "date_added": "2026-09-25T09:19:08.663224Z",
         "date_updated": "2026-10-05T13:13:13.387942Z"
     },
-    "footer_contact": {
-        "id": 1,
-        "branch": 1,
-        "branch_name": "DHA Branch",
-        "phone": "+92 71 1234567",
-        "email": "sukkur@redapple.com",
-        "date_updated": "2026-09-25T09:22:28.100461Z"
-    },
+    "footer_contact": null,
     "fixed_deals": [
         {
             "id": 2,
@@ -1085,13 +950,6 @@
                     "branch_name": "DHA Branch",
                     "price": "10.00",
                     "status": true
-                },
-                {
-                    "id": 3,
-                    "branch": 4,
-                    "branch_name": "gulshan branch",
-                    "price": "30.00",
-                    "status": true
                 }
             ],
             "valid_from_date": "2026-08-01",
@@ -1101,7 +959,7 @@
             "updated_by": null,
             "date_added": "2026-08-28T11:24:33.682892Z",
             "date_updated": "2026-09-14T12:56:22.609180Z",
-            "price_at_branch": "10.00"
+            "price_at_branch": "298.00"
         }
     ],
     "on_spot_deals": [
@@ -1422,13 +1280,6 @@
                                 "branch": 1,
                                 "branch_name": "DHA Branch",
                                 "price": "10.00",
-                                "status": true
-                            },
-                            {
-                                "id": 3,
-                                "branch": 4,
-                                "branch_name": "gulshan branch",
-                                "price": "30.00",
                                 "status": true
                             }
                         ],
@@ -2034,13 +1885,6 @@
                     "branch_name": "DHA Branch",
                     "price": "10.00",
                     "status": true
-                },
-                {
-                    "id": 3,
-                    "branch": 4,
-                    "branch_name": "gulshan branch",
-                    "price": "30.00",
-                    "status": true
                 }
             ],
             "valid_from_date": null,
@@ -2052,7 +1896,7 @@
             "updated_by": null,
             "date_added": "2026-08-30T21:41:17.645951Z",
             "date_updated": "2026-09-14T13:35:51.384810Z",
-            "price_at_branch": "10.00",
+            "price_at_branch": "352.0000",
             "is_available_now": true
         },
         {
@@ -2524,13 +2368,6 @@
                     "branch_name": "DHA Branch",
                     "price": "10.00",
                     "status": true
-                },
-                {
-                    "id": 3,
-                    "branch": 4,
-                    "branch_name": "gulshan branch",
-                    "price": "30.00",
-                    "status": true
                 }
             ],
             "size_prices": [],
@@ -2539,7 +2376,7 @@
             "date_added": "2026-08-21T11:38:27.950460Z",
             "date_updated": "2026-09-18T15:33:04.265436Z",
             "is_available_now": false,
-            "price_at_branch": "10.00"
+            "price_at_branch": "6.49"
         },
         {
             "id": 8,
@@ -4344,13 +4181,6 @@
                             "branch_name": "DHA Branch",
                             "price": "10.00",
                             "status": true
-                        },
-                        {
-                            "id": 3,
-                            "branch": 4,
-                            "branch_name": "gulshan branch",
-                            "price": "30.00",
-                            "status": true
                         }
                     ],
                     "size_prices": [],
@@ -4359,7 +4189,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 8,
@@ -4887,13 +4717,6 @@
                             "branch_name": "DHA Branch",
                             "price": "10.00",
                             "status": true
-                        },
-                        {
-                            "id": 3,
-                            "branch": 4,
-                            "branch_name": "gulshan branch",
-                            "price": "30.00",
-                            "status": true
                         }
                     ],
                     "size_prices": [],
@@ -4902,7 +4725,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 13,
@@ -5311,13 +5134,6 @@
                             "branch_name": "DHA Branch",
                             "price": "10.00",
                             "status": true
-                        },
-                        {
-                            "id": 3,
-                            "branch": 4,
-                            "branch_name": "gulshan branch",
-                            "price": "30.00",
-                            "status": true
                         }
                     ],
                     "size_prices": [],
@@ -5326,7 +5142,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-09-18T15:33:04.265436Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 12,

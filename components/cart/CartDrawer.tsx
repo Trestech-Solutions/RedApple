@@ -149,10 +149,10 @@ export function CartDrawer() {
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Tax = subtotal × (tax_number / 100). Delivery fee tax mein include nahi hoti.
-  // taxPercent sirf display ke liye (0.15 * 100 = 15.000000000000002 se bachne ke liye toFixed(2)).
-  const tax        = Math.round(subtotal * settings.taxPercentageRate)
-  const taxPercent = parseFloat((settings.taxPercentageRate * 100).toFixed(2))
+  // Tax = subtotal × cash_tax rate. Falls back to taxPercentageRate if cashTaxRate is 0.
+  const effectiveTaxRate = settings.cashTaxRate > 0 ? settings.cashTaxRate : settings.taxPercentageRate
+  const tax        = Math.round(subtotal * effectiveTaxRate)
+  const taxPercent = parseFloat((effectiveTaxRate * 100).toFixed(2))
 
   // Delivery fee from settings, fallback to DEFAULT_DELIVERY_FEE
   const deliveryFeeRaw = orderType === 'delivery'
