@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   X,
   LogIn,
@@ -35,6 +36,7 @@ const ORIGIN = 'calc(100% - 30px) 30px'
 const EASE = 'cubic-bezier(0.7, 0, 0.2, 1)'
 
 export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
+  const router = useRouter()
   const { user } = useCart()
   const { settings } = useStoreSettings()
   const showLogin = settings.enable_user_login !== false
@@ -54,7 +56,11 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
 
   const handleAuthClick = () => {
     onClose()
-    onLoginClick()
+    if (user) {
+      router.push('/website/profile')
+    } else {
+      onLoginClick()
+    }
   }
 
   // Stagger children in when opening, drop instantly when closing

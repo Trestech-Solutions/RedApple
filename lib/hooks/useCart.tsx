@@ -5,6 +5,8 @@ import {
   useContext,
   useCallback,
   useMemo,
+  useState,
+  useEffect,
   ReactNode,
 } from 'react'
 import { toast } from 'sonner'
@@ -39,7 +41,6 @@ import {
 import { useGetSettings, useGetMenu } from '@/api/client/browse'
 import type { StoreSettings } from '@/api/types'
 import { useStoreLocation } from './useStoreLocation'
-import { useEffect } from 'react'
 
 export type { CartItem, AuthUser, OrderType }
 
@@ -119,6 +120,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const areaId           = useAppSelector((s) => s.order.areaId)
   const locationModalOpen = useAppSelector((s) => s.order.locationModalOpen)
 
+  const CUSTOMER_KEYS = {
+    token:     'trestech_customer_token',
+    refresh:   'trestech_customer_refresh_token',
+    user:      'trestech_customer_user',
+    addresses: 'trestech_customer_addresses',
+  } as const
+
+  // ─── Local addresses ────────────────────────────────────────────────────────
+  const [localAddresses, setLocalAddresses] = useState<SavedAddress[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const raw = localStorage.getItem(CUSTOMER_KEYS.addresses)
+      if (!raw) return []
+      const parsed = JSON.parse(raw) as any[]
+      return parsed
+        .filter(a => a && a.id && a.line1)
+        .map(a => ({
+          id:    String(a.id),
+          line1: String(a.line1),
+          city:  String(a.city ?? ''),
+        }))
+    } catch {
+      return []
+    }
+  })
+
+  const persistLocalAddresses = (list: SavedAddress[]) => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(CUSTOMER_KEYS.addresses, JSON.stringify(list))
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const addAddress = useCallback((a: Omit<SavedAddress, 'id'>) => {
+    const newAddr: SavedAddress = {
+      id:    'local-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+      line1: a.line1,
+      city:  a.city ?? '',
+    }
+    setLocalAddresses((prev: SavedAddress[]) => {
+      const next = [newAddr, ...prev]
+      persistLocalAddresses(next)
+      return next
+    })
+  }, [])
+
+  const removeAddress = useCallback((id: string) => {
+    setLocalAddresses((prev: SavedAddress[]) => {
+      const next = prev.filter((a: SavedAddress) => a.id !== id)
+      persistLocalAddresses(next)
+      return next
+    })
+  }, [])
+
   // ─── Auth hydration: sync localStorage customer session into Redux ──────────
   // On first load (after SSR hydration), if redux auth.user is null but
   // trestech_customer_user exists in localStorage, we hydrate Redux so that:
@@ -128,54 +186,83 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // the Redux state (from an older save) has empty tokens.
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const savedToken = localStorage.getItem('trestech_customer_token')
-    const savedRefresh = localStorage.getItem('trestech_customer_refresh_token')
-    const savedUserRaw = localStorage.getItem('trestech_customer_user')
+    const savedToken   = localStorage.getItem(CUSTOMER_KEYS.token)
+    const savedRefresh = localStorage.getItem(CUSTOMER_KEYS.refresh)
+    const savedUserRaw = localStorage.getItem(CUSTOMER_KEYS.user)
 
     let savedUser: AuthUser | null = null
     if (savedUserRaw) {
       try {
         const parsed = JSON.parse(savedUserRaw) as any
+        const fullName =
+          parsed.name ||
+          [parsed.first_name, parsed.last_name].filter(Boolean).join(' ').trim()
         savedUser = {
-          name:   parsed.name ?? '',
+          name:   fullName ?? '',
           phone:  parsed.phone ?? '',
           email:  parsed.email || undefined,
-          gender: parsed.gender as AuthUser['gender'] | undefined,
+          gender: (parsed.gender as AuthUser['gender']) ?? undefined,
         }
       } catch { savedUser = null }
     }
 
-    // Hydrate tokens into Redux if missing
+    // 1) localStorage → Redux
     if (savedToken && !reduxTokens.access) {
       dispatch(reduxSetTokens({
         accessToken: savedToken,
         refreshToken: savedRefresh ?? '',
       }))
     }
-    // Hydrate user into Redux if missing
     if (savedUser && !user) {
       dispatch(reduxSetUser(savedUser))
     }
-    // If localStorage says logged out but Redux says logged in, clear Redux
-    if (!savedToken && (reduxTokens.access || user)) {
-      dispatch(reduxLogout())
-    }
-  }, [dispatch, reduxTokens.access, user]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const addresses: SavedAddress[] = []
+    // 2) Redux → localStorage (reconcile opposite direction; redux-persist
+    //    stores auth in `restaurant-root` key but other guards read the
+    //    trestech_customer_* keys. Keep them in sync. Never logout here;
+    //    logout only happens via explicit setUser(null).
+    if (reduxTokens.access && !savedToken) {
+      localStorage.setItem(CUSTOMER_KEYS.token,   reduxTokens.access)
+      localStorage.setItem(CUSTOMER_KEYS.refresh, reduxTokens.refresh ?? '')
+    }
+    if (user && !savedUser) {
+      localStorage.setItem(CUSTOMER_KEYS.user, JSON.stringify({
+        name:   user.name,
+        phone:  user.phone,
+        email:  user.email,
+        gender: user.gender,
+      }))
+    }
+  }, [dispatch, reduxTokens.access, reduxTokens.refresh, user]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const addresses: SavedAddress[] = localAddresses
 
   const setUser = useCallback(
     (u: AuthUser | null) => {
       if (u) {
         dispatch(reduxSetUser(u))
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(CUSTOMER_KEYS.user, JSON.stringify({
+              name:   u.name,
+              phone:  u.phone,
+              email:  u.email,
+              gender: u.gender,
+            }))
+          } catch {
+            // ignore
+          }
+        }
       } else {
         // Full customer sign-out: clear localStorage + Redux
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('trestech_customer_token')
-          localStorage.removeItem('trestech_customer_refresh_token')
-          localStorage.removeItem('trestech_customer_user')
+          localStorage.removeItem(CUSTOMER_KEYS.token)
+          localStorage.removeItem(CUSTOMER_KEYS.refresh)
+          localStorage.removeItem(CUSTOMER_KEYS.user)
+          localStorage.removeItem(CUSTOMER_KEYS.addresses)
         }
         dispatch(reduxLogout())
+        setLocalAddresses([])
       }
     },
     [dispatch]
@@ -278,8 +365,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     user,
     setUser,
     addresses,
-    addAddress:  () => {},
-    removeAddress: () => {},
+    addAddress,
+    removeAddress,
     orderType,
     setOrderType,
     location,
