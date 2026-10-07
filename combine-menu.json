@@ -542,7 +542,7 @@
         "meta_title": "Discover Authentic BBQ, Karahi & Matka Biryani in Karachi – Angeethi PK",
         "meta_description": "Experience the ultimate desi experience at Angeethi. Enjoy BBQ, karahi, biryani, rolls, handi and more. Order your favorite desi food in Karachi.",
         "insert_in_header": "<meta name=\"theme-color\" content=\"#ff0000\">",
-        "insert_in_body": "<div id=\"promo-banner\">Sale!</div>",
+        "insert_in_body": "<div id=\"promo-banner\"></div>",
         "insert_in_footer": "",
         "created_by": null,
         "updated_by": 10,

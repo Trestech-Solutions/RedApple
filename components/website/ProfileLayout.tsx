@@ -8,7 +8,7 @@ import {
   MapPin, Phone, Menu, ShoppingCart,
   Search, ArrowUp, MessageCircle,
 } from 'lucide-react'
-import { useCart } from '@/lib/hooks/useCart'
+import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
 import { MenuDrawer } from '@/components/website/MenuDrawer'
@@ -24,6 +24,9 @@ export function ProfileLayout({ children }: { children: React.ReactNode }) {
   const router   = useRouter()
   const pathname = usePathname()
   const { user, totalItems, openCart, location, openLocationModal } = useCart()
+  const { settings } = useStoreSettings()
+  const loginEnabled = settings.enable_user_login !== false
+  const showLogin = loginEnabled
 
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
@@ -43,32 +46,31 @@ export function ProfileLayout({ children }: { children: React.ReactNode }) {
     return !!token
   }
 
-  // Redirect if not logged in — but only after client hydration so we
-  // don't prematurely redirect based on a stale SSR snapshot of Redux state.
-  // Also tolerate the brief window where user/token are still being
-  // hydrated on the client (hasSession returns true from localStorage fallback).
+  // Redirect if:
+  //   1. login feature is disabled in store settings, OR
+  //   2. not logged in (after client hydration + localStorage sync window)
   useEffect(() => {
-    // Wait until the user is defined (or confirmed null after hydration).
-    // Avoid redirect if localStorage still has a token (CartProvider will soon
-    // sync it into Redux and the user check will pass on the next render).
     let cancelled = false
     const check = () => {
       if (cancelled) return
       if (typeof window === 'undefined') return
+      // If feature disabled → bounce to home regardless of stored token
+      if (!loginEnabled) {
+        router.replace('/')
+        return
+      }
       const hasToken = !!localStorage.getItem('trestech_customer_token')
       if (!user && !hasToken) {
         router.replace('/')
       }
     }
-    // Run twice: immediate check + delayed check in case we arrived before
-    // localStorage auth was read.
     check()
     const t = setTimeout(check, 50)
     return () => { cancelled = true; clearTimeout(t) }
-  }, [user, router])
+  }, [user, router, loginEnabled])
 
   // Render nothing until we have a client-side session decision.
-  // If user is null but localStorage has a token, CartProvider will sync it.
+  if (!loginEnabled) return null
   if (!hasSession()) return null
 
   return (
@@ -94,7 +96,7 @@ export function ProfileLayout({ children }: { children: React.ReactNode }) {
         <MessageCircle size={26} fill="white" />
       </a>
 
-      {authModalOpen && (
+      {showLogin && authModalOpen && (
         <AuthModal onClose={() => setAuthModalOpen(false)} onGuestContinue={() => setAuthModalOpen(false)} />
       )}
       {corporateModalOpen && (

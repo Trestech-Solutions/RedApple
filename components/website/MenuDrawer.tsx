@@ -13,7 +13,7 @@ import {
   ChevronRight,
   HelpCircle,
 } from 'lucide-react'
-import { useCart } from '@/lib/hooks/useCart'
+import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 
 const MENU_ITEMS = [
   { label: 'About Us',         href: '/website/about',     icon: Info },
@@ -36,6 +36,8 @@ const EASE = 'cubic-bezier(0.7, 0, 0.2, 1)'
 
 export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
   const { user } = useCart()
+  const { settings } = useStoreSettings()
+  const showLogin = settings.enable_user_login !== false
 
   // Close on Escape + lock page scroll while open
   useEffect(() => {
@@ -167,34 +169,36 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
 
         {/* Footer */}
         <div className="relative mt-auto px-4 pb-6">
-          <button
-            onClick={handleAuthClick}
-            style={enter(MENU_ITEMS.length + 1)}
-            className={enterCls(
-              'group flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left text-[var(--color-primary)] shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
-            )}
-          >
-            <span
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-white"
-              style={{ animation: isOpen ? 'md-pulse-ring 2s ease-out infinite' : 'none' }}
+          {showLogin && (
+            <button
+              onClick={handleAuthClick}
+              style={enter(MENU_ITEMS.length + 1)}
+              className={enterCls(
+                'group flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left text-[var(--color-primary)] shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+              )}
             >
-              {user ? <UserCircle size={20} /> : <LogIn size={18} />}
-            </span>
-            <span className="flex-1">
-              <span className="block text-sm font-bold">
-                {user ? 'My account' : 'Log in'}
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-white"
+                style={{ animation: isOpen ? 'md-pulse-ring 2s ease-out infinite' : 'none' }}
+              >
+                {user ? <UserCircle size={20} /> : <LogIn size={18} />}
               </span>
-              <span className="block text-xs opacity-60">
-                {user ? 'View your profile and orders' : 'Sign in to place your order'}
+              <span className="flex-1">
+                <span className="block text-sm font-bold">
+                  {user ? 'My account' : 'Log in'}
+                </span>
+                <span className="block text-xs opacity-60">
+                  {user ? 'View your profile and orders' : 'Sign in to place your order'}
+                </span>
               </span>
-            </span>
-            <ChevronRight
-              size={18}
-              className="transition-transform duration-300 group-hover:translate-x-1"
-            />
-          </button>
+              <ChevronRight
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </button>
+          )}
 
-          <p className="mt-4 text-center text-xs text-white/60">
+          <p className={enterCls('mt-4 text-center text-xs text-white/60')} style={enter(MENU_ITEMS.length + (showLogin ? 2 : 1))}>
             Powered by <span className="font-bold text-white/80">Trestech</span>
           </p>
         </div>

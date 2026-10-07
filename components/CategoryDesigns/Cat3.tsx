@@ -12,7 +12,7 @@ import { Icon } from '@iconify/react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 import type { CategoryNavProps } from './shared'
 
-const SCROLL_COLLAPSE_THRESHOLD = 900
+const SCROLL_COLLAPSE_THRESHOLD = 600
 
 export function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
   const { settings } = useStoreSettings()

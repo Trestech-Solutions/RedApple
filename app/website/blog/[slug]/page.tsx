@@ -5,10 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import {
-  MapPin, Phone, User, Menu, ShoppingCart,
+  MapPin, Phone, Menu, ShoppingCart,
   Search, ArrowUp, MessageCircle, Clock, ChevronLeft, ChevronRight, Calendar,
 } from 'lucide-react'
-import { useCart } from '@/lib/hooks/useCart'
+import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
 import { MenuDrawer } from '@/components/website/MenuDrawer'
@@ -19,6 +19,8 @@ export default function BlogDetailPage() {
   const pathname = usePathname()
   const router = useRouter()
   const { totalItems, openCart, location, openLocationModal } = useCart()
+  const { settings } = useStoreSettings()
+  const showLogin = settings.enable_user_login !== false
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
@@ -89,8 +91,12 @@ export default function BlogDetailPage() {
           <div className="flex-1" />
 
           <div className="hidden items-center gap-4 text-sm md:flex">
-            <UserDropdown onLoginClick={() => setAuthModalOpen(true)} />
-            <span className="text-white/50">|</span>
+            {showLogin && (
+              <>
+                <UserDropdown onLoginClick={() => setAuthModalOpen(true)} />
+                <span className="text-white/50">|</span>
+              </>
+            )}
             <button
               onClick={() => setCorporateModalOpen(true)}
               className="rounded bg-[#ffffff] px-3 py-1.5 text-xs font-semibold text-neutral-900"
@@ -298,7 +304,7 @@ export default function BlogDetailPage() {
         <MessageCircle size={26} fill="white" />
       </a>
 
-      {authModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} onGuestContinue={() => setAuthModalOpen(false)} />}
+      {showLogin && authModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} onGuestContinue={() => setAuthModalOpen(false)} />}
       {corporateModalOpen && <CorporateOrderModal onClose={() => setCorporateModalOpen(false)} />}
       <MenuDrawer
         isOpen={menuOpen}

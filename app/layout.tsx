@@ -5,7 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/hooks/useAuth";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { Toaster } from "sonner";
-import { AlertTriangle, Check, CheckCircle2, Info, Loader2, X, XCircle } from "lucide-react";
+import { AlertTriangle, Check, Info, Loader2, X } from "lucide-react";
 
 // ─── SEO from API ─────────────────────────────────────────────────────────────
 
@@ -70,6 +70,100 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+// ─── Safe Arbitrary HTML Injector ────────────────────────────────────────────
+
+type ParsedHtml = {
+  scripts: (
+    | { kind: 'inline'; code: string }
+    | { kind: 'external'; src: string; async?: boolean; defer?: boolean }
+  )[]
+  otherHtml: string
+}
+
+function parseArbitraryHtml(raw: string): ParsedHtml {
+  const scripts: ParsedHtml['scripts'] = []
+  let otherHtml = raw
+
+  const scriptRegex = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi
+
+  let match: RegExpExecArray | null
+  while ((match = scriptRegex.exec(raw)) !== null) {
+    const fullTag = match[0]
+    const attrs = match[1] ?? ''
+    const inner = match[2] ?? ''
+
+    const srcMatch = attrs.match(/\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/i)
+    const asyncMatch = /\basync\b/i.test(attrs)
+    const deferMatch = /\bdefer\b/i.test(attrs)
+
+    if (srcMatch) {
+      scripts.push({
+        kind: 'external',
+        src: srcMatch[1] ?? srcMatch[2] ?? srcMatch[3] ?? '',
+        async: asyncMatch,
+        defer: deferMatch,
+      })
+    } else {
+      const code = inner.trim()
+      if (code) {
+        scripts.push({ kind: 'inline', code })
+      }
+    }
+
+    otherHtml = otherHtml.replace(fullTag, '')
+  }
+
+  return { scripts, otherHtml: otherHtml.trim() }
+}
+
+function SafeHtmlInject({
+  id,
+  html,
+  strategy = 'afterInteractive',
+}: {
+  id: string
+  html: string
+  strategy?: 'afterInteractive' | 'lazyOnload' | 'beforeInteractive' | 'worker'
+}) {
+  if (!html?.trim()) return null
+  const { scripts, otherHtml } = parseArbitraryHtml(html)
+
+  return (
+    <>
+      {otherHtml && (
+        <div
+          suppressHydrationWarning
+          aria-hidden
+          style={{ display: 'contents' }}
+          dangerouslySetInnerHTML={{ __html: otherHtml }}
+        />
+      )}
+      {scripts.map((s, i) => {
+        if (s.kind === 'external') {
+          return (
+            <Script
+              key={`${id}-s-${i}`}
+              id={`${id}-s-${i}`}
+              strategy={strategy}
+              src={s.src}
+              async={s.async || undefined}
+              defer={s.defer || undefined}
+            />
+          )
+        }
+        return (
+          <Script
+            key={`${id}-s-${i}`}
+            id={`${id}-s-${i}`}
+            strategy={strategy}
+            dangerouslySetInnerHTML={{ __html: s.code }}
+          />
+        )
+      })}
+    </>
+  )
+}
+
 // ─── Viewport ────────────────────────────────────────────────────────────────
 
 export const viewport: Viewport = {
@@ -92,23 +186,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        {/* insert_in_header — injected via Script afterInteractive (Next.js handles placement) */}
-        {seo?.insert_in_header?.trim() && (
-          <Script
-            id="seo-header-inject"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{ __html: seo.insert_in_header }}
-          />
+        {/* insert_in_header — safely injects any arbitrary HTML (meta/link/noscript + scripts) */}
+        {seo?.insert_in_header && (
+          <SafeHtmlInject id="seo-header" html={seo.insert_in_header} strategy="afterInteractive" />
         )}
 
         {/* insert_in_body — e.g. GTM noscript, chat widgets */}
-        {seo?.insert_in_body?.trim() && (
-          <Script
-            id="seo-body-inject"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{ __html: seo.insert_in_body }}
-          />
-        )}
+        {/* {seo?.insert_in_body && (
+          <SafeHtmlInject id="seo-body" html={seo.insert_in_body} strategy="afterInteractive" />
+        )} */}
 
         <QueryProvider>
           <AuthProvider>
@@ -173,12 +259,8 @@ export default async function RootLayout({
         </QueryProvider>
 
         {/* insert_in_footer — e.g. analytics, heatmaps */}
-        {seo?.insert_in_footer?.trim() && (
-          <Script
-            id="seo-footer-inject"
-            strategy="lazyOnload"
-            dangerouslySetInnerHTML={{ __html: seo.insert_in_footer }}
-          />
+        {seo?.insert_in_footer && (
+          <SafeHtmlInject id="seo-footer" html={seo.insert_in_footer} strategy="lazyOnload" />
         )}
 
         {process.env.NODE_ENV === "production" && <Analytics />}
