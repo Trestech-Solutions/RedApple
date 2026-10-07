@@ -17,6 +17,7 @@ import OrderStatusTimeline, { ApprovalBanner } from '@/components/order/OrderSta
 import { useSubmitOrderFeedback } from '@/api/client/customer'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
+import { useRecentOrders } from '@/lib/hooks/useRecentOrders'
 
 // ─── Theme tokens (driven by CSS variables) ───────────────────────────────────
 // NOTE: class strings are written out in full so Tailwind's scanner picks them up.
@@ -253,11 +254,13 @@ function ProductLine({ line }: { line: Order['items'][number] }) {
 function FeedbackForm({
   orderId,
   customerPhone,
-  onContinue,
+  onDismiss,
+  onSubmitSuccess,
 }: {
-  orderId: number
+  orderId: string | number
   customerPhone: string
-  onContinue: () => void
+  onDismiss: () => void
+  onSubmitSuccess: () => void
 }) {
   const [stars,   setStars]   = useState(0)
   const [hover,   setHover]   = useState(0)
@@ -266,7 +269,10 @@ function FeedbackForm({
   const dialogRef = useRef<HTMLDivElement>(null)
 
   const { submitFeedback, isPending } = useSubmitOrderFeedback(orderId, {
-    onSuccess: () => setDone(true),
+    onSuccess: () => {
+      setDone(true)
+      onSubmitSuccess()   // ← remove order from cookie
+    },
   })
 
   useEffect(() => {
@@ -275,25 +281,21 @@ function FeedbackForm({
     document.body.style.overflow = 'hidden'
     dialogRef.current?.focus()
 
-    function preventDismissal(event: KeyboardEvent) {
+    function trapTab(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault()
         return
       }
       if (event.key !== 'Tab' || !dialogRef.current) return
-
       const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
         'button:not(:disabled), textarea:not(:disabled)'
       )
       const first = focusable[0]
-      const last = focusable[focusable.length - 1]
+      const last  = focusable[focusable.length - 1]
       if (!first || !last) {
         event.preventDefault()
         dialogRef.current.focus()
-      } else if (
-        event.shiftKey &&
-        (document.activeElement === first || document.activeElement === dialogRef.current)
-      ) {
+      } else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
         event.preventDefault()
         last.focus()
       } else if (!event.shiftKey && document.activeElement === last) {
@@ -302,9 +304,9 @@ function FeedbackForm({
       }
     }
 
-    document.addEventListener('keydown', preventDismissal)
+    document.addEventListener('keydown', trapTab)
     return () => {
-      document.removeEventListener('keydown', preventDismissal)
+      document.removeEventListener('keydown', trapTab)
       document.body.style.overflow = previousOverflow
       if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
     }
@@ -330,7 +332,7 @@ function FeedbackForm({
             Thank you for your feedback!
           </h2>
           <p className="mt-1 text-sm text-gray-500">Your review helps us improve.</p>
-          <button type="button" onClick={onContinue} className={`${BTN_PRIMARY} mt-6 w-full`}>
+          <button type="button" onClick={onDismiss} className={`${BTN_PRIMARY} mt-6 w-full`}>
             Continue to order
           </button>
         </div>
@@ -348,6 +350,18 @@ function FeedbackForm({
         tabIndex={-1}
         className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl outline-none sm:rounded-3xl sm:p-8"
       >
+        {/* Close button — dismisses modal, shows nudge button instead */}
+        <div className="flex justify-end mb-2">
+          <button
+            type="button"
+            onClick={onDismiss}
+            aria-label="Close feedback form"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          >
+            <XCircle size={20} />
+          </button>
+        </div>
+
         <div className="mb-6 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 ring-8 ring-amber-50/60">
             <Star size={24} className="fill-amber-400" />
@@ -357,6 +371,7 @@ function FeedbackForm({
           </h2>
           <p className="mt-1 text-sm text-gray-500">Share your feedback about this order.</p>
         </div>
+
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-center gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -419,8 +434,10 @@ export default function OrderConfirmationPage() {
   const [order,    setOrder]    = useState<Order | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [errorMsg, setErrorMsg] = useState('')
-  const [feedbackDismissed, setFeedbackDismissed] = useState(false)
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(true)
   const [copied,   setCopied]   = useState(false)
+
+  const { removeOrderId } = useRecentOrders()
 
   const supportPhone =
     branchPhone ||
@@ -679,12 +696,37 @@ export default function OrderConfirmationPage() {
               </div>
             </SectionCard>
 
-            {order.status?.toLowerCase() === 'completed' && !order.stars && !feedbackDismissed && (
+            {order.status?.toLowerCase() === 'completed' && !order.stars && feedbackModalOpen && (
               <FeedbackForm
                 orderId={order.unique_order_number || order.id}
                 customerPhone={order.customer_phone}
-                onContinue={() => setFeedbackDismissed(true)}
+                onDismiss={() => setFeedbackModalOpen(false)}
+                onSubmitSuccess={() => {
+                  // Remove this order from the recent-orders cookie after feedback
+                  const ref = order.unique_order_number ?? String(order.id)
+                  removeOrderId(ref)
+                  setFeedbackModalOpen(false)
+                  router.push('/website/home')
+                }}
               />
+            )}
+
+            {/* Nudge button — shown after modal is dismissed without submitting */}
+            {order.status?.toLowerCase() === 'completed' && !order.stars && !feedbackModalOpen && (
+              <button
+                type="button"
+                onClick={() => setFeedbackModalOpen(true)}
+                className="flex w-full items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-left transition hover:bg-amber-100"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+                  <Star size={18} className="fill-amber-400 stroke-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800">You haven&apos;t given feedback yet</p>
+                  <p className="text-xs text-amber-600 mt-0.5">Tap to rate your experience</p>
+                </div>
+                <ChevronDown size={16} className="shrink-0 text-amber-500 rotate-[-90deg]" />
+              </button>
             )}
             {order.stars != null && (
               <SectionCard icon={<Star size={18} />} title="Your Review">

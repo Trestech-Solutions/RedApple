@@ -63,8 +63,6 @@ function WhatsAppButton() {
   }, [])
 
   const cartBarVisible = totalItems > 0
-  // Mobile: 80px CartBar + 8px gap + 56px self + 8px above FloatingActions = sit between cart and floating btns
-  // When no cart: 24px from bottom (same as right arrow)
   const bottom = isMobile
     ? (cartBarVisible ? 80 + 8 + 56 + 8 : 24)
     : 24
@@ -129,8 +127,8 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (isLoading) return <WebsiteSkeleton />
 
+  // Background: image only (no background color)
   const bgImage = resolveMediaUrl(settings.menu_page_background_image) || DEFAULT_PATTERN_URL
-  const bgColor = settings.background_color || ''
 
   const primaryColor   = settings.primary_color   || '#000000'
   const secondaryColor = settings.secondary_color || '#FFFFFF'
@@ -144,7 +142,6 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        ...(bgColor ? { backgroundColor: bgColor } : {}),
         backgroundImage: `url("${bgImage}")`,
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
@@ -162,30 +159,26 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         } ${!isOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <span className="text-base" aria-hidden>{isHoliday ? '🎌' : '🔴'}</span>
+            <span>
+              {isHoliday
+                ? (holidayMessage ? `Holiday Closure: ${holidayMessage}` : 'Closed for holiday today')
+                : (closedMessage ?? 'We are currently closed')}
+            </span>
+          </div>
 
-            {/* Left: icon + main message */}
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <span className="text-base" aria-hidden>{isHoliday ? '🎌' : '🔴'}</span>
-              <span>
-                {isHoliday
-                  ? (holidayMessage ? `Holiday Closure: ${holidayMessage}` : 'Closed for holiday today')
-                  : (closedMessage ?? 'We are currently closed')}
-              </span>
-            </div>
-
-            {/* Right: date · time */}
-            <div className="flex items-center gap-3 text-xs font-medium opacity-90">
-              <span>{dateStr}</span>
-              <span className="opacity-50">·</span>
-              <span>{timeStr}</span>
-              {!isHoliday && todayOpensAt && todayClosesAt && !settings.close_store && (
-                <>
-                  <span className="opacity-50">·</span>
-                  <span>Hours: {todayOpensAt} – {todayClosesAt}</span>
-                </>
-              )}
-            </div>
-
+          <div className="flex items-center gap-3 text-xs font-medium opacity-90">
+            <span>{dateStr}</span>
+            <span className="opacity-50">·</span>
+            <span>{timeStr}</span>
+            {!isHoliday && todayOpensAt && todayClosesAt && !settings.close_store && (
+              <>
+                <span className="opacity-50">·</span>
+                <span>Hours: {todayOpensAt} – {todayClosesAt}</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -199,7 +192,7 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         onMenuClick={() => setMenuOpen(true)}
       />
 
-      {/* ── Scroll progress bar (animated, flows left → right) ─────────── */}
+      {/* ── Scroll progress bar ─────────── */}
       <div
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[60] h-[3px] w-full"
@@ -212,11 +205,8 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
             transition: 'width 120ms ease-out, opacity 300ms ease',
           }}
         >
-          {/* flowing gradient, moves left → right continuously */}
           <div className="progress-flow absolute inset-0 overflow-hidden" />
-          {/* moving light sweep */}
           <div className="progress-sweep absolute inset-0 overflow-hidden" />
-          {/* glowing head at the leading edge */}
           <span className="progress-head absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 translate-x-1/2 rounded-full" />
         </div>
       </div>
@@ -226,7 +216,6 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
       <CartBar />
       <WebsiteFooter />
 
-      {/* ── Floating action buttons (search + scroll-to-top) ── */}
       <FloatingActions />
       <WhatsAppButton />
 

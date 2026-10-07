@@ -141,7 +141,6 @@ function itemToProduct(
   const hasSizes = sizes.length > 0
 
   // ── Item-level price resolution ────────────────────────────────────────────
-  // Base: prefer size[0] price if sizes exist, else price_at_branch, else front_price
   let priceInt: number
   if (hasSizes) {
     priceInt = sizes[0]!.price
@@ -158,7 +157,6 @@ function itemToProduct(
                         item.price_at_branch !== item.front_price
 
   // ── Item-level discount (item_discount + item_discount_type) ───────────────
-  // Only applied when NO size-level data exists; size-level discount takes priority.
   const itemDiscountStr  = String(item.item_discount ?? '')
   const itemDiscountVal  = parseFloat(itemDiscountStr)
   const itemDiscountRaw  = !isNaN(itemDiscountVal) && itemDiscountVal > 0
@@ -169,7 +167,6 @@ function itemToProduct(
   let itemDiscountLabel: string | undefined
   if (itemDiscountRaw && showTag && !hasSizes) {
     if (itemDiscountType === 'fixed') {
-      // item_discount = original price
       const orig = Math.round(itemDiscountVal)
       if (orig > priceInt && priceInt > 0) {
         const saveAmt = orig - priceInt
@@ -183,7 +180,6 @@ function itemToProduct(
       itemOriginalPrice = String(Math.round(origNum))
       itemDiscountLabel = `${Math.round(pct)}% OFF`
     } else {
-      // Unknown type — best-effort fallback, same rule as size-level
       const orig = Math.round(itemDiscountVal)
       if (orig > priceInt && priceInt > 0) {
         itemOriginalPrice = String(orig)
@@ -192,7 +188,6 @@ function itemToProduct(
     }
   }
 
-  // Combined originalPrice + discount label: size (if available) > item-level
   const combinedOriginal = hasSizes
     ? (sizes[0]!.originalPrice != null ? String(sizes[0]!.originalPrice) : undefined)
     : (hasPriceDiff ? String(Math.round(frontPriceNum)) : (itemOriginalPrice ?? undefined))
@@ -257,7 +252,6 @@ function transformMenu(menu: MenuResponse | undefined): {
         itemRecords
           .filter((it) => {
             if (it.status === false || (it.status as unknown) === 0) return false
-            // Hide item if current PKT time is outside its availability window
             if (it.start_time && it.end_time) {
               return isDealActiveNowPKT(it.start_time, it.end_time)
             }
@@ -280,9 +274,7 @@ function transformMenu(menu: MenuResponse | undefined): {
         }
       }
 
-      // ── FALLBACK A: dish_detail[] — show Dish cards using Dish fields ──
-      // If Dish records have base_price they become orderable (productId = d.id).
-      // Otherwise they fall back to display-only (Coming Soon overlay).
+      // ── FALLBACK A: dish_detail[] ──
       const dishes = cat.dish_detail ?? []
       if (dishes.length > 0) {
         dishes
@@ -377,7 +369,6 @@ function transformMenu(menu: MenuResponse | undefined): {
       const hasDiscount   = finalPriceNum < origPriceNum && origPriceNum > 0
       const savePct       = hasDiscount ? Math.round(((origPriceNum - finalPriceNum) / origPriceNum) * 100) : 0
 
-      // Build included items list from items_detail
       const includedItems = (deal.items_detail ?? []).map((di) => ({
         name:            di.item_detail?.name ?? `Item ${di.item}`,
         qty:             di.quantity,
@@ -387,7 +378,6 @@ function transformMenu(menu: MenuResponse | undefined): {
           : undefined,
       }))
 
-      // Build description from items if none provided
       const description = deal.description ||
         (includedItems.length > 0
           ? includedItems.map((i) => `${i.qty}x ${i.name}`).join(' • ')
@@ -433,24 +423,21 @@ function transformMenu(menu: MenuResponse | undefined): {
         ? `${deal.start_time.slice(0, 5)} – ${deal.end_time.slice(0, 5)}`
         : null
 
-      // Build groups with full option objects for modal rendering
       const groups = (deal.groups_detail ?? []).map((g) => ({
         id:         g.id,
         name:       g.name,
         isRequired: g.is_required,
         selectQty:  g.select_quantity,
         options: g.options.map((o) => {
-          // addon_items: item is null, use addon_detail.name
           if (o.item === null && 'addon_detail' in o && o.addon_detail) {
             return {
               id:        (o as { addon: number }).addon,
               name:      o.addon_detail.name,
               qty:       o.quantity,
               maxQty:    o.max_quantity,
-              extraCost: undefined,   // addon_items options don't carry extra_cost in the current schema
+              extraCost: undefined,
             }
           }
-          // normal_dish: use item_detail.name
           return {
             id:        o.id,
             name:      (o.item_detail as { name?: string } | null | undefined)?.name ?? `Item ${o.item}`,
@@ -463,7 +450,6 @@ function transformMenu(menu: MenuResponse | undefined): {
         }),
       }))
 
-      // Build included fixed items
       const includedItems = (deal.items_detail ?? []).map((di) => ({
         name:            di.item_detail?.name ?? `Item ${di.item}`,
         qty:             di.quantity,
@@ -531,7 +517,7 @@ function transformMenu(menu: MenuResponse | undefined): {
     })
 
     return {
-      id:           String(item.id),   // numeric string — same as regular menu items so addItem check passes
+      id:           String(item.id),
       productId:    item.id,
       name:         item.name,
       description:  item.description || '',
@@ -548,8 +534,7 @@ function transformMenu(menu: MenuResponse | undefined): {
   return { categories, products, idPairs, popularProducts }
 }
 
-/** Wrapper for the popular carousel — same carousel on mobile, tablet and laptop.
- *  Pure Tailwind: glass arrows fade out at scroll ends, edge fade masks. */
+/** Popular carousel — edge fade masks removed so the page background image stays visible. */
 function PopularSection({ products }: { products: ProductData[] }) {
   const [selected, setSelected] = useState<ProductData | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -588,10 +573,6 @@ function PopularSection({ products }: { products: ProductData[] }) {
   return (
     <>
       <div className="relative">
-        {/* Edge fade masks */}
-        <div className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-white to-transparent transition-opacity duration-300 sm:w-12 ${atStart ? 'opacity-0' : 'opacity-100'}`} />
-        <div className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-white to-transparent transition-opacity duration-300 sm:w-12 ${atEnd ? 'opacity-0' : 'opacity-100'}`} />
-
         <button
           type="button"
           onClick={() => scroll('left')}
@@ -846,13 +827,11 @@ type HeroSlide = {
 
 /** Build hero slides from branch banners first, falling back to legacy settings.slide_image_N.
  *  Returns an empty array if nothing is available — the hero section is then hidden.
- *  Priority: 1) menu.banners (branch-wise banners — only if currently active), 2) settings.slide_image_N
  */
 function buildHeroSlides(
   settings: ReturnType<typeof useStoreSettings>['settings'],
   banners: MenuBanner[] | undefined,
 ): HeroSlide[] {
-  // 1) Branch-wise banners from menu API — only active (status + is_available_now) with an image
   if (banners && banners.length > 0) {
     const fromBanners = banners
       .filter((b) => b.status === true && b.is_available_now === true)
@@ -870,7 +849,6 @@ function buildHeroSlides(
     if (fromBanners.length > 0) return fromBanners
   }
 
-  // 2) Settings legacy slides (slide_image_1..4, heading/description/color/link per slide)
   const indices: Array<1 | 2 | 3 | 4> = [1, 2, 3, 4]
   const fromSettings = indices
     .map((i) => {
@@ -893,7 +871,6 @@ function buildHeroSlides(
   return fromSettings
 }
 
-// Small reusable section-label with accent dot — consistent premium language
 function SectionHeader({ title, subtitle, emoji }: { title: string; subtitle?: string; emoji?: string }) {
   return (
     <div className="mb-5">
@@ -914,7 +891,6 @@ export default function HomePage() {
   const registerProductId = useRegisterProductId()
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Use storeLocationSlice as canonical source for branchId/areaId
   const numericBranch = reduxBranchId ?? (branch ? Number(branch) : null)
   const numericArea   = reduxAreaId
 
@@ -923,10 +899,8 @@ export default function HomePage() {
     areaId: numericArea,
   })
 
-  // Popup banners — fetched once per restaurant; shown after menu loads
   const { data: popupBanners = [] } = useGetPopupBanners()
 
-  // ── Hero slides priority: 1) menu.banners, 2) settings.slide_image_N (empty = hide hero) ──
   const HERO_SLIDES = useMemo(
     () => buildHeroSlides(settings, menu?.banners),
     [settings, menu?.banners],
@@ -936,7 +910,6 @@ export default function HomePage() {
 
   const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu), [menu])
 
-  // Register product IDs after render — never during render
   reactUseEffect(() => {
     idPairs.forEach(({ clientId, numericId }) => registerProductId(clientId, numericId))
   }, [idPairs, registerProductId])
@@ -982,8 +955,6 @@ export default function HomePage() {
     })
   }, [searchQuery, branch, products])
 
-  // ── Loading state: show skeleton instead of fallback data ────────────────
-  // IMPORTANT: this check happens AFTER all hooks above, so hook order never changes.
   if (isLoading) {
     return (
       <div className="min-h-screen font-sans text-neutral-800">
@@ -993,28 +964,26 @@ export default function HomePage() {
     )
   }
 
-  // Resolve full URLs for background images
   const resolvedBgImage = resolveMediaUrl(settings.menu_page_background_image)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50/60 font-sans text-neutral-800">
-      {/* Popup banner — shown once per session after menu loads */}
+    // No bg here — the layout already paints the background image
+    <div className="min-h-screen font-sans text-neutral-800">
       {!isLoading && popupBanners.length > 0 && (
         <PopupBannerModal banners={popupBanners} />
       )}
 
-      {/* Hero carousel — only rendered when banners or legacy slides are available */}
+      {/* Hero carousel — backgroundColor removed, image only */}
       {heroActive && (
         <HeroCarousel
           slides={HERO_SLIDES}
-          backgroundColor={settings.background_color}
           backgroundImage={resolvedBgImage}
           hidePaymentBadge={settings.hide_payment_card_logo_from_banner === true}
         />
       )}
 
-      {/* Category nav — sticks right below hero */}
-      <div className="sticky top-0 z-30 border-b border-neutral-100 bg-white/90 shadow-sm backdrop-blur-md">
+      {/* Category nav — no bg color, transparent over the image */}
+      <div className="sticky top-0 z-30 border-b border-white/10 shadow-sm backdrop-blur-md">
         <CategoryNav
           categories={categories}
           activeCategoryId={activeCategoryId}
@@ -1022,7 +991,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* ── Offers strip — premium banner cards, centered ── */}
+      {/* ── Offers strip ── */}
       {(() => {
         const activeOffers: MenuOffer[] = (menu?.offers ?? []).filter(
           (o) => o.status && o.is_available_now,
@@ -1040,7 +1009,6 @@ export default function HomePage() {
                   const valueStr   = showValue ? (isPercent ? `${Math.round(amt)}%` : `Rs.${Math.round(amt)}`) : ''
                   const bannerUrl  = resolveMediaUrl(offer.banner_image)
 
-                  // ── NO IMAGE: dark strip → [icon] Flat (20) % Off ────────────
                   if (!bannerUrl) {
                     const label = offer.discount_text || 'Flat'
                     return (
@@ -1099,7 +1067,6 @@ export default function HomePage() {
                     )
                   }
 
-                  // ── WITH IMAGE: banner + gradient + white text ───────────────────────
                   return (
                     <div
                       key={offer.id}
@@ -1161,7 +1128,6 @@ export default function HomePage() {
       />
 
       {searchQuery ? (
-        // ── Search mode: show matching products from all categories ─────────
         <section className="mx-auto max-w-[1400px] px-4 py-8 md:px-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -1176,9 +1142,7 @@ export default function HomePage() {
           <ProductGrid products={filteredProducts} searchQuery={searchQuery} />
         </section>
       ) : (
-        // ── Browse mode: show each category section with banner → products → repeat ──
         <div>
-          {/* ── Popular Items section (from server, max 4, only when available) ── */}
           {popularProducts.length > 0 && (
             <section
               id="category-popular"
@@ -1211,20 +1175,14 @@ export default function HomePage() {
                       />
                     </div>
                   ) : (
-                    <div className="mb-6 flex items-center justify-between rounded-3xl px-5 py-4 shadow-lg ring-1 ring-black/5 sm:px-8 sm:py-5" style={{
-                      backgroundColor: settings.background_color || '#1f1f1f',
-                      backgroundImage: resolvedBgImage ? `url("${resolvedBgImage}")` : '',
-                      backgroundRepeat: 'repeat',
-                      backgroundSize: 'auto',
-                      backgroundAttachment: 'fixed',
-                      backgroundBlendMode: 'overlay',
-                    }}>
+                    // No bg color, no overlay — transparent over the layout image
+                    <div className="mb-6 flex items-center justify-between rounded-3xl px-5 py-4 shadow-lg ring-1 ring-black/5 sm:px-8 sm:py-5">
                       <div>
-                        <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-white sm:text-xl md:text-2xl">
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
+                        <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-neutral-900 sm:text-xl md:text-2xl">
+                          <span className="h-1.5 w-1.5 rounded-full bg-neutral-900/70" />
                           {cat.label}
                         </h2>
-                        <p className="mt-1 text-xs text-white/90 sm:text-sm">
+                        <p className="mt-1 text-xs text-neutral-700 sm:text-sm">
                           {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
                         </p>
                       </div>
@@ -1239,7 +1197,7 @@ export default function HomePage() {
                           />
                         ) : (
                           <span
-                            className="flex h-10 w-10 items-center justify-center text-3xl text-white sm:h-12 sm:w-12 sm:text-4xl"
+                            className="flex h-10 w-10 items-center justify-center text-3xl sm:h-12 sm:w-12 sm:text-4xl"
                             style={{ fontFamily: 'sans-serif' }}
                           >
                             🍽️
@@ -1250,7 +1208,6 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* Products */}
                 <ProductGrid products={catProducts} searchQuery="" />
               </section>
             )
