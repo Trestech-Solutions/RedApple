@@ -33,7 +33,7 @@ export function Modal1({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-4">
-      <div className="relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-[28px] bg-white shadow-2xl">
+      <div className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-[28px] bg-white shadow-2xl">
 
         {/* Red header */}
         <div className="relative flex items-center justify-center px-4 py-5 sm:py-6" style={{ backgroundColor: 'var(--color-primary)' }}>
@@ -48,7 +48,7 @@ export function Modal1({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Body */}
-        <div className="px-5 pt-4 sm:px-7">
+        <div className="px-5 pt-4 sm:px-8">
           <h2 className="mb-4 text-center text-lg font-bold text-neutral-900 sm:text-xl">Select Your Order Type</h2>
 
           {/* Toggle */}
@@ -160,7 +160,7 @@ export function Modal1({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Footer */}
-        <div className="mt-2 border-t border-neutral-100 px-5 py-5 sm:px-7">
+        <div className="mt-2 border-t border-neutral-100 px-5 py-5 sm:px-8">
           <button type="button" onClick={handleConfirm} disabled={!canConfirm}
             className="flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-base font-bold transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:py-4"
             style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
