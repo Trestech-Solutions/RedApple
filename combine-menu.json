@@ -1,11 +1,11 @@
 {
     "branch": {
-        "id": 1,
-        "branch_name": "DHA Branch",
+        "id": 55,
+        "branch_name": "North Nazimabad",
         "status": true,
-        "location": "DHA Phase 6, Karachi",
-        "address": "DHA Phase 6, Karachi Near Mohiuddin",
-        "map_location": "24.929018756728233,67.11300881345903",
+        "location": "",
+        "address": "",
+        "map_location": "",
         "is_default": false,
         "pickup_status": true,
         "delivery_status": true
@@ -14,8 +14,8 @@
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
-        "date_updated": "2026-10-07T17:58:07.681676Z",
-        "merchant_logo": "/media/settings/merchant_logo/ll.webp",
+        "date_updated": "2026-10-09T21:06:28.458456Z",
+        "merchant_logo": "/media/settings/merchant_logo/proper_HvWHTHQ.webp",
         "menu_header": "default",
         "phone_icon_type": "call",
         "logo_left_align": false,
@@ -24,17 +24,17 @@
         "logo_fit_to_navbar": false,
         "logo_link": "",
         "location_link": "https://maps.google.com/?q=...",
-        "navbar_color": "#000000",
-        "primary_color": "#000000",
-        "secondary_color": "#D4A43C",
+        "navbar_color": "#FFFFFF",
+        "primary_color": "#DE000A",
+        "secondary_color": "#FFFFFF",
         "product_card_design": "card-1",
-        "category_design": "category-3",
-        "order_modal_design": "modal-3",
+        "category_design": "category-2",
+        "order_modal_design": "modal-1",
         "card_tax": "8.00",
         "cash_tax": "15.00",
         "online_tax": "5.00",
         "online_tax_status": true,
-        "bank_details": "BankName: HBL\nETC ETC",
+        "bank_details": "BankName: HBL\r\nETC ETC",
         "slide_image_1": null,
         "heading_text_1": "Weekend Special",
         "heading_color_1": "#FFFFFF",
@@ -59,27 +59,27 @@
         "description_text_4": "",
         "description_color_4": "",
         "slide_link_4": "",
-        "merchant_header_background": "#D4A43C",
+        "merchant_header_background": "#FBD00E",
         "android_icon": "/media/settings/app_icons/badge-google-play-and-app-store-button-download-free-png.webp",
         "android_app_link": "https://unitedking.trestechsolutions.com/",
         "ios_icon": "/media/settings/app_icons/hello.webp",
         "ios_app_link": "https://unitedking.trestechsolutions.com/",
         "foreground_color": "#FFFFFF",
         "background_color": "#FFFFFF",
-        "menu_page_background_color": "#000000",
-        "menu_page_background_image": "/media/settings/backgrounds/1786973821_855c8816d21f6e41_vKUkeVi.jpg",
+        "menu_page_background_color": "#FFFEFF",
+        "menu_page_background_image": "/media/settings/backgrounds/ee_NQyiJuW.jpg",
         "menu_font_family": "Poppins",
-        "item_price_background": "#000000",
-        "item_price_text_color": "#D4A43C",
-        "item_price_border_color": "#000000",
+        "item_price_background": "#CA1F29",
+        "item_price_text_color": "#FFFEFF",
+        "item_price_border_color": "#FFFEFF",
         "price_rounder_center": true,
         "show_cart_icon": true,
         "show_stack_tag_on_item": true,
-        "stack_tag_background_color": "#D4A43C",
-        "stack_tag_color": "#000000",
-        "discount_background_color": "#D4A43C",
-        "discount_text_color": "#000000",
-        "category_navbar_background_color": "#000000",
+        "stack_tag_background_color": "#CA1F29",
+        "stack_tag_color": "#FFFEFF",
+        "discount_background_color": "#CA1F29",
+        "discount_text_color": "#FFFEFF",
+        "category_navbar_background_color": "#DE000A",
         "enable_user_login": true,
         "price_inclusive_tax": false,
         "sum_discount_in_minimum_order_amount": false,
@@ -144,36 +144,36 @@
         "restaurant": 1
     },
     "branch_settings": {
-        "id": 1,
-        "date_added": "2026-08-11T10:58:01.438900Z",
-        "date_updated": "2026-09-02T23:03:23.276362Z",
+        "id": 13,
+        "date_added": "2026-10-09T19:06:17.702842Z",
+        "date_updated": "2026-10-09T19:06:17.702871Z",
         "enable_city_on_checkout": false,
         "enable_save_my_info": false,
-        "checkout_note": "Enjoy your meal buddy",
-        "days_forward_for_always_preorder": 51,
-        "message_for_always_preorder": "Enjoy your meal buddy",
-        "time_slot_difference_minutes": 22,
-        "delivery_delivery_time": "120",
-        "delivery_pickup_time": "120",
-        "delivery_dinein_time": "136",
+        "checkout_note": "",
+        "days_forward_for_always_preorder": null,
+        "message_for_always_preorder": "",
+        "time_slot_difference_minutes": null,
+        "delivery_delivery_time": "",
+        "delivery_pickup_time": "",
+        "delivery_dinein_time": "",
         "delivery_minimum_order": null,
-        "delivery_message_for_delivery": "Enjoy your meal buddy",
-        "delivery_message_for_pickup": "Enjoy your meal buddy",
-        "delivery_message_for_dinein": "Enjoy your meal buddy",
-        "delivery_message_instruction": "Enjoy your meal buddy",
-        "preorder_delivery_time": "20",
-        "preorder_pickup_time": "20",
-        "preorder_dinein_time": "20",
-        "preorder_minimum_order": "20.00",
-        "preorder_message_for_delivery": "Delivery P MSG NOTHING",
-        "preorder_message_for_pickup": "PICKUP MSG NOTHING",
-        "preorder_message_for_dinein": "dIININ MSG NOTHING",
-        "preorder_message_instruction": "ENJOY YOUR MEAL",
+        "delivery_message_for_delivery": "",
+        "delivery_message_for_pickup": "",
+        "delivery_message_for_dinein": "",
+        "delivery_message_instruction": "",
+        "preorder_delivery_time": "",
+        "preorder_pickup_time": "",
+        "preorder_dinein_time": "",
+        "preorder_minimum_order": null,
+        "preorder_message_for_delivery": "",
+        "preorder_message_for_pickup": "",
+        "preorder_message_for_dinein": "",
+        "preorder_message_instruction": "",
         "apply_offer_discount_as_on_web_ordering": false,
         "apply_item_wise_discount_as_on_web_ordering": false,
         "created_by": null,
         "updated_by": null,
-        "branch": 1,
+        "branch": 55,
         "excluded_categories": [],
         "excluded_items": []
     },
@@ -498,10 +498,10 @@
     ],
     "banners": [
         {
-            "id": 17,
-            "title": "Weekan",
+            "id": 26,
+            "title": "dd",
             "url": "",
-            "banner_image": "/media/banners/33.jpeg",
+            "banner_image": "/media/banners/ee_EMfh4eI.png",
             "status": true,
             "valid_from_date": null,
             "valid_to_date": null,
@@ -529,92 +529,7 @@
         "updated_by": null,
         "restaurant": 1
     },
-    "branch_business_hours": [
-        {
-            "id": 5,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "fri",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 1,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "mon",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 6,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "sat",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 7,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "sun",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 4,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "thu",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:50:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 2,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "tue",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:59:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        },
-        {
-            "id": 3,
-            "branch": 1,
-            "branch_name": "DHA Branch",
-            "day": "wed",
-            "is_open": true,
-            "time_from": "10:00:00",
-            "time_to": "23:50:00",
-            "second_start": null,
-            "second_end": null,
-            "custom_text": ""
-        }
-    ],
+    "branch_business_hours": [],
     "holidays": [
         {
             "id": 2,
@@ -641,10 +556,10 @@
         "id": 1,
         "restaurant": 1,
         "logo": null,
-        "title": "Angeethi PK",
-        "subtitle": "Discover Authentic BBQ, Karahi & Matka Biryani in Karachi – Angeethi PK",
-        "description": "Experience the ultimate desi experience at Angeethi. Enjoy BBQ, karahi, biryani, rolls, handi and more. Order your favorite desi food in Karachi.",
-        "address": "Shahi Bazaar, Karachi, Sindh, Pakistan",
+        "title": "Propr",
+        "subtitle": "Flavorful Fast Food, Ready for You at Propr in Karachi",
+        "description": "Enjoy a satisfying fast food experience at Propr in Karachi. From light bites to hearty meals, we bring you bold flavors made with quality ingredients. Whether you're grabbing a quick meal or ordering for home, we’ve got something for everyone. Visit us or order online today!",
+        "address": "Shop No 3, Ground Floor, United Center, Block L North Nazimabad,",
         "link_groups": [
             {
                 "links": [
@@ -696,16 +611,9 @@
         "created_by": 10,
         "updated_by": 10,
         "date_added": "2026-09-25T09:19:08.663224Z",
-        "date_updated": "2026-10-05T13:13:13.387942Z"
+        "date_updated": "2026-10-09T21:02:17.878891Z"
     },
-    "footer_contact": {
-        "id": 1,
-        "branch": 1,
-        "branch_name": "DHA Branch",
-        "phone": "+92 71 1234567",
-        "email": "sukkur@redapple.com",
-        "date_updated": "2026-09-25T09:22:28.100461Z"
-    },
+    "footer_contact": null,
     "fixed_deals": [
         {
             "id": 2,
@@ -718,7 +626,7 @@
                 "hide_category_display_name_menu": false,
                 "hide_category_from_navbar": false,
                 "description": "Smoked to Perfection, Served with Passion.",
-                "banner": "/media/food_categories/banners/1787061829-02.webp",
+                "banner": "/media/food_categories/banners/kmkm.webp",
                 "icon": "/media/food_categories/icons/bb1.jpeg",
                 "dish": [],
                 "dish_detail": [],
@@ -774,9 +682,10 @@
                 "cart_style": "compact",
                 "header_style": "minimal",
                 "created_by": null,
-                "updated_by": null,
+                "updated_by": 10,
+                "updated_by_username": "Demo",
                 "date_added": "2026-08-18T18:34:15.037873Z",
-                "date_updated": "2026-09-17T15:54:15.779095Z"
+                "date_updated": "2026-10-09T20:57:28.711248Z"
             },
             "name": "Deal Mohid",
             "description": "1 Roti , 1 Chest Piece with raita",
@@ -817,7 +726,7 @@
                                 "hide_category_display_name_menu": false,
                                 "hide_category_from_navbar": false,
                                 "description": "Smoked to Perfection, Served with Passion.",
-                                "banner": "/media/food_categories/banners/1787061829-02.webp",
+                                "banner": "/media/food_categories/banners/kmkm.webp",
                                 "icon": "/media/food_categories/icons/bb1.jpeg",
                                 "dish": [],
                                 "dish_detail": [],
@@ -873,9 +782,10 @@
                                 "cart_style": "compact",
                                 "header_style": "minimal",
                                 "created_by": null,
-                                "updated_by": null,
+                                "updated_by": 10,
+                                "updated_by_username": "Demo",
                                 "date_added": "2026-08-18T18:34:15.037873Z",
-                                "date_updated": "2026-09-17T15:54:15.779095Z"
+                                "date_updated": "2026-10-09T20:57:28.711248Z"
                             }
                         ],
                         "item_discount": "10.00",
@@ -942,7 +852,7 @@
                                 "hide_category_display_name_menu": false,
                                 "hide_category_from_navbar": false,
                                 "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                                "banner": "/media/food_categories/banners/1787061771-11.webp",
+                                "banner": "/media/food_categories/banners/.webp",
                                 "icon": "/media/food_categories/icons/b2.jpeg",
                                 "dish": [],
                                 "dish_detail": [],
@@ -998,9 +908,10 @@
                                 "cart_style": "",
                                 "header_style": "",
                                 "created_by": null,
-                                "updated_by": null,
+                                "updated_by": 10,
+                                "updated_by_username": "Demo",
                                 "date_added": "2026-08-18T18:36:01.284910Z",
-                                "date_updated": "2026-08-21T09:34:50.474618Z"
+                                "date_updated": "2026-10-09T20:58:32.244908Z"
                             }
                         ],
                         "item_discount": "5.00",
@@ -1038,15 +949,7 @@
                     "available_addons_detail": []
                 }
             ],
-            "branch_prices": [
-                {
-                    "id": 1,
-                    "branch": 1,
-                    "branch_name": "DHA Branch",
-                    "price": "10.00",
-                    "status": true
-                }
-            ],
+            "branch_prices": [],
             "valid_from_date": "2026-08-01",
             "valid_to_date": "2026-12-31",
             "status": 1,
@@ -1055,7 +958,7 @@
             "updated_by_username": "Demo",
             "date_added": "2026-08-28T11:24:33.682892Z",
             "date_updated": "2026-10-06T19:24:18.816550Z",
-            "price_at_branch": "10.00"
+            "price_at_branch": "298.00"
         }
     ],
     "on_spot_deals": [
@@ -1070,7 +973,7 @@
                 "hide_category_display_name_menu": false,
                 "hide_category_from_navbar": false,
                 "description": "Smoked to Perfection, Served with Passion.",
-                "banner": "/media/food_categories/banners/1787061829-02.webp",
+                "banner": "/media/food_categories/banners/kmkm.webp",
                 "icon": "/media/food_categories/icons/bb1.jpeg",
                 "dish": [],
                 "dish_detail": [],
@@ -1126,9 +1029,10 @@
                 "cart_style": "compact",
                 "header_style": "minimal",
                 "created_by": null,
-                "updated_by": null,
+                "updated_by": 10,
+                "updated_by_username": "Demo",
                 "date_added": "2026-08-18T18:34:15.037873Z",
-                "date_updated": "2026-09-17T15:54:15.779095Z"
+                "date_updated": "2026-10-09T20:57:28.711248Z"
             },
             "name": "Onspot mohid",
             "description": "",
@@ -1267,7 +1171,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Smoked to Perfection, Served with Passion.",
-                                        "banner": "/media/food_categories/banners/1787061829-02.webp",
+                                        "banner": "/media/food_categories/banners/kmkm.webp",
                                         "icon": "/media/food_categories/icons/bb1.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1323,9 +1227,10 @@
                                         "cart_style": "compact",
                                         "header_style": "minimal",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:34:15.037873Z",
-                                        "date_updated": "2026-09-17T15:54:15.779095Z"
+                                        "date_updated": "2026-10-09T20:57:28.711248Z"
                                     },
                                     {
                                         "id": 5,
@@ -1334,7 +1239,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                                        "banner": "/media/food_categories/banners/1787061815-04.webp",
+                                        "banner": "/media/food_categories/banners/kkm.webp",
                                         "icon": "/media/food_categories/icons/b3.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1390,9 +1295,10 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:35:06.257313Z",
-                                        "date_updated": "2026-08-21T09:37:59.824949Z"
+                                        "date_updated": "2026-10-09T20:57:50.178375Z"
                                     }
                                 ],
                                 "item_discount": "10.00",
@@ -1445,7 +1351,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                                        "banner": "/media/food_categories/banners/1787061771-11.webp",
+                                        "banner": "/media/food_categories/banners/.webp",
                                         "icon": "/media/food_categories/icons/b2.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1501,9 +1407,10 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:36:01.284910Z",
-                                        "date_updated": "2026-08-21T09:34:50.474618Z"
+                                        "date_updated": "2026-10-09T20:58:32.244908Z"
                                     }
                                 ],
                                 "item_discount": "5.00",
@@ -1574,7 +1481,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                                        "banner": "/media/food_categories/banners/1787061771-11.webp",
+                                        "banner": "/media/food_categories/banners/.webp",
                                         "icon": "/media/food_categories/icons/b2.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1630,9 +1537,10 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:36:01.284910Z",
-                                        "date_updated": "2026-08-21T09:34:50.474618Z"
+                                        "date_updated": "2026-10-09T20:58:32.244908Z"
                                     },
                                     {
                                         "id": 7,
@@ -1641,7 +1549,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                                        "banner": "/media/food_categories/banners/1787061880-07.webp",
+                                        "banner": "/media/food_categories/banners/mkmkm.webp",
                                         "icon": "/media/food_categories/icons/ee.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1697,9 +1605,10 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:37:08.811541Z",
-                                        "date_updated": "2026-08-21T09:36:37.558722Z"
+                                        "date_updated": "2026-10-09T20:58:50.092089Z"
                                     },
                                     {
                                         "id": 8,
@@ -1708,7 +1617,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                                        "banner": "/media/food_categories/banners/1787061801-09.webp",
+                                        "banner": "/media/food_categories/banners/pdwokdow.webp",
                                         "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -1764,24 +1673,17 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:37:54.257232Z",
-                                        "date_updated": "2026-08-21T09:35:32.223915Z"
+                                        "date_updated": "2026-10-09T20:59:04.029653Z"
                                     }
                                 ],
                                 "item_discount": "5.00",
                                 "item_discount_type": "percentage",
                                 "show_discount_tag": true,
                                 "front_price": "6.49",
-                                "branch_prices": [
-                                    {
-                                        "id": 1,
-                                        "branch": 1,
-                                        "branch_name": "DHA Branch",
-                                        "price": "10.00",
-                                        "status": true
-                                    }
-                                ],
+                                "branch_prices": [],
                                 "size_prices": [],
                                 "created_by": null,
                                 "updated_by": 10,
@@ -1824,7 +1726,7 @@
                 "hide_category_display_name_menu": false,
                 "hide_category_from_navbar": false,
                 "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                "banner": "/media/food_categories/banners/1787061801-09.webp",
+                "banner": "/media/food_categories/banners/pdwokdow.webp",
                 "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                 "dish": [],
                 "dish_detail": [],
@@ -1880,9 +1782,10 @@
                 "cart_style": "",
                 "header_style": "",
                 "created_by": null,
-                "updated_by": null,
+                "updated_by": 10,
+                "updated_by_username": "Demo",
                 "date_added": "2026-08-18T18:37:54.257232Z",
-                "date_updated": "2026-08-21T09:35:32.223915Z"
+                "date_updated": "2026-10-09T20:59:04.029653Z"
             },
             "name": "Broast Deal",
             "description": "2 Chest Broast 1 Drink",
@@ -1925,7 +1828,7 @@
                                 "hide_category_display_name_menu": false,
                                 "hide_category_from_navbar": false,
                                 "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                                "banner": "/media/food_categories/banners/1787061771-11.webp",
+                                "banner": "/media/food_categories/banners/.webp",
                                 "icon": "/media/food_categories/icons/b2.jpeg",
                                 "dish": [],
                                 "dish_detail": [],
@@ -1981,9 +1884,10 @@
                                 "cart_style": "",
                                 "header_style": "",
                                 "created_by": null,
-                                "updated_by": null,
+                                "updated_by": 10,
+                                "updated_by_username": "Demo",
                                 "date_added": "2026-08-18T18:36:01.284910Z",
-                                "date_updated": "2026-08-21T09:34:50.474618Z"
+                                "date_updated": "2026-10-09T20:58:32.244908Z"
                             },
                             {
                                 "id": 7,
@@ -1992,7 +1896,7 @@
                                 "hide_category_display_name_menu": false,
                                 "hide_category_from_navbar": false,
                                 "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                                "banner": "/media/food_categories/banners/1787061880-07.webp",
+                                "banner": "/media/food_categories/banners/mkmkm.webp",
                                 "icon": "/media/food_categories/icons/ee.jpeg",
                                 "dish": [],
                                 "dish_detail": [],
@@ -2048,9 +1952,10 @@
                                 "cart_style": "",
                                 "header_style": "",
                                 "created_by": null,
-                                "updated_by": null,
+                                "updated_by": 10,
+                                "updated_by_username": "Demo",
                                 "date_added": "2026-08-18T18:37:08.811541Z",
-                                "date_updated": "2026-08-21T09:36:37.558722Z"
+                                "date_updated": "2026-10-09T20:58:50.092089Z"
                             },
                             {
                                 "id": 8,
@@ -2059,7 +1964,7 @@
                                 "hide_category_display_name_menu": false,
                                 "hide_category_from_navbar": false,
                                 "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                                "banner": "/media/food_categories/banners/1787061801-09.webp",
+                                "banner": "/media/food_categories/banners/pdwokdow.webp",
                                 "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                                 "dish": [],
                                 "dish_detail": [],
@@ -2115,24 +2020,17 @@
                                 "cart_style": "",
                                 "header_style": "",
                                 "created_by": null,
-                                "updated_by": null,
+                                "updated_by": 10,
+                                "updated_by_username": "Demo",
                                 "date_added": "2026-08-18T18:37:54.257232Z",
-                                "date_updated": "2026-08-21T09:35:32.223915Z"
+                                "date_updated": "2026-10-09T20:59:04.029653Z"
                             }
                         ],
                         "item_discount": "5.00",
                         "item_discount_type": "percentage",
                         "show_discount_tag": true,
                         "front_price": "6.49",
-                        "branch_prices": [
-                            {
-                                "id": 1,
-                                "branch": 1,
-                                "branch_name": "DHA Branch",
-                                "price": "10.00",
-                                "status": true
-                            }
-                        ],
+                        "branch_prices": [],
                         "size_prices": [],
                         "created_by": null,
                         "updated_by": 10,
@@ -2274,7 +2172,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Smoked to Perfection, Served with Passion.",
-                                        "banner": "/media/food_categories/banners/1787061829-02.webp",
+                                        "banner": "/media/food_categories/banners/kmkm.webp",
                                         "icon": "/media/food_categories/icons/bb1.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -2330,9 +2228,10 @@
                                         "cart_style": "compact",
                                         "header_style": "minimal",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:34:15.037873Z",
-                                        "date_updated": "2026-09-17T15:54:15.779095Z"
+                                        "date_updated": "2026-10-09T20:57:28.711248Z"
                                     }
                                 ],
                                 "item_discount": "10.00",
@@ -2400,7 +2299,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                                        "banner": "/media/food_categories/banners/1787061771-11.webp",
+                                        "banner": "/media/food_categories/banners/.webp",
                                         "icon": "/media/food_categories/icons/b2.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -2456,9 +2355,10 @@
                                         "cart_style": "",
                                         "header_style": "",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:36:01.284910Z",
-                                        "date_updated": "2026-08-21T09:34:50.474618Z"
+                                        "date_updated": "2026-10-09T20:58:32.244908Z"
                                     }
                                 ],
                                 "item_discount": "5.00",
@@ -2649,7 +2549,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Smoked to Perfection, Served with Passion.",
-                                        "banner": "/media/food_categories/banners/1787061829-02.webp",
+                                        "banner": "/media/food_categories/banners/kmkm.webp",
                                         "icon": "/media/food_categories/icons/bb1.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -2705,9 +2605,10 @@
                                         "cart_style": "compact",
                                         "header_style": "minimal",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:34:15.037873Z",
-                                        "date_updated": "2026-09-17T15:54:15.779095Z"
+                                        "date_updated": "2026-10-09T20:57:28.711248Z"
                                     }
                                 ],
                                 "item_discount": "5.00",
@@ -2730,15 +2631,7 @@
                     ]
                 }
             ],
-            "branch_prices": [
-                {
-                    "id": 1,
-                    "branch": 1,
-                    "branch_name": "DHA Branch",
-                    "price": "10.00",
-                    "status": true
-                }
-            ],
+            "branch_prices": [],
             "valid_from_date": null,
             "valid_to_date": null,
             "start_time": null,
@@ -2748,7 +2641,7 @@
             "updated_by": null,
             "date_added": "2026-08-30T21:41:17.645951Z",
             "date_updated": "2026-09-14T13:35:51.384810Z",
-            "price_at_branch": "10.00",
+            "price_at_branch": "352.0000",
             "is_available_now": true
         },
         {
@@ -2762,7 +2655,7 @@
                 "hide_category_display_name_menu": false,
                 "hide_category_from_navbar": false,
                 "description": "Smoked to Perfection, Served with Passion.",
-                "banner": "/media/food_categories/banners/1787061829-02.webp",
+                "banner": "/media/food_categories/banners/kmkm.webp",
                 "icon": "/media/food_categories/icons/bb1.jpeg",
                 "dish": [],
                 "dish_detail": [],
@@ -2818,9 +2711,10 @@
                 "cart_style": "compact",
                 "header_style": "minimal",
                 "created_by": null,
-                "updated_by": null,
+                "updated_by": 10,
+                "updated_by_username": "Demo",
                 "date_added": "2026-08-18T18:34:15.037873Z",
-                "date_updated": "2026-09-17T15:54:15.779095Z"
+                "date_updated": "2026-10-09T20:57:28.711248Z"
             },
             "name": "Lunch Combo",
             "description": "Choose any 1 thing with a drink",
@@ -2871,7 +2765,7 @@
                                         "hide_category_display_name_menu": false,
                                         "hide_category_from_navbar": false,
                                         "description": "Smoked to Perfection, Served with Passion.",
-                                        "banner": "/media/food_categories/banners/1787061829-02.webp",
+                                        "banner": "/media/food_categories/banners/kmkm.webp",
                                         "icon": "/media/food_categories/icons/bb1.jpeg",
                                         "dish": [],
                                         "dish_detail": [],
@@ -2927,9 +2821,10 @@
                                         "cart_style": "compact",
                                         "header_style": "minimal",
                                         "created_by": null,
-                                        "updated_by": null,
+                                        "updated_by": 10,
+                                        "updated_by_username": "Demo",
                                         "date_added": "2026-08-18T18:34:15.037873Z",
-                                        "date_updated": "2026-09-17T15:54:15.779095Z"
+                                        "date_updated": "2026-10-09T20:57:28.711248Z"
                                     }
                                 ],
                                 "item_discount": "10.00",
@@ -3012,7 +2907,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                    "banner": "/media/food_categories/banners/1787061801-09.webp",
+                    "banner": "/media/food_categories/banners/pdwokdow.webp",
                     "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3068,9 +2963,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:37:54.257232Z",
-                    "date_updated": "2026-08-21T09:35:32.223915Z"
+                    "date_updated": "2026-10-09T20:59:04.029653Z"
                 }
             ],
             "item_discount": "2.00",
@@ -3114,7 +3010,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                    "banner": "/media/food_categories/banners/1787061815-04.webp",
+                    "banner": "/media/food_categories/banners/kkm.webp",
                     "icon": "/media/food_categories/icons/b3.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3170,9 +3066,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:35:06.257313Z",
-                    "date_updated": "2026-08-21T09:37:59.824949Z"
+                    "date_updated": "2026-10-09T20:57:50.178375Z"
                 }
             ],
             "item_discount": "100.00",
@@ -3216,7 +3113,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                    "banner": "/media/food_categories/banners/1787061815-04.webp",
+                    "banner": "/media/food_categories/banners/kkm.webp",
                     "icon": "/media/food_categories/icons/b3.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3272,9 +3169,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:35:06.257313Z",
-                    "date_updated": "2026-08-21T09:37:59.824949Z"
+                    "date_updated": "2026-10-09T20:57:50.178375Z"
                 }
             ],
             "item_discount": "5.00",
@@ -3320,7 +3218,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                    "banner": "/media/food_categories/banners/1787061771-11.webp",
+                    "banner": "/media/food_categories/banners/.webp",
                     "icon": "/media/food_categories/icons/b2.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3376,9 +3274,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:36:01.284910Z",
-                    "date_updated": "2026-08-21T09:34:50.474618Z"
+                    "date_updated": "2026-10-09T20:58:32.244908Z"
                 },
                 {
                     "id": 7,
@@ -3387,7 +3286,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                    "banner": "/media/food_categories/banners/1787061880-07.webp",
+                    "banner": "/media/food_categories/banners/mkmkm.webp",
                     "icon": "/media/food_categories/icons/ee.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3443,9 +3342,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:37:08.811541Z",
-                    "date_updated": "2026-08-21T09:36:37.558722Z"
+                    "date_updated": "2026-10-09T20:58:50.092089Z"
                 },
                 {
                     "id": 8,
@@ -3454,7 +3354,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                    "banner": "/media/food_categories/banners/1787061801-09.webp",
+                    "banner": "/media/food_categories/banners/pdwokdow.webp",
                     "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3510,24 +3410,17 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:37:54.257232Z",
-                    "date_updated": "2026-08-21T09:35:32.223915Z"
+                    "date_updated": "2026-10-09T20:59:04.029653Z"
                 }
             ],
             "item_discount": "5.00",
             "item_discount_type": "percentage",
             "show_discount_tag": true,
             "front_price": "6.49",
-            "branch_prices": [
-                {
-                    "id": 1,
-                    "branch": 1,
-                    "branch_name": "DHA Branch",
-                    "price": "10.00",
-                    "status": true
-                }
-            ],
+            "branch_prices": [],
             "size_prices": [],
             "created_by": null,
             "updated_by": 10,
@@ -3535,7 +3428,7 @@
             "date_added": "2026-08-21T11:38:27.950460Z",
             "date_updated": "2026-10-06T19:36:16.078524Z",
             "is_available_now": false,
-            "price_at_branch": "10.00"
+            "price_at_branch": "6.49"
         },
         {
             "id": 11,
@@ -3565,7 +3458,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                    "banner": "/media/food_categories/banners/1787061801-09.webp",
+                    "banner": "/media/food_categories/banners/pdwokdow.webp",
                     "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3621,9 +3514,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:37:54.257232Z",
-                    "date_updated": "2026-08-21T09:35:32.223915Z"
+                    "date_updated": "2026-10-09T20:59:04.029653Z"
                 }
             ],
             "item_discount": "4.00",
@@ -3667,7 +3561,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Wow Deals",
-                    "banner": "/media/food_categories/banners/1787061667-10.webp",
+                    "banner": "/media/food_categories/banners/KMK.webp",
                     "icon": "/media/food_categories/icons/1787034029-WhatsApp-Image-2026-08-18-at-11-17-18-AM--1-.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3723,9 +3617,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-21T19:51:03.674291Z",
-                    "date_updated": "2026-08-21T19:51:03.674310Z"
+                    "date_updated": "2026-10-09T20:59:41.666476Z"
                 }
             ],
             "item_discount": "5.00",
@@ -3769,7 +3664,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Smoked to Perfection, Served with Passion.",
-                    "banner": "/media/food_categories/banners/1787061829-02.webp",
+                    "banner": "/media/food_categories/banners/kmkm.webp",
                     "icon": "/media/food_categories/icons/bb1.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3825,9 +3720,10 @@
                     "cart_style": "compact",
                     "header_style": "minimal",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:34:15.037873Z",
-                    "date_updated": "2026-09-17T15:54:15.779095Z"
+                    "date_updated": "2026-10-09T20:57:28.711248Z"
                 }
             ],
             "item_discount": "5.00",
@@ -3871,7 +3767,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                    "banner": "/media/food_categories/banners/1787061880-07.webp",
+                    "banner": "/media/food_categories/banners/mkmkm.webp",
                     "icon": "/media/food_categories/icons/ee.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -3927,9 +3823,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:37:08.811541Z",
-                    "date_updated": "2026-08-21T09:36:37.558722Z"
+                    "date_updated": "2026-10-09T20:58:50.092089Z"
                 }
             ],
             "item_discount": "2.00",
@@ -3973,7 +3870,7 @@
                     "hide_category_display_name_menu": false,
                     "hide_category_from_navbar": false,
                     "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                    "banner": "/media/food_categories/banners/1787061771-11.webp",
+                    "banner": "/media/food_categories/banners/.webp",
                     "icon": "/media/food_categories/icons/b2.jpeg",
                     "dish": [],
                     "dish_detail": [],
@@ -4029,9 +3926,10 @@
                     "cart_style": "",
                     "header_style": "",
                     "created_by": null,
-                    "updated_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
                     "date_added": "2026-08-18T18:36:01.284910Z",
-                    "date_updated": "2026-08-21T09:34:50.474618Z"
+                    "date_updated": "2026-10-09T20:58:32.244908Z"
                 }
             ],
             "item_discount": "5.00",
@@ -4074,7 +3972,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "Smoked to Perfection, Served with Passion.",
-            "banner": "/media/food_categories/banners/1787061829-02.webp",
+            "banner": "/media/food_categories/banners/kmkm.webp",
             "icon": "/media/food_categories/icons/bb1.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -4130,9 +4028,10 @@
             "cart_style": "compact",
             "header_style": "minimal",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-18T18:34:15.037873Z",
-            "date_updated": "2026-09-17T15:54:15.779095Z",
+            "date_updated": "2026-10-09T20:57:28.711248Z",
             "items": [
                 {
                     "id": 29,
@@ -4163,7 +4062,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Smoked to Perfection, Served with Passion.",
-                            "banner": "/media/food_categories/banners/1787061829-02.webp",
+                            "banner": "/media/food_categories/banners/kmkm.webp",
                             "icon": "/media/food_categories/icons/bb1.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4219,9 +4118,10 @@
                             "cart_style": "compact",
                             "header_style": "minimal",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:34:15.037873Z",
-                            "date_updated": "2026-09-17T15:54:15.779095Z"
+                            "date_updated": "2026-10-09T20:57:28.711248Z"
                         },
                         {
                             "id": 5,
@@ -4230,7 +4130,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                            "banner": "/media/food_categories/banners/1787061815-04.webp",
+                            "banner": "/media/food_categories/banners/kkm.webp",
                             "icon": "/media/food_categories/icons/b3.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4286,9 +4186,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:35:06.257313Z",
-                            "date_updated": "2026-08-21T09:37:59.824949Z"
+                            "date_updated": "2026-10-09T20:57:50.178375Z"
                         }
                     ],
                     "item_discount": "10.00",
@@ -4334,7 +4235,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Smoked to Perfection, Served with Passion.",
-                            "banner": "/media/food_categories/banners/1787061829-02.webp",
+                            "banner": "/media/food_categories/banners/kmkm.webp",
                             "icon": "/media/food_categories/icons/bb1.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4390,9 +4291,10 @@
                             "cart_style": "compact",
                             "header_style": "minimal",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:34:15.037873Z",
-                            "date_updated": "2026-09-17T15:54:15.779095Z"
+                            "date_updated": "2026-10-09T20:57:28.711248Z"
                         }
                     ],
                     "item_discount": "10.00",
@@ -4453,7 +4355,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Smoked to Perfection, Served with Passion.",
-                            "banner": "/media/food_categories/banners/1787061829-02.webp",
+                            "banner": "/media/food_categories/banners/kmkm.webp",
                             "icon": "/media/food_categories/icons/bb1.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4509,9 +4411,10 @@
                             "cart_style": "compact",
                             "header_style": "minimal",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:34:15.037873Z",
-                            "date_updated": "2026-09-17T15:54:15.779095Z"
+                            "date_updated": "2026-10-09T20:57:28.711248Z"
                         }
                     ],
                     "item_discount": "5.00",
@@ -4536,7 +4439,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-            "banner": "/media/food_categories/banners/1787061815-04.webp",
+            "banner": "/media/food_categories/banners/kkm.webp",
             "icon": "/media/food_categories/icons/b3.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -4592,9 +4495,10 @@
             "cart_style": "",
             "header_style": "",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-18T18:35:06.257313Z",
-            "date_updated": "2026-08-21T09:37:59.824949Z",
+            "date_updated": "2026-10-09T20:57:50.178375Z",
             "items": [
                 {
                     "id": 29,
@@ -4625,7 +4529,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Smoked to Perfection, Served with Passion.",
-                            "banner": "/media/food_categories/banners/1787061829-02.webp",
+                            "banner": "/media/food_categories/banners/kmkm.webp",
                             "icon": "/media/food_categories/icons/bb1.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4681,9 +4585,10 @@
                             "cart_style": "compact",
                             "header_style": "minimal",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:34:15.037873Z",
-                            "date_updated": "2026-09-17T15:54:15.779095Z"
+                            "date_updated": "2026-10-09T20:57:28.711248Z"
                         },
                         {
                             "id": 5,
@@ -4692,7 +4597,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                            "banner": "/media/food_categories/banners/1787061815-04.webp",
+                            "banner": "/media/food_categories/banners/kkm.webp",
                             "icon": "/media/food_categories/icons/b3.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4748,9 +4653,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:35:06.257313Z",
-                            "date_updated": "2026-08-21T09:37:59.824949Z"
+                            "date_updated": "2026-10-09T20:57:50.178375Z"
                         }
                     ],
                     "item_discount": "10.00",
@@ -4796,7 +4702,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                            "banner": "/media/food_categories/banners/1787061815-04.webp",
+                            "banner": "/media/food_categories/banners/kkm.webp",
                             "icon": "/media/food_categories/icons/b3.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4852,9 +4758,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:35:06.257313Z",
-                            "date_updated": "2026-08-21T09:37:59.824949Z"
+                            "date_updated": "2026-10-09T20:57:50.178375Z"
                         }
                     ],
                     "item_discount": "100.00",
@@ -4898,7 +4805,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                            "banner": "/media/food_categories/banners/1787061815-04.webp",
+                            "banner": "/media/food_categories/banners/kkm.webp",
                             "icon": "/media/food_categories/icons/b3.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -4954,9 +4861,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:35:06.257313Z",
-                            "date_updated": "2026-08-21T09:37:59.824949Z"
+                            "date_updated": "2026-10-09T20:57:50.178375Z"
                         }
                     ],
                     "item_discount": "5.00",
@@ -5000,7 +4908,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "A delicious feast featuring tender, juicy meat served with fragrant, flavorful rice and a selection of fresh sides. Perfect for sharing, our Mandi & Platter brings rich Arabian flavors and a satisfying dining experience to your table.",
-                            "banner": "/media/food_categories/banners/1787061815-04.webp",
+                            "banner": "/media/food_categories/banners/kkm.webp",
                             "icon": "/media/food_categories/icons/b3.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5056,9 +4964,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:35:06.257313Z",
-                            "date_updated": "2026-08-21T09:37:59.824949Z"
+                            "date_updated": "2026-10-09T20:57:50.178375Z"
                         }
                     ],
                     "item_discount": "5.00",
@@ -5084,7 +4993,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-            "banner": "/media/food_categories/banners/1787061771-11.webp",
+            "banner": "/media/food_categories/banners/.webp",
             "icon": "/media/food_categories/icons/b2.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -5140,9 +5049,10 @@
             "cart_style": "",
             "header_style": "",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-18T18:36:01.284910Z",
-            "date_updated": "2026-08-21T09:34:50.474618Z",
+            "date_updated": "2026-10-09T20:58:32.244908Z",
             "items": [
                 {
                     "id": 9,
@@ -5174,7 +5084,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                            "banner": "/media/food_categories/banners/1787061771-11.webp",
+                            "banner": "/media/food_categories/banners/.webp",
                             "icon": "/media/food_categories/icons/b2.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5230,9 +5140,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:36:01.284910Z",
-                            "date_updated": "2026-08-21T09:34:50.474618Z"
+                            "date_updated": "2026-10-09T20:58:32.244908Z"
                         },
                         {
                             "id": 7,
@@ -5241,7 +5152,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                            "banner": "/media/food_categories/banners/1787061880-07.webp",
+                            "banner": "/media/food_categories/banners/mkmkm.webp",
                             "icon": "/media/food_categories/icons/ee.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5297,9 +5208,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:08.811541Z",
-                            "date_updated": "2026-08-21T09:36:37.558722Z"
+                            "date_updated": "2026-10-09T20:58:50.092089Z"
                         },
                         {
                             "id": 8,
@@ -5308,7 +5220,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/1787061801-09.webp",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
                             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5364,24 +5276,17 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-08-21T09:35:32.223915Z"
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
                         }
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [
-                        {
-                            "id": 1,
-                            "branch": 1,
-                            "branch_name": "DHA Branch",
-                            "price": "10.00",
-                            "status": true
-                        }
-                    ],
+                    "branch_prices": [],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -5389,7 +5294,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-06T19:36:16.078524Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 10,
@@ -5419,7 +5324,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                            "banner": "/media/food_categories/banners/1787061771-11.webp",
+                            "banner": "/media/food_categories/banners/.webp",
                             "icon": "/media/food_categories/icons/b2.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5475,9 +5380,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:36:01.284910Z",
-                            "date_updated": "2026-08-21T09:34:50.474618Z"
+                            "date_updated": "2026-10-09T20:58:32.244908Z"
                         }
                     ],
                     "item_discount": "4.00",
@@ -5521,7 +5427,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                            "banner": "/media/food_categories/banners/1787061771-11.webp",
+                            "banner": "/media/food_categories/banners/.webp",
                             "icon": "/media/food_categories/icons/b2.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5577,9 +5483,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:36:01.284910Z",
-                            "date_updated": "2026-08-21T09:34:50.474618Z"
+                            "date_updated": "2026-10-09T20:58:32.244908Z"
                         }
                     ],
                     "item_discount": "5.00",
@@ -5622,7 +5529,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-            "banner": "/media/food_categories/banners/1787061880-07.webp",
+            "banner": "/media/food_categories/banners/mkmkm.webp",
             "icon": "/media/food_categories/icons/ee.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -5678,9 +5585,10 @@
             "cart_style": "",
             "header_style": "",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-18T18:37:08.811541Z",
-            "date_updated": "2026-08-21T09:36:37.558722Z",
+            "date_updated": "2026-10-09T20:58:50.092089Z",
             "items": [
                 {
                     "id": 9,
@@ -5712,7 +5620,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                            "banner": "/media/food_categories/banners/1787061771-11.webp",
+                            "banner": "/media/food_categories/banners/.webp",
                             "icon": "/media/food_categories/icons/b2.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5768,9 +5676,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:36:01.284910Z",
-                            "date_updated": "2026-08-21T09:34:50.474618Z"
+                            "date_updated": "2026-10-09T20:58:32.244908Z"
                         },
                         {
                             "id": 7,
@@ -5779,7 +5688,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                            "banner": "/media/food_categories/banners/1787061880-07.webp",
+                            "banner": "/media/food_categories/banners/mkmkm.webp",
                             "icon": "/media/food_categories/icons/ee.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5835,9 +5744,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:08.811541Z",
-                            "date_updated": "2026-08-21T09:36:37.558722Z"
+                            "date_updated": "2026-10-09T20:58:50.092089Z"
                         },
                         {
                             "id": 8,
@@ -5846,7 +5756,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/1787061801-09.webp",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
                             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -5902,24 +5812,17 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-08-21T09:35:32.223915Z"
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
                         }
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [
-                        {
-                            "id": 1,
-                            "branch": 1,
-                            "branch_name": "DHA Branch",
-                            "price": "10.00",
-                            "status": true
-                        }
-                    ],
+                    "branch_prices": [],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -5927,7 +5830,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-06T19:36:16.078524Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 13,
@@ -5957,7 +5860,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                            "banner": "/media/food_categories/banners/1787061880-07.webp",
+                            "banner": "/media/food_categories/banners/mkmkm.webp",
                             "icon": "/media/food_categories/icons/ee.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6013,9 +5916,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:08.811541Z",
-                            "date_updated": "2026-08-21T09:36:37.558722Z"
+                            "date_updated": "2026-10-09T20:58:50.092089Z"
                         }
                     ],
                     "item_discount": "2.00",
@@ -6040,7 +5944,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-            "banner": "/media/food_categories/banners/1787061801-09.webp",
+            "banner": "/media/food_categories/banners/pdwokdow.webp",
             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -6096,9 +6000,10 @@
             "cart_style": "",
             "header_style": "",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-18T18:37:54.257232Z",
-            "date_updated": "2026-08-21T09:35:32.223915Z",
+            "date_updated": "2026-10-09T20:59:04.029653Z",
             "items": [
                 {
                     "id": 12,
@@ -6128,7 +6033,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/1787061801-09.webp",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
                             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6184,9 +6089,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-08-21T09:35:32.223915Z"
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
                         }
                     ],
                     "item_discount": "2.00",
@@ -6232,7 +6138,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Jumbo Rolls  Big, crispy, and loaded with irresistible flavor in every bite.",
-                            "banner": "/media/food_categories/banners/1787061771-11.webp",
+                            "banner": "/media/food_categories/banners/.webp",
                             "icon": "/media/food_categories/icons/b2.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6288,9 +6194,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:36:01.284910Z",
-                            "date_updated": "2026-08-21T09:34:50.474618Z"
+                            "date_updated": "2026-10-09T20:58:32.244908Z"
                         },
                         {
                             "id": 7,
@@ -6299,7 +6206,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Makhni Fry — Crispy, creamy, buttery goodness tossed in a rich makhni sauce.",
-                            "banner": "/media/food_categories/banners/1787061880-07.webp",
+                            "banner": "/media/food_categories/banners/mkmkm.webp",
                             "icon": "/media/food_categories/icons/ee.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6355,9 +6262,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:08.811541Z",
-                            "date_updated": "2026-08-21T09:36:37.558722Z"
+                            "date_updated": "2026-10-09T20:58:50.092089Z"
                         },
                         {
                             "id": 8,
@@ -6366,7 +6274,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/1787061801-09.webp",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
                             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6422,24 +6330,17 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-08-21T09:35:32.223915Z"
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
                         }
                     ],
                     "item_discount": "5.00",
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [
-                        {
-                            "id": 1,
-                            "branch": 1,
-                            "branch_name": "DHA Branch",
-                            "price": "10.00",
-                            "status": true
-                        }
-                    ],
+                    "branch_prices": [],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -6447,7 +6348,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-06T19:36:16.078524Z",
                     "is_available_now": false,
-                    "price_at_branch": "10.00"
+                    "price_at_branch": "6.49"
                 },
                 {
                     "id": 11,
@@ -6477,7 +6378,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/1787061801-09.webp",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
                             "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6533,9 +6434,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-08-21T09:35:32.223915Z"
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
                         }
                     ],
                     "item_discount": "4.00",
@@ -6560,7 +6462,7 @@
             "hide_category_display_name_menu": false,
             "hide_category_from_navbar": false,
             "description": "Wow Deals",
-            "banner": "/media/food_categories/banners/1787061667-10.webp",
+            "banner": "/media/food_categories/banners/KMK.webp",
             "icon": "/media/food_categories/icons/1787034029-WhatsApp-Image-2026-08-18-at-11-17-18-AM--1-.jpeg",
             "dish": [],
             "dish_detail": [],
@@ -6616,9 +6518,10 @@
             "cart_style": "",
             "header_style": "",
             "created_by": null,
-            "updated_by": null,
+            "updated_by": 10,
+            "updated_by_username": "Demo",
             "date_added": "2026-08-21T19:51:03.674291Z",
-            "date_updated": "2026-08-21T19:51:03.674310Z",
+            "date_updated": "2026-10-09T20:59:41.666476Z",
             "items": [
                 {
                     "id": 14,
@@ -6648,7 +6551,7 @@
                             "hide_category_display_name_menu": false,
                             "hide_category_from_navbar": false,
                             "description": "Wow Deals",
-                            "banner": "/media/food_categories/banners/1787061667-10.webp",
+                            "banner": "/media/food_categories/banners/KMK.webp",
                             "icon": "/media/food_categories/icons/1787034029-WhatsApp-Image-2026-08-18-at-11-17-18-AM--1-.jpeg",
                             "dish": [],
                             "dish_detail": [],
@@ -6704,9 +6607,10 @@
                             "cart_style": "",
                             "header_style": "",
                             "created_by": null,
-                            "updated_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
                             "date_added": "2026-08-21T19:51:03.674291Z",
-                            "date_updated": "2026-08-21T19:51:03.674310Z"
+                            "date_updated": "2026-10-09T20:59:41.666476Z"
                         }
                     ],
                     "item_discount": "5.00",
@@ -6723,6 +6627,16 @@
                     "price_at_branch": "200.00"
                 }
             ]
+        }
+    ],
+    "pages": [
+        {
+            "title": "Terms & Conditions",
+            "slug": "hello"
+        },
+        {
+            "title": "About Us",
+            "slug": "about-us"
         }
     ]
 }
