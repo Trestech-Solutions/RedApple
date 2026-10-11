@@ -439,7 +439,8 @@ function transformMenu(menu: MenuResponse | undefined): {
             }
           }
           return {
-            id:        o.id,
+            // The orders API validates against the menu Item id, not the option row id
+            id:        o.item ?? o.id,
             name:      (o.item_detail as { name?: string } | null | undefined)?.name ?? `Item ${o.item}`,
             qty:       o.quantity,
             maxQty:    o.max_quantity,
