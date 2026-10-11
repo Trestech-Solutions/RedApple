@@ -60,7 +60,7 @@ export default function BlogDetailPage() {
 
       {/* ── Topbar ──────────────────────────────────────────────────────── */}
       <header className="bg-[#000000] text-white relative relative">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-2.5 md:px-8">
+        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-4 px-4 py-2.5 md:px-8">
           <button onClick={handleLocationClick} className="flex items-center gap-2 rounded bg-[#ffffff] px-3 py-1.5 text-xs font-semibold text-neutral-900">
               <MapPin size={16} />
               <span className="text-left leading-tight">
@@ -240,7 +240,7 @@ export default function BlogDetailPage() {
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="relative overflow-visible bg-[#000000] pt-16 text-white rounded-tl-3xl rounded-tr-3xl">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 px-4 pb-10 md:grid-cols-4 md:px-8">
+        <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-10 px-4 pb-10 md:grid-cols-4 md:px-8">
           <div>
             <div className="mb-3 overflow-hidden rounded-full w-16 h-16 border-2 border-[#ffffff]">
               <Image src="https://assets.indolj.io/upload/1776252259-1652698752-uk-1.jpg" alt="United King" width={64} height={64} className="object-contain" />

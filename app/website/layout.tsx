@@ -181,7 +181,7 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
           isHoliday ? 'bg-amber-500' : 'bg-red-600'
         } ${!isOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
+        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <span className="text-base" aria-hidden>{isHoliday ? '🎌' : '🔴'}</span>
             <span>

@@ -22,7 +22,8 @@ interface CartAnimationContextType {
    * @param sourceEl  The element that was clicked (used to get start coords)
    * @param image     Product image URL — shown as the flying thumbnail
    */
-  triggerFly: (sourceEl: HTMLElement, image: string) => void
+  /** `size` = starting diameter in px (default 48, e.g. larger when flying out of the product modal) */
+  triggerFly: (sourceEl: HTMLElement, image: string, opts?: { size?: number }) => void
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -55,7 +56,7 @@ let nextId = 0
 export function CartAnimationProvider({ children }: { children: React.ReactNode }) {
   const [particles, setParticles] = useState<FlyParticle[]>([])
 
-  const triggerFly = useCallback((sourceEl: HTMLElement, image: string) => {
+  const triggerFly = useCallback((sourceEl: HTMLElement, image: string, opts?: { size?: number }) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const target = getCartTarget()
     if (!target) return
@@ -76,7 +77,7 @@ export function CartAnimationProvider({ children }: { children: React.ReactNode 
       startX, startY,
       endX, endY,
       image,
-      size: 48,
+      size: opts?.size ?? 48,
     }
 
     setParticles((p) => [...p, particle])

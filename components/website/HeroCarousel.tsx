@@ -109,17 +109,16 @@ export function HeroCarousel({
 
   return (
     <section
-      className="px-3 py-3 sm:px-6 sm:py-6 md:px-10 md:py-8"
+      className="px-3 pb-2 pt-4 sm:px-5 sm:pb-3 sm:pt-5 lg:px-7 lg:pt-6"
       style={{
         backgroundColor: backgroundColor || '',
         backgroundImage: backgroundImage ? `url("${backgroundImage}")` : '',
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
-        backgroundAttachment: 'fixed',
       }}
     >
       <div
-        className="relative mx-auto w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-[aspect-ratio] duration-500 ease-out sm:rounded-3xl"
+        className="relative mx-auto w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-[aspect-ratio] duration-500 ease-out sm:rounded-3xl"
         style={{ aspectRatio: slideRatios[slides[currentSlide]?.id ?? ''] ?? 3.3 }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}

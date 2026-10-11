@@ -5,7 +5,7 @@ export function WebsiteSkeleton() {
     <div className="min-h-screen bg-white font-sans text-neutral-800">
       {/* ─── Navbar ─────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:h-20 md:px-8">
+        <div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between px-4 md:h-20 md:px-8">
           {/* Left: logo pill + icon circle */}
           <div className="flex items-center gap-3">
             <div className="h-9 w-28 animate-pulse rounded-full bg-neutral-200 sm:h-10 sm:w-36 md:h-11 md:w-44" />
@@ -30,8 +30,8 @@ export function WebsiteSkeleton() {
       </header>
 
       {/* ─── Hero banner ────────────────────────────────────────────────────── */}
-      <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
-        <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-neutral-100 sm:rounded-3xl">
+      <section className="px-3 pb-2 pt-4 sm:px-5 sm:pb-3 sm:pt-5 lg:px-7 lg:pt-6">
+        <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1920px] overflow-hidden rounded-2xl border border-neutral-100 sm:rounded-3xl">
           {/* Banner background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
 
@@ -53,7 +53,7 @@ export function WebsiteSkeleton() {
       </section>
 
       {/* ─── Section title + product cards ──────────────────────────────────── */}
-      <section className="mx-auto max-w-[1400px] px-4 pb-16 md:px-8">
+      <section className="mx-auto max-w-[1320px] px-4 pb-16 md:px-8">
         {/* Heading rows */}
         <div className="mb-6 flex items-center justify-between">
           <div className="space-y-2 w-full max-w-xl">

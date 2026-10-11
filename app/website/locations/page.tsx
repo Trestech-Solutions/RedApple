@@ -59,7 +59,7 @@ export default function LocationsPage() {
     <div className="min-h-screen font-sans text-neutral-800">
       <Header search={search} onSearchChange={setSearch} />
 
-      <section className="mx-auto max-w-[1400px] px-4 pb-14 md:px-8">
+      <section className="mx-auto max-w-[1320px] px-4 pb-14 md:px-8">
         {isLoading && <LoadingState />}
         {isError && !isLoading && <ErrorState onRetry={refetch} />}
         {!isLoading && !isError && filtered.length === 0 && search && <EmptyState query={search} />}
@@ -85,7 +85,7 @@ export default function LocationsPage() {
 
 function Header({ search, onSearchChange }: { search: string; onSearchChange: (v: string) => void }) {
   return (
-    <section className="mx-auto max-w-[1400px] px-4 pt-16 pb-6 md:px-8">
+    <section className="mx-auto max-w-[1320px] px-4 pt-16 pb-6 md:px-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-extrabold uppercase tracking-tight text-neutral-900 sm:text-4xl">
           Find Our Stores

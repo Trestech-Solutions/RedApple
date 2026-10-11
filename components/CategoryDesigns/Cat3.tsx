@@ -80,10 +80,10 @@ export function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProp
       }}
     >
       <div
-        className={`mx-auto flex w-full max-w-[1400px] snap-x overflow-x-auto overscroll-x-contain scroll-px-3 scrollbar-hide transition-[gap,padding] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`mx-auto flex w-full max-w-[1320px] snap-x overflow-x-auto overscroll-x-contain scroll-px-4 md:scroll-px-8 scrollbar-hide transition-[gap,padding] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
           collapsed
-            ? 'items-center gap-1.5 px-3 py-2 sm:gap-2 sm:px-4 sm:py-2.5 md:gap-2.5 md:py-3'
-            : 'items-stretch gap-1.5 px-2 pb-3 pt-3 sm:gap-2 sm:px-3 md:gap-3 md:px-4'
+            ? 'items-center gap-1.5 px-4 py-2 sm:gap-2 sm:py-2.5 md:gap-2.5 md:px-8 md:py-3'
+            : 'items-stretch gap-1.5 px-4 pb-3 pt-3 sm:gap-2 md:gap-3 md:px-8'
         }`}
       >
         {categories.map((cat, i) => {

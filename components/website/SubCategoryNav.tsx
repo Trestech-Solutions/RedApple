@@ -11,7 +11,7 @@ interface SubCategoryNavProps {
 export function SubCategoryNav({ subCategories, activeSubCategoryId, onSelect }: SubCategoryNavProps) {
   return (
     <div className="bg-[#ffffff] py-3 sticky top-[66px] z-20 sm:top-[76px] md:top-[96px] lg:top-[116px]">
-      <div className="mx-auto max-w-[1400px] px-3 md:px-8 sm:px-4">
+      <div className="mx-auto max-w-[1320px] px-3 md:px-8 sm:px-4">
         <div className="flex gap-2 justify-start sm:justify-center overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 sm:pb-0 sm:gap-3">
           {subCategories.map((sub) => {
             const isActive = sub.id === activeSubCategoryId

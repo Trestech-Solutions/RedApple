@@ -128,7 +128,7 @@ export function WebsiteFooter() {
   const hasFooterPages = footerPages.length > 0
 
   return (
-    <footer className="relative mt-20">
+    <footer className="relative mt-14 sm:mt-20">
       {/* Curved top edge */}
       <svg
         aria-hidden
@@ -150,12 +150,12 @@ export function WebsiteFooter() {
           className="pointer-events-none absolute -right-24 bottom-20 h-80 w-80 rounded-full bg-[var(--color-primary)]/10 blur-3xl"
         />
 
-        <div className="relative mx-auto max-w-[1400px] px-4 pb-8 pt-4 sm:px-6 md:px-8">
+        <div className="relative mx-auto max-w-[1320px] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4 md:px-8">
           {/* SEO block */}
           {(seoTitle || seoDesc) && (
-            <div className="mb-12 rounded-3xl border border-white/70 bg-white/60 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md sm:p-8">
+            <div className="mb-10 rounded-3xl border border-white/70 bg-white/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:mb-12 sm:p-8">
               {seoTitle && (
-                <h2 className="text-xl font-semibold text-neutral-900 sm:text-2xl">{seoTitle}</h2>
+                <h2 className="text-lg font-semibold leading-snug text-neutral-900 sm:text-2xl">{seoTitle}</h2>
               )}
               {seoDesc && (
                 <>
@@ -182,9 +182,9 @@ export function WebsiteFooter() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
             {/* Brand */}
-            <div className="lg:col-span-4">
+            <div className="flex flex-col items-center text-center sm:items-start sm:text-left lg:col-span-4">
               <div className="flex items-center gap-3">
                 <Image
                   src={logo}
@@ -193,15 +193,15 @@ export function WebsiteFooter() {
                   height={56}
                   className="h-14 w-14 rounded-2xl bg-white object-cover shadow-sm ring-1 ring-black/5"
                 />
-                <span className="text-xl font-bold tracking-tight text-neutral-900">{restaurantName}</span>
+                <span className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">{restaurantName}</span>
               </div>
 
               {address && (
-                <p className="mt-5 max-w-xs text-sm leading-relaxed text-neutral-600">{address}</p>
+                <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-600 sm:mt-5">{address}</p>
               )}
 
               {showApps && (
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-wrap justify-center gap-2.5 sm:mt-6 sm:justify-start sm:gap-3">
                   {androidLink && (
                     <a
                       href={androidLink}
@@ -215,7 +215,7 @@ export function WebsiteFooter() {
                         alt="Google Play"
                         width={160}
                         height={56}
-                        className="h-14 w-auto rounded-xl object-contain"
+                        className="h-11 w-auto rounded-xl object-contain sm:h-12 lg:h-14"
                       />
                     </a>
                   )}
@@ -232,7 +232,7 @@ export function WebsiteFooter() {
                         alt="App Store"
                         width={160}
                         height={56}
-                        className="h-14 w-auto rounded-xl object-contain"
+                        className="h-11 w-auto rounded-xl object-contain sm:h-12 lg:h-14"
                       />
                     </a>
                   )}
@@ -240,7 +240,7 @@ export function WebsiteFooter() {
               )}
 
               {!showApps && footerButtons.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-start">
                   {footerButtons.map((btn) => (
                     <a
                       key={btn.url}
@@ -257,7 +257,7 @@ export function WebsiteFooter() {
             </div>
 
             {/* Columns */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-8">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 sm:gap-y-10 lg:col-span-8">
               {/* Contact */}
               {(phone || email) && (
                 <div>
@@ -315,9 +315,9 @@ export function WebsiteFooter() {
 
               {/* Social */}
               {activeSocial.length > 0 && (
-                <div>
+                <div className="col-span-2 text-center sm:col-span-1 sm:text-left">
                   <h4 className={COL_HEADING}>Follow us</h4>
-                  <div className="mt-4 flex flex-wrap gap-2.5">
+                  <div className="mt-4 flex flex-wrap justify-center gap-2.5 sm:justify-start">
                     {activeSocial.map((name) => (
                       <a
                         key={name}
@@ -337,7 +337,7 @@ export function WebsiteFooter() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-14 flex flex-col items-center justify-between gap-2 rounded-full border border-white/70 bg-white/60 px-6 py-3.5 text-xs text-neutral-600 backdrop-blur-md sm:flex-row sm:text-sm max-sm:rounded-3xl">
+          <div className="mt-10 flex flex-col items-center justify-between gap-1.5 rounded-3xl border border-white/70 bg-white/60 px-5 py-3.5 text-center text-xs text-neutral-600 sm:mx-14 sm:mt-14 sm:flex-row sm:gap-2 sm:rounded-full sm:px-6 sm:text-left sm:text-sm">
             <span>
               © {new Date().getFullYear()} {restaurantName}. All rights reserved.
             </span>

@@ -714,8 +714,8 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
 /** Skeleton for the hero carousel while the menu (and branch/area context) is loading. */
 function HeroSkeleton() {
   return (
-    <section className="bg-black px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
-      <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
+    <section className="px-3 pb-2 pt-4 sm:px-5 sm:pb-3 sm:pt-5 lg:px-7 lg:pt-6">
+      <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-800" />
 
         <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
@@ -750,7 +750,7 @@ function HeroSkeleton() {
 /** Skeleton for nav rows + product grid area while the menu is loading. */
 function ContentSkeleton() {
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 md:px-8">
+    <div className="mx-auto max-w-[1320px] px-4 py-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <div className="h-5 w-40 animate-pulse rounded bg-neutral-200" />
@@ -965,7 +965,7 @@ export default function HomePage() {
         if (activeOffers.length === 0) return null
 
         return (
-          <section className="mx-auto max-w-[1400px] px-4 py-4 md:px-8">
+          <section className="mx-auto max-w-[1320px] px-4 py-4 md:px-8">
             <div className="flex justify-center">
               <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-hide md:justify-center">
                 {activeOffers.map((offer) => {
@@ -1094,7 +1094,7 @@ export default function HomePage() {
       />
 
       {searchQuery ? (
-        <section className="mx-auto max-w-[1400px] px-4 py-8 md:px-8">
+        <section className="mx-auto max-w-[1320px] px-4 py-8 md:px-8">
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-neutral-900">
@@ -1112,7 +1112,7 @@ export default function HomePage() {
           {popularProducts.length > 0 && (
             <section
               id="category-popular"
-              className="mx-auto max-w-[1400px] px-4 pt-8 pb-2 md:px-8 scroll-mt-28"
+              className="mx-auto max-w-[1320px] px-4 pt-8 pb-2 sm:pt-12 md:px-8 scroll-mt-28"
             >
               <SectionHeader title="Popular" subtitle="Most ordered right now" emoji="🔥" />
               <PopularSection products={popularProducts} />
@@ -1127,7 +1127,7 @@ export default function HomePage() {
               <section
                 key={cat.id}
                 id={`category-${cat.id}`}
-                className="cv-auto mx-auto max-w-[1400px] px-4 py-6 sm:py-8 md:px-8 scroll-mt-28"
+                className="cv-auto mx-auto max-w-[1320px] px-4 py-8 sm:py-10 md:px-8 lg:py-12 scroll-mt-28"
               >
                 {/* Category Banner */}
                 <div className="mb-6">

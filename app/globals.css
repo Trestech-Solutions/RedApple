@@ -73,6 +73,7 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
     /* Never allow sideways scrolling on phones (a single over-wide child would
        otherwise make the whole page wobble horizontally). `clip` keeps sticky working. */
     overflow-x: clip;

@@ -24,12 +24,13 @@
  *    and more diffused, consistent with a premium storefront.
  */
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
+import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 import type { ProductData } from '../product/ProductCard'
 import type { SelectedAddon, CartGroupSelection } from '@/redux/slices/cartSlice'
 
@@ -93,6 +94,8 @@ export function ProductDetailModal(props: ProductDetailModalProps) {
 
 function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps) {
   const { addItem } = useCart()
+  const { triggerFly } = useCartAnimation()
+  const imageRef = useRef<HTMLDivElement>(null)
   const { settings } = useStoreSettings()
   const { isOpen: storeOpen, closedMessage, isHoliday, holidayMessage } = useBusinessHours()
 
@@ -297,8 +300,12 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
       groupSelections:     payloadGroupSelections.length > 0 ? payloadGroupSelections : undefined,
       cartStyle:           product.cartStyle || undefined,
     })
-    setAdded(true)
-    setTimeout(() => { setAdded(false); onClose() }, 900)
+    // Close the modal right away and let the product fly from where its image
+    // was into the cart, so the user sees it land. triggerFly measures the
+    // image synchronously, before the modal unmounts.
+    if (imageRef.current) triggerFly(imageRef.current, product.image, { size: 120 })
+    else { setAdded(true) }
+    onClose()
   }
 
   return (
@@ -309,7 +316,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
       <div className="modal-panel-in relative flex w-full max-w-[1020px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_40px_100px_-24px_rgba(0,0,0,0.5)] ring-1 ring-black/5 max-h-[92vh] sm:h-[85vh] sm:max-h-[720px] sm:flex-row sm:rounded-[28px] md:h-[75vh] lg:h-[70vh]">
 
         {/* ── LEFT — image ────────────────────────────────────────── */}
-        <div className="relative h-40 w-full shrink-0 overflow-hidden xs:h-48 sm:h-full sm:w-[42%] md:w-[46%]">
+        <div ref={imageRef} className="relative h-40 w-full shrink-0 overflow-hidden xs:h-48 sm:h-full sm:w-[42%] md:w-[46%]">
           <div className="ken-burns absolute inset-0">
             <Image src={product.image} alt={product.name} fill className="object-cover" priority />
           </div>

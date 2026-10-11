@@ -35,7 +35,7 @@ export function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProp
   return (
     <nav className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)]"
       style={{ backgroundColor: navBg }}>
-      <div className="relative mx-auto flex max-w-[1400px] items-center">
+      <div className="relative mx-auto flex max-w-[1320px] items-center">
         {/* Left fade + arrow */}
         <div
           className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r transition-opacity duration-300 ${showLeftFade ? 'opacity-100' : 'opacity-0'}`}
@@ -51,7 +51,7 @@ export function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProp
         </button>
 
         <div ref={scrollRef} onScroll={updateFades}
-          className="flex flex-1 gap-2 overflow-x-auto scrollbar-hide snap-x px-3 py-2.5 sm:gap-2.5 sm:px-4 sm:py-3">
+          className="flex flex-1 gap-2 overflow-x-auto scrollbar-hide snap-x px-4 py-2.5 sm:gap-2.5 sm:py-3 md:px-8">
           {categories.map((cat, i) => {
             const isActive = cat.id === activeCategoryId
             return (

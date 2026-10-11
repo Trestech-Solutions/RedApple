@@ -1,11 +1,20 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/hooks/useAuth";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { AlertTriangle, Check, Info, Loader2, X } from "lucide-react";
+
+// Self-hosted Poppins (no layout shift, no extra request to Google at runtime)
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 // ─── SEO from API ─────────────────────────────────────────────────────────────
 
@@ -184,7 +193,7 @@ export default async function RootLayout({
   const seo = await fetchSeo()
 
   return (
-    <html lang="en">
+    <html lang="en" className={poppins.variable}>
       <body suppressHydrationWarning>
         {/* insert_in_header — safely injects any arbitrary HTML (meta/link/noscript + scripts) */}
         {seo?.insert_in_header && (

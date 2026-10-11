@@ -217,13 +217,13 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
   return (
     <header
       id="site-header"
-      className="relative z-30 w-full px-3 pt-3 sm:px-4 sm:pt-4 md:px-6"
+      className="relative z-30 w-full px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7"
       style={{ ...themeVars, color: textColor }}
     >
       <style dangerouslySetInnerHTML={{ __html: NAVBAR_CSS }} />
 
       <div
-        className="wn-bar relative mx-auto max-w-[1400px] rounded-2xl sm:rounded-[20px]"
+        className="wn-bar relative mx-auto max-w-[1920px] rounded-2xl sm:rounded-[20px]"
         style={{
           backgroundColor: navBg,
           border: `1px solid ${hairline}`,
