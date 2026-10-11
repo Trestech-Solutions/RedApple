@@ -13,6 +13,7 @@ import { WebsiteFooter } from '@/components/website/WebsiteFooter'
 import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { FloatingActions } from '@/components/website/FloatingActions'
+import { FloatingCartButton } from '@/components/website/FloatingCartButton'
 import { CartAnimationProvider } from '@/lib/context/CartAnimationContext'
 
 // Overlays are code-split: they (and framer-motion, used by CartDrawer) load
@@ -232,6 +233,7 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
       <WebsiteFooter />
 
       <FloatingActions />
+      <FloatingCartButton />
       <WhatsAppButton />
 
       {authModalOpen && (

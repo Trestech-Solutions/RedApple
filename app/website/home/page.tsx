@@ -12,7 +12,6 @@ import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 import { CategoryNav } from '@/components/website/CategoryNav'
-import { StickyCartButton } from '@/components/website/StickyCartButton'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { ProductDetailModal } from '@/components/product/ProductDetailModal'
@@ -950,19 +949,12 @@ export default function HomePage() {
       )}
 
       {/* Category nav — no bg color, transparent over the image */}
-      {/* Category bar + a cart that slides in at its right end once the navbar scrolls away */}
-      <div
-        className="sticky top-0 z-30 flex items-stretch"
-        style={{ backgroundColor: settings.category_navbar_background_color || 'var(--color-primary)' }}
-      >
-        <div className="min-w-0 flex-1">
-          <CategoryNav
-            categories={categories}
-            activeCategoryId={activeCategoryId}
-            onSelect={handleCategoryChange}
-          />
-        </div>
-        <StickyCartButton />
+      <div className="sticky top-0 z-30">
+        <CategoryNav
+          categories={categories}
+          activeCategoryId={activeCategoryId}
+          onSelect={handleCategoryChange}
+        />
       </div>
 
       {/* ── Offers strip ── */}
