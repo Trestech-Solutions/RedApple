@@ -98,7 +98,7 @@ function WhatsAppButton() {
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ReduxProvider>
+    <ReduxProvider fallback={<WebsiteSkeleton />}>
       <CartProvider>
         <StoreSettingsProvider>
           <CartAnimationProvider>

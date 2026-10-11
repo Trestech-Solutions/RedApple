@@ -318,7 +318,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
         {/* ── LEFT — image ────────────────────────────────────────── */}
         <div ref={imageRef} className="relative h-40 w-full shrink-0 overflow-hidden xs:h-48 sm:h-full sm:w-[42%] md:w-[46%]">
           <div className="ken-burns absolute inset-0">
-            <Image src={product.image} alt={product.name} fill className="object-cover" priority />
+            <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 470px, (min-width: 640px) 42vw, 100vw" className="object-cover" loading="eager" />
           </div>
 
           {/* top vignette so glass controls always read well */}

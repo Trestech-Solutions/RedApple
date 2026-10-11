@@ -91,11 +91,15 @@ export function useGetPages(opts: PagesListOpts = {}) {
       const params: Record<string, string> = { restaurant: restaurantId }
       if (opts.showInFooter) params.footer = '1'
       if (opts.showInMenu) params.menu = '1'
+      // Optional content: if the endpoint is unavailable just show no extra links
+      // (no retries, no error state in the footer/menu).
       return api
         .get<StorefrontPageLink[]>(API_ENDPOINTS.StorefrontContent.pages, { params })
-        .then((r) => r.data ?? [])
+        .then((r) => (Array.isArray(r.data) ? r.data : []))
+        .catch(() => [] as StorefrontPageLink[])
     },
     staleTime: 1000 * 60 * 10,
+    retry: false,
   })
 }
 

@@ -5,7 +5,7 @@ import { X, Plus, Minus, Trash2, ArrowRight, ChevronLeft, ChevronRight, Plus as 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useCart, DEFAULT_DELIVERY_FEE, useStoreSettings } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useGetMenu } from '@/api/client/browse'
@@ -94,11 +94,11 @@ const CSS = `
 
 // ── Shared motion presets ──────────────────────────────────────────────
 const drawerSpring = { type: 'spring', stiffness: 340, damping: 34, mass: 0.9 } as const
-const listStagger = {
+const listStagger: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
 }
-const rowVariant = {
+const rowVariant: Variants = {
   hidden: { opacity: 0, y: 14, scale: 0.97 },
   show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
   exit: { opacity: 0, x: 28, height: 0, marginBottom: 0, transition: { duration: 0.22, ease: 'easeIn' } },

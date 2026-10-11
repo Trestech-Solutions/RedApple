@@ -41,6 +41,9 @@ type HeroSlide = {
 
 const AUTOPLAY_MS = 4500
 
+/** Banner shape used until the real image loads (matches the store's 2060×763 banners). */
+const DEFAULT_RATIO = 2.7
+
 export function HeroCarousel({
   slides,
   backgroundColor,
@@ -54,6 +57,9 @@ export function HeroCarousel({
 }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [slideRatios, setSlideRatios] = useState<Record<string, number>>({})
+  // Slides whose optimised version failed (e.g. a huge upload timing out in the
+  // image optimiser) fall back to the original file instead of a blank banner.
+  const [rawSlides, setRawSlides] = useState<Record<string, true>>({})
   const [isPaused, setIsPaused] = useState(false)
 
   const touchStartX = useRef<number | null>(null)
@@ -119,7 +125,7 @@ export function HeroCarousel({
     >
       <div
         className="relative mx-auto w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-[aspect-ratio] duration-500 ease-out sm:rounded-3xl"
-        style={{ aspectRatio: slideRatios[slides[currentSlide]?.id ?? ''] ?? 3.3 }}
+        style={{ aspectRatio: slideRatios[slides[currentSlide]?.id ?? ''] ?? DEFAULT_RATIO }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={onTouchStart}
@@ -161,12 +167,16 @@ export function HeroCarousel({
                       alt={s.title || s.heading || 'slide'}
                       fill
                       priority={i === 0}
+                      sizes="(min-width: 1920px) 1920px, 100vw"
+                      unoptimized={!!rawSlides[s.id]}
                       className="object-contain object-center"
-                      onLoadingComplete={(img) => {
+                      onLoad={(e) => {
+                        const img = e.currentTarget
                         if (!img.naturalWidth || !img.naturalHeight) return
                         const ratio = img.naturalWidth / img.naturalHeight
                         setSlideRatios((prev) => (prev[s.id] === ratio ? prev : { ...prev, [s.id]: ratio }))
                       }}
+                      onError={() => setRawSlides((prev) => (prev[s.id] ? prev : { ...prev, [s.id]: true }))}
                     />
                   </div>
                 </div>

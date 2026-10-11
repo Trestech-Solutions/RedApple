@@ -88,6 +88,18 @@ function mergeSocial(
   return result
 }
 
+/**
+ * Footer links are configured in the admin as site paths like `/about` or
+ * `/terms`, but storefront pages live under `/website/…` (CMS pages are served
+ * by `/website/[slug]`). Map internal paths onto those routes so the links
+ * don't 404. External URLs, `#anchors`, `/website/…` and `/` pass through.
+ */
+function resolveFooterHref(url: string): string {
+  const u = (url || '').trim()
+  if (!u || u === '/' || !u.startsWith('/') || u.startsWith('//') || u.startsWith('/website')) return u || '/'
+  return `/website${u}`
+}
+
 // Shared styles
 const COL_HEADING = 'text-sm font-semibold tracking-wide text-neutral-900'
 const COL_LINK =
@@ -304,7 +316,7 @@ export function WebsiteFooter() {
                   <ul className="mt-4 space-y-3">
                     {group.links.map((link) => (
                       <li key={link.url}>
-                        <Link href={link.url} className={COL_LINK}>
+                        <Link href={resolveFooterHref(link.url)} className={COL_LINK}>
                           {link.label}
                         </Link>
                       </li>

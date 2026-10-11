@@ -109,17 +109,17 @@ export function Modal1({ onClose }: { onClose: () => void }) {
             <ChevronDown className={chevronCls} />
           </div>
 
-          {/* Pickup: branch */}
-          {orderType === 'pickup' && selectedCityId && (
+          {/* Pickup: branch (always shown → stable modal height, no layout jump) */}
+          {orderType === 'pickup' && (
             <div className="relative mb-2.5 min-[400px]:mb-3">
               {loadingCityBranches
                 ? <div className={loaderCls}><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                 : <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)}
-                    disabled={branchList.length === 0}
+                    disabled={!selectedCityId || branchList.length === 0}
                     className={selectCls}
                     onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
                     onBlur={(e) => { e.target.style.borderColor = '' }}>
-                    <option value="">{branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
+                    <option value="">{!selectedCityId ? 'Select a city first' : branchList.length === 0 ? 'No branches available' : 'Select a branch'}</option>
                     {branchList.map((b) => <option key={b.branchId} value={String(b.branchId)}>{b.name}</option>)}
                   </select>
               }
@@ -127,17 +127,17 @@ export function Modal1({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Delivery: area */}
-          {orderType === 'delivery' && selectedCityId && (
+          {/* Delivery: area (always shown → stable modal height, no layout jump) */}
+          {orderType === 'delivery' && (
             <div className="relative mb-2.5 min-[400px]:mb-3">
               {loadingCityAreas
                 ? <div className={loaderCls}><Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} /></div>
                 : <select value={selectedAreaId} onChange={(e) => setSelectedAreaId(e.target.value)}
-                    disabled={areaList.length === 0}
+                    disabled={!selectedCityId || areaList.length === 0}
                     className={selectCls}
                     onFocus={(e) => { e.target.style.borderColor = 'var(--color-primary)' }}
                     onBlur={(e) => { e.target.style.borderColor = '' }}>
-                    <option value="">{areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
+                    <option value="">{!selectedCityId ? 'Select a city first' : areaList.length === 0 ? 'No areas available' : 'Select your area'}</option>
                     {areaList.map((a) => <option key={a.id} value={String(a.id)}>{a.name}</option>)}
                   </select>
               }
@@ -146,11 +146,27 @@ export function Modal1({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Previews */}
-          {orderType === 'pickup' && selectedBranchId && (
+          {orderType === 'pickup' && (
             <div className="mb-3 space-y-1 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 min-[400px]:py-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 min-[400px]:text-[11px] sm:text-xs">Selected Branch</p>
-              <p className="break-words text-sm font-bold text-neutral-800">{branchList.find((b) => String(b.branchId) === selectedBranchId)?.name ?? '—'}</p>
-              {selectedCityObj && <p className="text-[11px] text-neutral-500 sm:text-xs">{selectedCityObj.name}</p>}
+              {selectedBranchId ? (
+                <>
+                  <p className="break-words text-sm font-bold text-neutral-800">{branchList.find((b) => String(b.branchId) === selectedBranchId)?.name ?? '—'}</p>
+                  <p className="text-[11px] text-neutral-500 sm:text-xs">{selectedCityObj?.name ?? '\u00A0'}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-neutral-400">Choose a branch to continue</p>
+                  <p className="text-[11px] text-neutral-400 sm:text-xs">&nbsp;</p>
+                </>
+              )}
+            </div>
+          )}
+          {orderType === 'delivery' && !selectedAreaObj && (
+            <div className="mb-3 space-y-1 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 min-[400px]:py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 min-[400px]:text-[11px] sm:text-xs">Assigned Outlet</p>
+              <p className="text-sm font-medium text-neutral-400">Select an area to see your outlet</p>
+              <p className="text-[11px] text-neutral-400 sm:text-xs">&nbsp;</p>
             </div>
           )}
           {orderType === 'delivery' && selectedAreaObj && (

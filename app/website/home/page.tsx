@@ -715,7 +715,7 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
 function HeroSkeleton() {
   return (
     <section className="px-3 pb-2 pt-4 sm:px-5 sm:pb-3 sm:pt-5 lg:px-7 lg:pt-6">
-      <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
+      <div className="relative mx-auto aspect-[2.7/1] w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-800" />
 
         <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
@@ -1133,10 +1133,15 @@ export default function HomePage() {
                 <div className="mb-6">
                   {cat.banner ? (
                     <div className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-2xl">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      {/* width/height give the browser the banner's shape up front (no layout
+                          jump while it loads); the optimizer serves a screen-sized WebP/AVIF
+                          instead of the ~200KB original. Other ratios still render correctly. */}
+                      <Image
                         src={cat.banner}
                         alt={cat.label}
+                        width={2073}
+                        height={758}
+                        sizes="(min-width: 1320px) 1256px, calc(100vw - 32px)"
                         className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     </div>

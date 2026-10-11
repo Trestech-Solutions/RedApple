@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Poppins } from "next/font/google";
+import { preconnect } from "react-dom";
 import "./globals.css";
 import { AuthProvider } from "@/lib/hooks/useAuth";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
@@ -191,6 +192,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const seo = await fetchSeo()
+
+  // Open the connection to the API/media host while JS is still downloading —
+  // the menu request and product images then skip DNS + TLS setup on mobile.
+  if (BASE_URL) preconnect(BASE_URL, { crossOrigin: "anonymous" })
 
   return (
     <html lang="en" className={poppins.variable}>
