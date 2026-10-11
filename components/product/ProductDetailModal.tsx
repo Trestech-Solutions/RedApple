@@ -25,6 +25,7 @@
  */
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
@@ -79,7 +80,18 @@ function SectionLabel({ children, tone = 'neutral' }: { children: React.ReactNod
   )
 }
 
-export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+/**
+ * Rendered into <body> via a portal. The menu's category sections use
+ * `content-visibility: auto` (which implies CSS containment), and a contained
+ * ancestor becomes the containing block for `position: fixed` — without the
+ * portal the overlay was trapped inside the section instead of covering the screen.
+ */
+export function ProductDetailModal(props: ProductDetailModalProps) {
+  if (typeof document === 'undefined') return null
+  return createPortal(<ProductDetailModalContent {...props} />, document.body)
+}
+
+function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps) {
   const { addItem } = useCart()
   const { settings } = useStoreSettings()
   const { isOpen: storeOpen, closedMessage, isHoliday, holidayMessage } = useBusinessHours()

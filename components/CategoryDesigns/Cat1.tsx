@@ -15,10 +15,10 @@ export function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProp
 
   return (
     <nav
-      className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)] backdrop-blur-md"
+      className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)]"
       style={{ backgroundColor: navBg }}
     >
-      <div className="mx-auto flex max-w-[1400px] gap-1.5 overflow-x-auto scrollbar-hide snap-x touch-pan-x px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
+      <div className="mx-auto flex max-w-[1400px] gap-1.5 overflow-x-auto scrollbar-hide snap-x px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
         {categories.map((cat, i) => {
           const isActive = cat.id === activeCategoryId
           return (

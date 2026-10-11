@@ -13,6 +13,8 @@ import {
   MessageSquareWarning,
   ChevronRight,
   HelpCircle,
+  Phone,
+  MessageCircle,
 } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 
@@ -40,6 +42,12 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
   const { user } = useCart()
   const { settings } = useStoreSettings()
   const showLogin = settings.enable_user_login !== false
+
+  // Same phone rules as the navbar; the navbar only shows the number on wide
+  // screens (xl), so smaller screens get it here instead.
+  const showPhone  = settings.show_navbar !== false && !settings.hide_phone_from_header
+  const isWhatsapp = (settings.phone_icon_type || 'none') === 'whatsapp'
+  const phoneHref  = isWhatsapp ? 'https://wa.me/923366655786' : 'tel:021111022022'
 
   // Close on Escape + lock page scroll while open
   useEffect(() => {
@@ -137,7 +145,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
         </div>
 
         {/* Links */}
-        <nav className="relative mt-4 flex flex-col gap-2 px-4">
+        <nav className="relative mt-4 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-3">
           {MENU_ITEMS.map((item, i) => {
             const Icon = item.icon
             return (
@@ -147,7 +155,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
                 onClick={onClose}
                 style={enter(i + 1)}
                 className={enterCls(
-                  'group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3.5 backdrop-blur-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+                  'group relative flex shrink-0 items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3.5 backdrop-blur-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
                 )}
               >
                 {/* Fill that sweeps in from the left on hover */}
@@ -174,11 +182,35 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
         </nav>
 
         {/* Footer */}
-        <div className="relative mt-auto px-4 pb-6">
+        <div className="relative shrink-0 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
+          {showPhone && (
+            <a
+              href={phoneHref}
+              target={isWhatsapp ? '_blank' : undefined}
+              rel={isWhatsapp ? 'noopener noreferrer' : undefined}
+              onClick={onClose}
+              style={enter(MENU_ITEMS.length + 1)}
+              className={enterCls(
+                'group mb-3 flex w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white xl:hidden'
+              )}
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[var(--color-primary)] transition-transform duration-300 group-hover:-rotate-12">
+                {isWhatsapp ? <MessageCircle size={18} /> : <Phone size={18} />}
+              </span>
+              <span className="flex-1">
+                <span className="block text-[11px] font-medium uppercase tracking-[0.14em] text-white/70">
+                  {isWhatsapp ? 'Chat with us' : 'Call us'}
+                </span>
+                <span className="block text-base font-bold tabular-nums tracking-wide">021-111-022-022</span>
+              </span>
+              <ChevronRight size={18} className="opacity-60 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          )}
+
           {showLogin && (
             <button
               onClick={handleAuthClick}
-              style={enter(MENU_ITEMS.length + 1)}
+              style={enter(MENU_ITEMS.length + 2)}
               className={enterCls(
                 'group flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left text-[var(--color-primary)] shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
               )}
@@ -204,7 +236,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
             </button>
           )}
 
-          <p className={enterCls('mt-4 text-center text-xs text-white/60')} style={enter(MENU_ITEMS.length + (showLogin ? 2 : 1))}>
+          <p className={enterCls('mt-4 text-center text-xs text-white/60')} style={enter(MENU_ITEMS.length + (showLogin ? 3 : 2))}>
             Powered by <span className="font-bold text-white/80">Trestech</span>
           </p>
         </div>

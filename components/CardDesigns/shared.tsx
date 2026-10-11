@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Image, { type ImageProps } from 'next/image'
+import { UtensilsCrossed } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
@@ -209,4 +211,25 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
     storeClosed: !storeOpen,
     closedMessage,
   }
+}
+
+
+// ─── Product image with graceful fallback ────────────────────────────────────
+// Missing / broken image URLs used to leave an empty grey box. Show a soft
+// branded placeholder instead.
+
+export function ProductImage({ src, alt, className = '', ...rest }: ImageProps) {
+  const [failed, setFailed] = useState(false)
+  if (!src || failed) {
+    return (
+      <span
+        aria-label={typeof alt === 'string' ? alt : undefined}
+        role="img"
+        className="absolute inset-0 flex items-center justify-center bg-[color-mix(in_srgb,var(--color-primary)_8%,#f5f5f5)]"
+      >
+        <UtensilsCrossed className="h-1/3 w-1/3 text-[color-mix(in_srgb,var(--color-primary)_45%,#a3a3a3)]" strokeWidth={1.5} />
+      </span>
+    )
+  }
+  return <Image src={src} alt={alt} className={className} onError={() => setFailed(true)} {...rest} />
 }

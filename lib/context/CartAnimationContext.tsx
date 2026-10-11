@@ -29,14 +29,23 @@ interface CartAnimationContextType {
 
 const CartAnimationContext = createContext<CartAnimationContextType | undefined>(undefined)
 
-// ─── Cart icon target ID ──────────────────────────────────────────────────────
-// WebsiteNavbar renders the cart button with data-cart-target="true".
-// We query for it at fly-time so we always get the current position.
+// ─── Cart icon target ─────────────────────────────────────────────────────────
+// Cart buttons carry data-cart-target="true" (navbar cart + the floating cart
+// that appears once the navbar has scrolled away). At fly-time pick the one
+// that's actually on screen, so the item never flies off the top of the page.
 
-function getCartIconRect(): DOMRect | null {
+const FLY_MS = 1300
+
+function getCartTarget(): HTMLElement | null {
   if (typeof document === 'undefined') return null
-  const el = document.querySelector<HTMLElement>('[data-cart-target="true"]')
-  return el ? el.getBoundingClientRect() : null
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-cart-target="true"]'))
+  const vh = window.innerHeight
+  const vw = window.innerWidth
+  const onScreen = els.find((el) => {
+    const r = el.getBoundingClientRect()
+    return r.width > 0 && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw
+  })
+  return onScreen ?? els[0] ?? null
 }
 
 // ─── Provider ────────────────────────────────────────────────────────────────
@@ -47,8 +56,10 @@ export function CartAnimationProvider({ children }: { children: React.ReactNode 
   const [particles, setParticles] = useState<FlyParticle[]>([])
 
   const triggerFly = useCallback((sourceEl: HTMLElement, image: string) => {
-    const cartRect = getCartIconRect()
-    if (!cartRect) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const target = getCartTarget()
+    if (!target) return
+    const cartRect = target.getBoundingClientRect()
 
     const srcRect = sourceEl.getBoundingClientRect()
 
@@ -70,10 +81,18 @@ export function CartAnimationProvider({ children }: { children: React.ReactNode 
 
     setParticles((p) => [...p, particle])
 
-    // Remove after animation completes (750 ms)
+    // Little "catch" bounce on the cart as the item lands
+    setTimeout(() => {
+      target.animate?.(
+        [{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(.95)' }, { transform: 'scale(1)' }],
+        { duration: 450, easing: 'ease-out' },
+      )
+    }, FLY_MS - 120)
+
+    // Remove after the animation completes
     setTimeout(() => {
       setParticles((p) => p.filter((x) => x.id !== particle.id))
-    }, 800)
+    }, FLY_MS + 100)
   }, [])
 
   return (
@@ -95,7 +114,7 @@ export function useCartAnimation() {
 // (startX, startY) to (endX, endY) along a quadratic bezier arc using a
 // CSS @keyframes injected once.
 
-const STYLE_ID = 'fly-to-cart-styles'
+const STYLE_ID = 'fly-to-cart-styles-v2'
 
 function ensureStyles() {
   if (typeof document === 'undefined') return
@@ -103,30 +122,42 @@ function ensureStyles() {
 
   const style = document.createElement('style')
   style.id = STYLE_ID
+  // Horizontal and vertical motion run on separate layers with different
+  // easing, which bends the straight line into a natural arc: the item lifts
+  // and pops a little, then glides into the cart while shrinking.
   style.textContent = `
-    @keyframes fly-to-cart {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      60% {
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--fly-dx), var(--fly-dy)) scale(0.15);
-        opacity: 0;
-      }
+    @keyframes fly-x {
+      from { transform: translateX(0); }
+      to   { transform: translateX(var(--fly-dx)); }
+    }
+    @keyframes fly-y {
+      0%   { transform: translateY(0) scale(1); }
+      18%  { transform: translateY(-44px) scale(1.15); }
+      100% { transform: translateY(var(--fly-dy)) scale(0.25); }
+    }
+    @keyframes fly-fade {
+      0%, 82% { opacity: 1; }
+      100%    { opacity: 0; }
     }
 
     .fly-particle {
       position: fixed;
       z-index: 9999;
+      pointer-events: none;
+      will-change: transform;
+      animation: fly-x ${FLY_MS}ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+    }
+    .fly-particle-inner {
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       overflow: hidden;
-      pointer-events: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-      border: 2px solid rgba(255,255,255,0.7);
-      animation: fly-to-cart 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+      border: 2px solid rgba(255,255,255,0.85);
+      will-change: transform, opacity;
+      animation:
+        fly-y ${FLY_MS}ms cubic-bezier(0.5, 0, 0.75, 1) forwards,
+        fly-fade ${FLY_MS}ms linear forwards;
     }
   `
   document.head.appendChild(style)
@@ -157,12 +188,14 @@ function FlyingParticlesRenderer({ particles }: { particles: FlyParticle[] }) {
               '--fly-dy': `${dy}px`,
             } as React.CSSProperties}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={p.image}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            <div className="fly-particle-inner">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.image}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
           </div>
         )
       })}

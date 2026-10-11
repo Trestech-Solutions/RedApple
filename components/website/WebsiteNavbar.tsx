@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MapPin, Phone, ShoppingCart, MessageCircle } from 'lucide-react'
+import { MapPin, Phone, ShoppingBag, MessageCircle, ChevronDown, Menu } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { UserDropdown } from '@/components/website/UserDropdown'
 import { RecentOrdersDropdown } from '@/components/website/RecentOrdersDropdown'
@@ -23,144 +23,83 @@ function resolveMediaUrl(path?: string | null): string {
   return FALLBACK_LOGO
 }
 
+/** Only accept well-formed hex colours (store data has values like '#00000'). */
+function validHex(color?: string | null): string | undefined {
+  const c = color?.trim()
+  return c && /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c) ? c : undefined
+}
+
+/** True when a #rgb / #rrggbb colour is dark enough to need light text on top. */
+function isDarkColor(color: string): boolean {
+  const hex = color.trim().replace('#', '')
+  if (!/^[0-9a-f]{3}([0-9a-f]{3})?$/i.test(hex)) return false
+  const full = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex
+  const r = parseInt(full.slice(0, 2), 16)
+  const g = parseInt(full.slice(2, 4), 16)
+  const b = parseInt(full.slice(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.55
+}
+
 /* ------------------------------------------------------------------ */
-/*  Animations + hover states                                          */
-/*  Colors come from CSS variables so the store's theme still rules:   */
-/*    --wn-fg   = settings.foreground_color                            */
-/*    --wn-bg   = settings.navbar_color                                */
-/*    --wn-icon = icon color on top of the light circles               */
+/*  Colours come from CSS variables so the store's theme still rules:  */
+/*    --wn-bg    = settings.navbar_color      (bar surface)            */
+/*    --wn-brand = brand accent (merchant_header_background / fg)     */
+/*    --wn-text  = readable text on the bar (auto light/dark)         */
 /* ------------------------------------------------------------------ */
 const NAVBAR_CSS = `
-@keyframes wn-drop {
-  from { opacity: 0; transform: translateY(-28px) scale(.97); }
-  to   { opacity: 1; transform: none; }
+@keyframes wn-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes wn-bump  { 0%,100% { transform: scale(1); } 35% { transform: scale(1.14); } 70% { transform: scale(.96); } }
+@keyframes wn-pop   { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes wn-ping  { 0% { transform: scale(1); opacity: .7; } 80%,100% { transform: scale(2.4); opacity: 0; } }
+@keyframes wn-spin  { to { transform: rotate(360deg); } }
+@keyframes wn-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes wn-logo-in {
+  0%   { opacity: 0; transform: translateY(-16px) scale(.7) rotate(-12deg); }
+  60%  { opacity: 1; transform: translateY(2px) scale(1.06) rotate(3deg); }
+  100% { opacity: 1; transform: none; }
 }
-@keyframes wn-in {
-  from { opacity: 0; transform: translateY(-10px) scale(.85); }
-  to   { opacity: 1; transform: none; }
-}
-@keyframes wn-spin { to { transform: rotate(360deg); } }
-@keyframes wn-ping {
-  0%   { transform: scale(1); opacity: .75; }
-  80%, 100% { transform: scale(2.6); opacity: 0; }
-}
-@keyframes wn-pop {
-  0%   { transform: scale(0); }
-  60%  { transform: scale(1.4); }
-  100% { transform: scale(1); }
-}
-@keyframes wn-bump {
-  0%, 100% { transform: scale(1) rotate(0); }
-  30% { transform: scale(1.2) rotate(-10deg); }
-  60% { transform: scale(.94) rotate(6deg); }
-}
-@keyframes wn-wiggle {
-  0%, 100% { transform: rotate(0); }
-  20% { transform: rotate(-18deg); }
-  40% { transform: rotate(16deg); }
-  60% { transform: rotate(-10deg); }
-  80% { transform: rotate(8deg); }
-}
-@keyframes wn-hop {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-@keyframes wn-sheen {
-  0%, 70% { transform: translateX(-120%) skewX(-18deg); }
-  100%    { transform: translateX(320%) skewX(-18deg); }
+@keyframes wn-shine { 0%,72% { transform: translateX(-180%) skewX(-20deg); } 100% { transform: translateX(280%) skewX(-20deg); } }
+
+.wn-bar  { animation: wn-enter .45s cubic-bezier(.2,.8,.2,1) both; }
+.wn-bump { animation: wn-bump .5s ease; }
+.wn-pop  { animation: wn-pop .35s cubic-bezier(.3,1.6,.5,1); }
+.wn-ping { animation: wn-ping 2s cubic-bezier(0,0,.2,1) infinite; }
+
+/* Logo: entrance once, then a slow float + rotating brand ring + occasional shine.
+   Transform/opacity only, so it stays smooth on phones. */
+.wn-logo-in    { animation: wn-logo-in .9s cubic-bezier(.2,.9,.25,1) .1s both; }
+.wn-logo-float { animation: wn-float 5s ease-in-out 1s infinite; }
+.wn-logo-ring  { animation: wn-spin 9s linear infinite; }
+.wn-logo-tile  { transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
+.wn-logo:hover .wn-logo-tile { transform: scale(1.06) rotate(-3deg); }
+.wn-logo-shine::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+  animation: wn-shine 6.5s ease-in-out 1.6s infinite;
+  pointer-events: none;
 }
 
-/* One orchestrated entrance: bar drops in, then items pop in one by one */
-.wn-bar { animation: wn-drop .8s cubic-bezier(.2,.9,.25,1) backwards; }
-.wn-in  { animation: wn-in .55s cubic-bezier(.2,.9,.25,1) backwards; animation-delay: var(--d, 0ms); }
+/* Quiet "ghost" control: transparent until hovered */
+.wn-ghost { transition: background-color .2s ease, color .2s ease; }
+.wn-ghost:hover { background-color: color-mix(in srgb, var(--wn-text) 6%, transparent); }
 
-/* Premium bar: soft sheen sweep every few seconds */
-.wn-sheen {
-  position: absolute; top: 0; bottom: 0; left: 0; width: 22%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
-  animation: wn-sheen 9s ease-in-out infinite;
+/* Primary control (cart): solid brand */
+.wn-primary {
+  background-color: var(--wn-brand);
+  color: var(--wn-on-brand);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--wn-brand) 70%, transparent);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
 }
+.wn-primary:hover  { filter: brightness(1.06); box-shadow: 0 10px 22px -8px color-mix(in srgb, var(--wn-brand) 75%, transparent); }
+.wn-primary:active { transform: scale(.95); }
 
-/* Round icon buttons (light circle, dark icon) */
-.wn-btn {
-  background: linear-gradient(145deg, color-mix(in srgb, var(--wn-fg) 100%, white), var(--wn-fg) 55%, color-mix(in srgb, var(--wn-fg) 88%, black));
-  color: var(--wn-icon);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.55),
-    inset 0 -1px 0 rgba(0,0,0,.08),
-    0 6px 14px -6px rgba(0,0,0,.45);
-  transition: transform .3s cubic-bezier(.3,1.7,.5,1), box-shadow .3s ease;
-}
-.wn-btn:hover {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.6),
-    0 14px 28px -10px color-mix(in srgb, var(--wn-fg) 75%, transparent),
-    0 0 0 5px color-mix(in srgb, var(--wn-fg) 22%, transparent);
-}
-.wn-lift:hover  { transform: translateY(-2px) scale(1.08); }
-.wn-lift:active { transform: scale(.92); }
-.wn-bump { animation: wn-bump .6s ease; }
-.wn-pop  { animation: wn-pop .4s cubic-bezier(.3,1.7,.5,1); }
-
-/* Pills (location, phone): same contrast as the cart button */
-.wn-pill {
-  background: linear-gradient(145deg, color-mix(in srgb, var(--wn-fg) 100%, white), var(--wn-fg) 55%, color-mix(in srgb, var(--wn-fg) 88%, black));
-  color: var(--wn-icon);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.55),
-    inset 0 -1px 0 rgba(0,0,0,.08),
-    0 6px 14px -6px rgba(0,0,0,.45);
-  transition: transform .3s cubic-bezier(.3,1.7,.5,1), box-shadow .3s ease;
-}
-.wn-pill:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.6),
-    0 14px 28px -10px color-mix(in srgb, var(--wn-fg) 75%, transparent),
-    0 0 0 5px color-mix(in srgb, var(--wn-fg) 22%, transparent);
-}
-.wn-pill:active { transform: scale(.96); }
-.wn-pill:hover .wn-pin  { animation: wn-hop .5s ease infinite; }
-.wn-pill:hover .wn-ring { animation: wn-wiggle .7s ease; }
-.wn-ping { animation: wn-ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
-
-/* Logo: slowly rotating ring is the one always-on motion */
-.wn-logo-ring { animation: wn-spin 7s linear infinite; }
-
-/* Hamburger that morphs on hover */
-.wn-burger span {
-  display: block; height: 3px; border-radius: 3px; background: currentColor;
-  transition: width .3s cubic-bezier(.3,1.4,.5,1), transform .3s ease;
-}
-.wn-burger span:nth-child(1) { width: 18px; }
-.wn-burger span:nth-child(2) { width: 18px; }
-.wn-burger span:nth-child(3) { width: 12px; }
-.wn-menu:hover .wn-burger span { width: 18px; }
-.wn-menu:active .wn-burger span:nth-child(2) { transform: scaleX(.5); }
-
-.wn-focus:focus-visible { outline: 2px solid var(--wn-fg); outline-offset: 3px; }
-
-@media (min-width: 400px) {
-  .wn-burger span:nth-child(1) { width: 20px; }
-  .wn-burger span:nth-child(2) { width: 20px; }
-  .wn-burger span:nth-child(3) { width: 14px; }
-  .wn-menu:hover .wn-burger span { width: 20px; }
-}
-@media (min-width: 640px) {
-  .wn-burger span:nth-child(1) { width: 22px; }
-  .wn-burger span:nth-child(2) { width: 22px; }
-  .wn-burger span:nth-child(3) { width: 15px; }
-  .wn-menu:hover .wn-burger span { width: 22px; }
-}
+.wn-focus:focus-visible { outline: 2px solid var(--wn-brand); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .wn-bar, .wn-in, .wn-bump, .wn-pop, .wn-logo-ring, .wn-ping, .wn-sheen,
-  .wn-pill:hover .wn-pin, .wn-pill:hover .wn-ring { animation: none !important; }
-  .wn-btn, .wn-pill, .wn-burger span { transition-duration: .01ms !important; }
+  .wn-bar, .wn-bump, .wn-pop, .wn-ping, .wn-logo-in, .wn-logo-float, .wn-logo-ring,
+  .wn-logo-shine::after { animation: none !important; }
 }
 `
-
-const delay = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties
 
 interface WebsiteNavbarProps {
   onLoginClick: () => void
@@ -173,13 +112,18 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
   const { totalItems, openCart, location, openLocationModal } = useCart()
   const { settings } = useStoreSettings()
 
-  /* ---------- theme (all from store settings, same as before) ---------- */
-  const navBg              = settings.navbar_color                || '#000000'
-  const pillBg             = settings.foreground_color            || '#ffffff'
-  const navbarTextColor    = settings.merchant_header_background  || settings.foreground_color  || '#FBD00E'
-  const headerBg           = settings.merchant_header_background  || ''
-  // Icons sit on light circles (pillBg), so they take the brand text colour (merchant_header_background).
-  const iconTextColor      = navbarTextColor
+  /* ---------- theme (all from store settings) ---------- */
+  const navBg     = validHex(settings.navbar_color) || '#ffffff'
+  const logoBg    = validHex(settings.foreground_color) || '#ffffff'
+  // Accent = the store's brand colour (same red as the category bar / buttons).
+  const brand     =
+    validHex(settings.primary_color) ||
+    validHex(settings.merchant_header_background) ||
+    validHex(settings.category_navbar_background_color) ||
+    '#171717'
+  const barIsDark = isDarkColor(navBg)
+  const textColor = barIsDark ? '#ffffff' : '#171717'
+  const onBrand   = isDarkColor(brand) ? '#ffffff' : '#171717'
 
   const logoSrc = resolveMediaUrl(settings.merchant_logo)
   const logoLeftAlign = Boolean(settings.logo_left_align)
@@ -190,12 +134,11 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
 
   const showPhone = settings.show_navbar !== false && !settings.hide_phone_from_header
   const showCartIcon = settings.show_cart_icon !== false
-  const phoneIconType = settings.phone_icon_type || 'none'
-  const isWhatsapp = phoneIconType === 'whatsapp'
+  const isWhatsapp = (settings.phone_icon_type || 'none') === 'whatsapp'
   const phoneHref = isWhatsapp ? 'https://wa.me/923366655786' : 'tel:021111022022'
 
   const isHome = pathname === '/' || pathname === '/website/home'
-  const locationLabel = location || 'NED University'
+  const locationLabel = location || 'Select location'
 
   /* ---------- cart bump when an item is added ---------- */
   const [bump, setBump] = useState(false)
@@ -205,233 +148,180 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
     prevItems.current = totalItems
     if (!increased) return
     setBump(true)
-    const t = setTimeout(() => setBump(false), 650)
+    const t = setTimeout(() => setBump(false), 550)
     return () => clearTimeout(t)
   }, [totalItems])
 
-  /* ---------- logo (responsive across all breakpoints) ---------- */
+  /* ---------- logo ---------- */
+  // Big badge logo that hangs over the bar's bottom edge (unless the store
+  // chose "fit to navbar", which keeps it small and inside the bar).
   const logoBox = logoFit
-    ? 'h-8 w-8 min-[400px]:h-9 min-[400px]:w-9 sm:h-10 sm:w-10'
-    : 'h-15 w-15 min-[400px]:h-14 min-[400px]:w-14 sm:h-[72px] sm:w-[72px] md:h-[88px] md:w-[88px] lg:h-[104px] lg:w-[104px]'
-  const logoImgSize = logoFit ? 56 : 144
+    ? 'h-10 w-10 sm:h-11 sm:w-11'
+    : 'h-[60px] w-[60px] sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-[108px] lg:w-[108px]'
   const logoSpacer = logoFit
-    ? 'w-10 sm:w-12'
-    : 'w-14 min-[400px]:w-16 sm:w-24 md:w-28 lg:w-[120px]'
-  const logoY = logoFit ? 'top-1/2' : 'top-full'
-  const ringGradient = `conic-gradient(from 0deg, ${pillBg}, transparent 30%, ${pillBg} 55%, transparent 80%, ${pillBg})`
+    ? 'w-10 sm:w-11'
+    : 'w-[60px] sm:w-20 md:w-24 lg:w-[108px]'
+  const logoPos = logoFit ? 'top-1/2 -translate-y-1/2' : 'top-1.5 sm:top-2'
+  const ringGradient =
+    `conic-gradient(from 0deg, ${brand}, color-mix(in srgb, ${brand} 8%, transparent) 25%, ` +
+    `${brand} 50%, color-mix(in srgb, ${brand} 8%, transparent) 75%, ${brand})`
 
   const LogoElement = (
-    <div className="wn-in" style={delay(80)}>
-      <div className="relative rounded-full p-[2px] sm:p-[3px] lg:p-1">
-        {/* soft glow + crisp ring, both rotating */}
+    <span className="wn-logo wn-logo-in relative block">
+      <span className="wn-logo-float relative block">
+        {/* soft glow + crisp rotating brand ring */}
+        <span aria-hidden className="wn-logo-ring absolute -inset-1.5 rounded-full opacity-50 blur-md" style={{ background: ringGradient }} />
+        <span aria-hidden className="wn-logo-ring absolute -inset-[5px] rounded-full" style={{ background: ringGradient }} />
         <span
-          aria-hidden
-          className="wn-logo-ring absolute inset-0 rounded-full opacity-70 blur-[8px]"
-          style={{ background: ringGradient }}
-        />
-        <span
-          aria-hidden
-          className="wn-logo-ring absolute inset-0 rounded-full"
-          style={{ background: ringGradient }}
-        />
-        <span
-          className={`relative grid ${logoBox} place-items-center overflow-hidden rounded-full shadow-[0_12px_28px_-10px_rgba(0,0,0,.65)] ring-2 ring-white/40 sm:shadow-[0_16px_34px_-10px_rgba(0,0,0,.65)]`}
-          style={{ backgroundColor: pillBg }}
+          className={`wn-logo-tile wn-logo-shine relative grid ${logoBox} place-items-center overflow-hidden rounded-full`}
+          style={{
+            backgroundColor: logoBg,
+            boxShadow: `0 0 0 3px ${navBg}, 0 16px 32px -12px rgba(0,0,0,.5)`,
+          }}
         >
           <Image
             src={logoSrc}
             alt="Logo"
-            width={logoImgSize}
-            height={logoImgSize}
-            className="h-full w-full object-contain p-0.5"
-            loading="eager"
+            width={216}
+            height={216}
+            className="h-full w-full object-contain p-[12%]"
             priority
           />
         </span>
-      </div>
-    </div>
+      </span>
+    </span>
   )
 
   const LogoLinked = logoIsExternal ? (
-    <a
-      href={logoLink}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Visit website"
-      className="wn-focus shrink-0 rounded-full"
-    >
+    <a href={logoLink} target="_blank" rel="noopener noreferrer" aria-label="Visit website" className="wn-focus block shrink-0 rounded-full">
       {LogoElement}
     </a>
   ) : isHome ? (
     <div className="shrink-0">{LogoElement}</div>
   ) : (
-    <Link href={logoLink} aria-label="Home" className="wn-focus shrink-0 rounded-full">
+    <Link href={logoLink} aria-label="Home" className="wn-focus block shrink-0 rounded-full">
       {LogoElement}
     </Link>
   )
 
-  /* ---------- bar surface (no shade gradient) ---------- */
-  const barSurface: CSSProperties = {
-    backgroundColor: navBg,
-    backgroundImage: headerBg ? `url("${headerBg}")` : undefined,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backdropFilter: 'blur(18px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(18px) saturate(180%)',
-    border: `1px solid color-mix(in srgb, ${pillBg} 28%, transparent)`,
-    boxShadow: [
-      'inset 0 1px 0 rgba(255,255,255,.28)',
-      'inset 0 -1px 0 rgba(0,0,0,.25)',
-      '0 18px 40px -16px rgba(0,0,0,.55)',
-      '0 2px 6px rgba(0,0,0,.15)',
-    ].join(', '),
-  }
-
   const themeVars = {
-    '--wn-fg':   pillBg,
-    '--wn-bg':   navBg,
-    '--wn-icon': iconTextColor,
+    '--wn-bg': navBg,
+    '--wn-brand': brand,
+    '--wn-on-brand': onBrand,
+    '--wn-text': textColor,
   } as CSSProperties
+
+  const muted = barIsDark ? 'text-white/60' : 'text-neutral-500'
+  const hairline = `color-mix(in srgb, ${textColor} 9%, transparent)`
 
   return (
     <header
-      className="relative z-30 w-full px-1.5 pt-1.5 min-[400px]:px-2 min-[400px]:pt-2 sm:px-3 sm:pt-2.5 md:px-4 md:pt-3"
-      style={{ ...themeVars, color: navbarTextColor }}
+      id="site-header"
+      className="relative z-30 w-full px-3 pt-3 sm:px-4 sm:pt-4 md:px-6"
+      style={{ ...themeVars, color: textColor }}
     >
       <style dangerouslySetInnerHTML={{ __html: NAVBAR_CSS }} />
 
-      <div className="wn-bar relative mx-auto max-w-[1400px] rounded-full">
-        {/* Surface layer: background lives here so dropdowns aren't affected */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
-          style={barSurface}
-        >
-          <span className="wn-sheen" />
-        </div>
-
-        {/* Floating logo: centre sits on the bar's bottom edge, so half hangs onto the page */}
-        <div
-          className={`pointer-events-none absolute z-20 -translate-y-1/2 ${logoY} ${
-            logoLeftAlign ? 'left-2 min-[400px]:left-2.5 sm:left-4' : 'inset-x-0 flex justify-center'
-          }`}
-        >
-          <div className="pointer-events-auto">{LogoLinked}</div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex items-center gap-2 px-2 py-2 min-[400px]:gap-2.5 min-[400px]:px-2.5 min-[400px]:py-2.5 sm:gap-3 sm:px-3 sm:py-3 md:gap-3.5 md:px-3.5">
-          {/* Left cluster */}
-          <div className="flex min-w-0 flex-1 basis-0 items-center gap-2 min-[400px]:gap-2.5">
+      <div
+        className="wn-bar relative mx-auto max-w-[1400px] rounded-2xl sm:rounded-[20px]"
+        style={{
+          backgroundColor: navBg,
+          border: `1px solid ${hairline}`,
+          boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 12px 32px -18px rgba(0,0,0,.28)',
+        }}
+      >
+        <div className="relative flex h-16 items-center gap-2 px-2.5 sm:h-[72px] sm:gap-3 sm:px-4 md:h-20 md:px-5">
+          {/* ── Left ── */}
+          <div className="flex min-w-0 flex-1 basis-0 items-center gap-2 sm:gap-3">
             {logoLeftAlign && <div aria-hidden className={`${logoSpacer} shrink-0`} />}
 
-            {/* ── Location pill ── */}
             <button
               type="button"
               onClick={() => openLocationModal()}
-              aria-label="Change location"
-              className="wn-pill wn-in wn-focus flex min-w-0 items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-left ring-1 ring-inset ring-black/5 min-[400px]:py-2 sm:gap-2.5 sm:pr-4"
-              style={delay(160)}
+              aria-label={`Change location (currently ${locationLabel})`}
+              className="wn-ghost wn-focus group flex min-w-0 items-center gap-2 rounded-xl p-1 pr-1.5 text-left sm:gap-2.5 sm:p-1.5 sm:pr-3"
             >
               <span
-                className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full min-[400px]:h-9 min-[400px]:w-9 sm:h-10 sm:w-10"
-                style={{ backgroundColor: 'color-mix(in srgb, var(--wn-icon) 14%, transparent)' }}
+                className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl sm:h-10 sm:w-10"
+                style={{ backgroundColor: `color-mix(in srgb, ${brand} 12%, transparent)`, color: brand }}
               >
-                <MapPin size={16} strokeWidth={2.4} className="wn-pin min-[400px]:hidden" />
-                <MapPin size={19} strokeWidth={2.3} className="wn-pin hidden min-[400px]:block sm:hidden" />
-                <MapPin size={21} strokeWidth={2.2} className="wn-pin hidden sm:block" />
-                <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
-                  <span className="wn-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-1 ring-black/10" />
-                </span>
+                <MapPin size={18} strokeWidth={2.2} />
+                {location && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
+                    <span className="wn-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2" style={{ ['--tw-ring-color' as string]: navBg }} />
+                  </span>
+                )}
               </span>
-
-              {/* sm and up: two lines */}
-              <span className="hidden min-w-0 leading-tight sm:block">
-                <span className="block text-[11px] font-medium uppercase tracking-[0.12em] opacity-60">
+              <span className="min-w-0 leading-tight">
+                <span className={`hidden text-[10px] font-semibold uppercase tracking-[0.14em] sm:block ${muted}`}>
                   Deliver to
                 </span>
-                <span className="block max-w-[120px] truncate text-sm font-bold md:max-w-[170px]">
-                  {locationLabel}
+                <span className="flex items-center gap-1">
+                  <span className="block max-w-[72px] truncate text-xs font-semibold min-[400px]:max-w-[104px] sm:max-w-[150px] sm:text-sm md:max-w-[200px]">
+                    {locationLabel}
+                  </span>
+                  <ChevronDown size={14} className={`hidden shrink-0 transition-transform group-hover:translate-y-px sm:block ${muted}`} />
                 </span>
               </span>
-
-              {/* mobile: one line */}
-              <span className="max-w-[90px] truncate text-[11px] font-bold min-[400px]:max-w-[85px] min-[400px]:text-xs sm:hidden">
-                {locationLabel}
-              </span>
             </button>
+          </div>
 
-            {/* ── Phone / WhatsApp pill ── */}
+          {/* ── Centre logo ── */}
+          <div
+            className={`pointer-events-none absolute z-20 ${logoPos} ${
+              logoLeftAlign ? 'left-2.5 sm:left-4 md:left-5' : 'inset-x-0 flex justify-center'
+            }`}
+          >
+            <div className="pointer-events-auto">{LogoLinked}</div>
+          </div>
+
+          {/* ── Right ── */}
+          <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-1.5 md:gap-2">
             {showPhone && (
               <a
                 href={phoneHref}
                 target={isWhatsapp ? '_blank' : undefined}
                 rel={isWhatsapp ? 'noopener noreferrer' : undefined}
                 aria-label={isWhatsapp ? 'Chat on WhatsApp' : 'Call us'}
-                className="wn-pill wn-in wn-focus hidden shrink-0 items-center gap-2.5 rounded-full p-1.5 ring-1 ring-inset ring-black/5 sm:flex lg:py-1.5 lg:pl-1.5 lg:pr-4"
-                style={delay(240)}
+                className="wn-ghost wn-focus hidden h-10 items-center gap-2 rounded-xl px-3 lg:flex"
               >
-                <span
-                  className="wn-ring grid h-10 w-10 shrink-0 place-items-center rounded-full"
-                  style={{
-                    backgroundColor: isWhatsapp
-                      ? 'color-mix(in srgb, #25D366 24%, transparent)'
-                      : 'color-mix(in srgb, var(--wn-icon) 14%, transparent)',
-                    color: isWhatsapp ? '#128C7E' : 'inherit',
-                  }}
-                >
-                  {isWhatsapp ? <MessageCircle size={20} strokeWidth={2.2} /> : <Phone size={20} strokeWidth={2.2} />}
-                </span>
-                <span className="hidden text-sm font-bold tracking-wide lg:inline">
+                {isWhatsapp
+                  ? <MessageCircle size={18} strokeWidth={2.2} className="text-[#25D366]" />
+                  : <Phone size={17} strokeWidth={2.2} style={{ color: brand }} />}
+                <span className="hidden text-sm font-semibold tabular-nums tracking-wide xl:inline">
                   021-111-022-022
                 </span>
               </a>
             )}
-          </div>
 
-          {/* Center logo spacer (only when logo centered, on smaller screens) */}
-          {!logoLeftAlign && <div aria-hidden className={`${logoSpacer} shrink-0 lg:hidden`} />}
+            {showPhone && (
+              <span aria-hidden className="mx-1 hidden h-6 w-px lg:block" style={{ backgroundColor: hairline }} />
+            )}
 
-          {/* Right cluster */}
-          <div className="flex shrink-0 items-center justify-end gap-1.5 min-[400px]:gap-2 sm:gap-2.5">
             {settings.enable_user_login !== false && (
-              <div
-                className="wn-btn wn-in relative flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full px-2 py-1 min-[400px]:min-h-11 min-[400px]:min-w-11 sm:min-h-12 sm:min-w-12 sm:px-2.5"
-                style={delay(280)}
-              >
+              <div className="wn-ghost flex h-10 min-w-10 items-center justify-center rounded-xl px-2.5 text-sm font-semibold [&_button]:hover:no-underline sm:px-3">
                 <UserDropdown onLoginClick={onLoginClick} />
               </div>
             )}
 
-            {/* Recent orders: only renders when cookie has order IDs */}
-            <RecentOrdersDropdown navFg={navbarTextColor} iconTextColor={iconTextColor} />
+            {/* Recent orders: only renders when the cookie has order IDs */}
+            <RecentOrdersDropdown navFg={brand} iconTextColor={onBrand} />
 
-            {/* ── Cart icon ── */}
             {showCartIcon && (
               <button
                 type="button"
                 onClick={openCart}
-                aria-label="Open cart"
+                aria-label={totalItems > 0 ? `Open cart, ${totalItems} items` : 'Open cart'}
                 data-cart-target="true"
-                className={`wn-btn wn-lift wn-in wn-focus relative grid h-10 w-10 place-items-center rounded-full ring-1 ring-inset ring-black/5 min-[400px]:h-11 min-[400px]:w-11 sm:h-12 sm:w-12 ${
-                  bump ? 'wn-bump' : ''
-                }`}
-                style={delay(340)}
+                className={`wn-primary wn-focus relative grid h-10 w-10 place-items-center rounded-xl sm:h-11 sm:w-11 ${bump ? 'wn-bump' : ''}`}
               >
-                <ShoppingCart size={18} strokeWidth={2.4} className="min-[400px]:hidden" />
-                <ShoppingCart size={21} strokeWidth={2.3} className="hidden min-[400px]:block sm:hidden" />
-                <ShoppingCart size={23} strokeWidth={2.2} className="hidden sm:block" />
-
+                <ShoppingBag size={19} strokeWidth={2.2} />
                 {totalItems > 0 && (
                   <span
                     key={totalItems}
-                    className="wn-pop absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[10px] font-extrabold leading-none shadow-md min-[400px]:h-5 min-[400px]:min-w-5 min-[400px]:text-[11px]"
-                    style={{
-                      backgroundColor: navBg,
-                      color: navbarTextColor,
-                      boxShadow: `0 0 0 2px ${navbarTextColor}`,
-                    }}
+                    className="wn-pop absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[10px] font-bold leading-none tabular-nums"
+                    style={{ backgroundColor: navBg, color: brand, boxShadow: `0 0 0 2px ${brand}` }}
                   >
                     {totalItems > 99 ? '99+' : totalItems}
                   </span>
@@ -439,19 +329,13 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
               </button>
             )}
 
-            {/* ── Menu icon ── */}
             <button
               type="button"
               aria-label="Open menu"
               onClick={onMenuClick}
-              className="wn-btn wn-lift wn-menu wn-in wn-focus grid h-10 w-10 place-items-center rounded-full ring-1 ring-inset ring-black/5 min-[400px]:h-11 min-[400px]:w-11 sm:h-12 sm:w-12"
-              style={delay(400)}
+              className="wn-ghost wn-focus grid h-10 w-10 place-items-center rounded-xl sm:h-11 sm:w-11"
             >
-              <span className="wn-burger flex flex-col items-center gap-[4px] min-[400px]:gap-[5px]">
-                <span />
-                <span />
-                <span />
-              </span>
+              <Menu size={21} strokeWidth={2.2} />
             </button>
           </div>
         </div>

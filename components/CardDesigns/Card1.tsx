@@ -7,9 +7,8 @@
  * Tweak the values in the `SIZE_VARS` string below.
  */
 
-import Image from 'next/image'
 import { Check, Minus, Plus } from 'lucide-react'
-import { useCardLogic, FOCUS_RING, Chip, type ProductCardProps } from './shared'
+import { useCardLogic, FOCUS_RING, Chip, type ProductCardProps, ProductImage } from './shared'
 
 const FONT_FAMILY = 'Poppins, "Poppins Fallback", sans-serif'
 
@@ -125,7 +124,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
       {/* Image */}
       <div className="relative flex-shrink-0" style={{ width: 'var(--img)', height: 'var(--img)' }}>
         <div className="absolute inset-0 overflow-hidden rounded-xl bg-neutral-100">
-          <Image
+          <ProductImage
             src={product.image}
             alt={product.name}
             fill

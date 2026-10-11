@@ -44,7 +44,8 @@
 }
 
 :root {
-  color-scheme: light dark;
+  /* Storefront is light-only; "light dark" turned native inputs/scrollbars dark on dark-mode phones. */
+  color-scheme: light;
   --background: #FAFAFA;
   --foreground: #18181B;
   --card: #FFFFFF;
@@ -66,8 +67,36 @@
 @layer base {
   html {
     @apply bg-background;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    /* Never allow sideways scrolling on phones (a single over-wide child would
+       otherwise make the whole page wobble horizontally). `clip` keeps sticky working. */
+    overflow-x: clip;
+  }
+  img, video, svg {
+    max-width: 100%;
+  }
+  button, a, [role='button'] {
+    touch-action: manipulation; /* no 300ms double-tap-zoom delay */
+  }
+}
+
+/* Long menus: let the browser skip layout/paint for off-screen category
+   sections until they're about to scroll into view. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

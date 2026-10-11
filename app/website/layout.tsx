@@ -1,22 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import {
   CartProvider, StoreSettingsProvider, useStoreSettings, useCart,
 } from '@/lib/hooks/useCart'
 import { ReduxProvider } from '@/redux/Provider'
-import { CartDrawer } from '@/components/cart/CartDrawer'
 import { CartBar } from '@/components/cart/CartBar'
 import { WebsiteBootstrap } from '@/components/website/WebsiteBootstrap'
 import { WebsiteNavbar } from '@/components/website/WebsiteNavbar'
 import { WebsiteFooter } from '@/components/website/WebsiteFooter'
 import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
-import { AuthModal } from '@/components/auth/AuthModal'
-import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
-import { MenuDrawer } from '@/components/website/MenuDrawer'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { FloatingActions } from '@/components/website/FloatingActions'
 import { CartAnimationProvider } from '@/lib/context/CartAnimationContext'
+
+// Overlays are code-split: they (and framer-motion, used by CartDrawer) load
+// after the menu is interactive instead of blocking the first paint.
+const CartDrawer = dynamic(() => import('@/components/cart/CartDrawer').then((m) => m.CartDrawer), { ssr: false })
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal').then((m) => m.AuthModal), { ssr: false })
+const CorporateOrderModal = dynamic(
+  () => import('@/components/website/CorporateOrderModal').then((m) => m.CorporateOrderModal),
+  { ssr: false },
+)
+const MenuDrawer = dynamic(() => import('@/components/website/MenuDrawer').then((m) => m.MenuDrawer), { ssr: false })
 
 const DEFAULT_PATTERN_URL =
   'https://assets.indolj.io/upload/1693394669-Final-Pattern.png'
@@ -56,10 +63,11 @@ function WhatsAppButton() {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    function onResize() { setIsMobile(window.innerWidth < 640) }
-    onResize()
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    const mq = window.matchMedia('(max-width: 639px)')
+    const onChange = () => setIsMobile(mq.matches)
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
   const cartBarVisible = totalItems > 0
@@ -73,14 +81,15 @@ function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp"
-      className="group fixed right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg"
+      className="group fixed right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 sm:right-6 sm:h-14 sm:w-14"
       style={{
-        bottom: `${bottom}px`,
-        transition: 'bottom 300ms cubic-bezier(.2,.9,.25,1)',
+        transform: `translateY(-${bottom - 24}px)`,
+        bottom: 'calc(24px + env(safe-area-inset-bottom))',
+        transition: 'transform 300ms cubic-bezier(.2,.9,.25,1)',
       }}
     >
       <span className="transition-transform duration-200 group-hover:scale-110">
-        <WhatsAppIcon size={30} />
+        <WhatsAppIcon size={26} />
       </span>
     </a>
   )
@@ -106,24 +115,34 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const [authModalOpen, setAuthModalOpen]           = useState(false)
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
-  const [scrollPct, setScrollPct]                   = useState(0)
+  const progressRef = useRef<HTMLDivElement>(null)
 
   // ── Scroll progress ────────────────────────────────────────────────────────
+  // Written straight to the DOM (transform: scaleX) once per animation frame.
+  // Using React state here re-rendered the navbar/footer/cart on every scroll
+  // event, which is what made scrolling stutter on phones.
   useEffect(() => {
+    let frame = 0
     function update() {
-      const el  = document.documentElement
-      const scrolled = el.scrollTop  || document.body.scrollTop
-      const total    = el.scrollHeight - el.clientHeight
-      setScrollPct(total > 0 ? (scrolled / total) * 100 : 0)
+      frame = 0
+      const el = progressRef.current
+      if (!el) return
+      const doc   = document.documentElement
+      const total = doc.scrollHeight - doc.clientHeight
+      const pct   = total > 0 ? Math.min(1, doc.scrollTop / total) : 0
+      el.style.transform = `scaleX(${pct})`
+      el.style.opacity   = pct > 0 ? '1' : '0'
     }
+    function schedule() { if (!frame) frame = requestAnimationFrame(update) }
     update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
     return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
     }
-  }, [])
+  }, [isLoading])
 
   if (isLoading) return <WebsiteSkeleton />
 
@@ -141,17 +160,20 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div
+      className="relative isolate min-h-dvh"
       style={{
-        backgroundImage: `url("${bgImage}")`,
-        backgroundRepeat: 'repeat',
-        backgroundSize: 'auto',
-        backgroundAttachment: 'fixed',
-        minHeight: '100vh',
         '--color-primary':   primaryColor,
         '--color-secondary': secondaryColor,
         '--color-tertiary':  tertiaryColor,
       } as React.CSSProperties}
     >
+      {/* Page pattern on its own fixed layer. `background-attachment: fixed`
+          repaints the whole page every scroll frame on mobile (and iOS ignores it). */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 [transform:translateZ(0)]"
+        style={{ backgroundImage: `url("${bgImage}")`, backgroundRepeat: 'repeat', backgroundSize: 'auto' }}
+      />
       {/* ── Closed / Holiday Banner ───────────────────────────────────────── */}
       <div
         className={` top-0 z-50 w-full text-white overflow-hidden transition-all duration-500 ease-in-out ${
@@ -198,17 +220,10 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
         className="pointer-events-none fixed left-0 top-0 z-[60] h-[3px] w-full"
       >
         <div
-          className="relative h-full"
-          style={{
-            width: `${scrollPct}%`,
-            opacity: scrollPct > 0 ? 1 : 0,
-            transition: 'width 120ms ease-out, opacity 300ms ease',
-          }}
-        >
-          <div className="progress-flow absolute inset-0 overflow-hidden" />
-          <div className="progress-sweep absolute inset-0 overflow-hidden" />
-          <span className="progress-head absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 translate-x-1/2 rounded-full" />
-        </div>
+          ref={progressRef}
+          className="progress-bar h-full w-full origin-left"
+          style={{ transform: 'scaleX(0)', opacity: 0, transition: 'opacity 300ms ease', willChange: 'transform' }}
+        />
       </div>
 
       {children}
@@ -235,48 +250,9 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
       />
 
       <style jsx>{`
-        .progress-flow {
-          background: linear-gradient(
-            90deg,
-            var(--color-primary),
-            var(--color-secondary),
-            var(--color-primary),
-            var(--color-secondary),
-            var(--color-primary)
-          );
-          background-size: 200% 100%;
-          animation: progress-flow 1.8s linear infinite;
-          box-shadow: 0 0 8px 1px var(--color-primary);
-        }
-        @keyframes progress-flow {
-          from { background-position: 100% 0; }
-          to   { background-position: 0% 0; }
-        }
-
-        .progress-sweep::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          width: 40%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
-          transform: translateX(-100%);
-          animation: progress-sweep 1.4s ease-in-out infinite;
-        }
-        @keyframes progress-sweep {
-          from { transform: translateX(-100%); }
-          to   { transform: translateX(350%); }
-        }
-
-        .progress-head {
-          background: var(--color-primary);
-          box-shadow: 0 0 10px 3px var(--color-primary);
-          animation: progress-head-pulse 1.2s ease-in-out infinite;
-        }
-        @keyframes progress-head-pulse {
-          0%, 100% { transform: translate(50%, -50%) scale(1); opacity: 0.9; }
-          50%      { transform: translate(50%, -50%) scale(1.5); opacity: 1; }
+        .progress-bar {
+          background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
+          box-shadow: 0 0 6px var(--color-primary);
         }
       `}</style>
     </div>

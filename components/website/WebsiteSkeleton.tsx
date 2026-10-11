@@ -31,7 +31,7 @@ export function WebsiteSkeleton() {
 
       {/* ─── Hero banner ────────────────────────────────────────────────────── */}
       <section className="px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
-        <div className="relative mx-auto h-[20vh] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-neutral-100 sm:h-[40vh] sm:rounded-3xl md:h-[55vh] lg:h-[62vh] xl:h-[68vh]">
+        <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-neutral-100 sm:rounded-3xl">
           {/* Banner background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
 

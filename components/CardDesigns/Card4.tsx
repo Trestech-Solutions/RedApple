@@ -6,9 +6,8 @@
  * Round add button at bottom-right.
  */
 
-import Image from 'next/image'
 import { Check, Minus, Plus } from 'lucide-react'
-import { useCardLogic, FOCUS_RING, Chip, type ProductCardProps } from './shared'
+import { useCardLogic, FOCUS_RING, Chip, type ProductCardProps, ProductImage } from './shared'
 
 export function Card4({ product, onOpen }: ProductCardProps) {
   const {
@@ -45,7 +44,7 @@ export function Card4({ product, onOpen }: ProductCardProps) {
       className={`group relative flex h-full flex-col rounded-[clamp(1rem,3vw,1.75rem)] border-2 border-neutral-200 bg-white p-[clamp(0.5rem,1.4vw,0.75rem)] transition-shadow duration-200 hover:shadow-[0_14px_32px_-14px_rgba(0,0,0,0.3)] ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
     >
       <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden rounded-[clamp(0.5rem,1.2vw,0.75rem)] bg-neutral-100">
-        <Image src={product.image} alt={product.name} fill
+        <ProductImage src={product.image} alt={product.name} fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
 

@@ -6,9 +6,8 @@
  * Full-width pill button at bottom.
  */
 
-import Image from 'next/image'
 import { Minus, Plus } from 'lucide-react'
-import { useCardLogic, CARD_SHELL, FOCUS_RING, Chip, type ProductCardProps } from './shared'
+import { useCardLogic, CARD_SHELL, FOCUS_RING, Chip, type ProductCardProps, ProductImage } from './shared'
 
 export function Card3({ product, onOpen }: ProductCardProps) {
   const {
@@ -37,7 +36,7 @@ export function Card3({ product, onOpen }: ProductCardProps) {
       className={`${CARD_SHELL} flex flex-col overflow-hidden rounded-[clamp(0.75rem,2.2vw,1.125rem)] hover:ring-black/10 hover:shadow-[0_16px_36px_-18px_rgba(0,0,0,0.25)] ${onOpen ? `cursor-pointer ${FOCUS_RING}` : ''}`}
     >
       <div className="relative aspect-[3/2] w-full flex-shrink-0 overflow-hidden bg-neutral-100">
-        <Image src={product.image} alt={product.name} fill
+        <ProductImage src={product.image} alt={product.name} fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
 

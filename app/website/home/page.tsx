@@ -12,6 +12,7 @@ import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 import { CategoryNav } from '@/components/website/CategoryNav'
+import { StickyCartButton } from '@/components/website/StickyCartButton'
 import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { ProductDetailModal } from '@/components/product/ProductDetailModal'
@@ -20,7 +21,7 @@ import { CATEGORIES as FALLBACK_CATS, ALL_PRODUCTS as FALLBACK_PRODS, type Categ
 import { useGetMenu } from '@/api/client/browse'
 import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
-import type { ProductData, SizeMeta } from '@/components/product/ProductCard'
+import type { ProductData } from '@/components/product/ProductCard'
 import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
 import { getRestaurantId } from '@/api/utils'
 import { HeroCarousel } from '@/components/website/HeroCarousel'
@@ -486,50 +487,13 @@ function transformMenu(menu: MenuResponse | undefined): {
     })
 
   // ── Build popularProducts from menu.popular_items (server-filtered, max 4) ──
-  const popularProducts: ProductData[] = (menu?.popular_items ?? []).map((item) => {
-    const rawSizes = (item.size_prices ?? []).filter(
-      (sp) => sp && typeof sp.size_name === 'string' && sp.size_name.length > 0
-    )
-    const hasSizes = rawSizes.length > 0
-    const rawPrice = item.price_at_branch || item.front_price || '0'
-    const priceInt = hasSizes
-      ? (Math.round(parseFloat(rawSizes[0]!.price || '0')) || 0)
-      : (Math.round(parseFloat(rawPrice)) || 0)
-
-    const sizeMetas: SizeMeta[] = rawSizes.map((sp) => {
-      const p = Math.round(parseFloat(sp.price || '0')) || 0
-      const dv = parseFloat(String(sp.discount ?? ''))
-      const hasDv = !isNaN(dv) && dv > 0
-      const dt = normalizeDiscountType(sp.discount_type)
-      let origPrice: number | undefined
-      let discLabel: string | undefined
-      let hasTag = false
-      if (hasDv) {
-        if (dt === 'fixed') {
-          const orig = Math.round(dv)
-          if (orig > p && p > 0) { origPrice = orig; discLabel = `${Math.round(((orig - p) / orig) * 100)}% OFF`; hasTag = true }
-        } else if (dt === 'percent') {
-          const orig = Math.round(p / Math.max(0.0001, 1 - dv / 100))
-          origPrice = orig; discLabel = `${Math.round(dv)}% OFF`; hasTag = true
-        }
-      }
-      return { sizeId: Number(sp.id), sizeFk: Number(sp.size), sizeName: sp.size_name, price: p, originalPrice: origPrice, discountLabel: discLabel, hasDiscountTag: hasTag }
-    })
-
-    return {
-      id:           String(item.id),
-      productId:    item.id,
-      name:         item.name,
-      description:  item.description || '',
-      timeDuration: item.time_duration || undefined,
-      price:        String(priceInt),
-      image:        resolveMediaUrl(item.feature_image) || PLACEHOLDER_IMAGE,
-      options:      hasSizes ? sizeMetas.map((s) => s.sizeName) : [],
-      sizes:        hasSizes ? sizeMetas : undefined,
-      tag:          '🔥 Popular',
-      fromLabel:    false,
-    } satisfies ProductData
-  })
+  // Same conversion as the category cards, so prices, struck-through original
+  // prices and discount badges always match (incl. item-level discounts and
+  // branch-vs-front price differences, which the old popular-only builder missed).
+  const popularIdPairs: Array<{ clientId: string; numericId: number }> = []
+  const popularBuilt: Parameters<typeof itemToProduct>[3] = []
+  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt))
+  const popularProducts: ProductData[] = popularBuilt.map((p) => ({ ...p, tag: '🔥 Popular' }))
 
   return { categories, products, idPairs, popularProducts }
 }
@@ -752,13 +716,8 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
 function HeroSkeleton() {
   return (
     <section className="bg-black px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
-      <div className="relative mx-auto h-[20vh] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:h-[40vh] sm:rounded-3xl md:h-[55vh] lg:h-[70vh] xl:h-[75vh]">
-        <div className="flex h-full w-full flex-col items-center justify-center gap-6 px-6">
-          <div className="h-4 w-40 animate-pulse rounded bg-white/10" />
-          <div className="h-10 w-full max-w-md animate-pulse rounded-md bg-white/10 sm:h-12" />
-          <div className="h-40 w-40 animate-pulse rounded-full bg-white/10 sm:h-52 sm:w-52" />
-          <div className="h-3 w-72 max-w-[80%] animate-pulse rounded bg-white/10" />
-        </div>
+      <div className="relative mx-auto aspect-[3.3/1] w-full max-w-[1400px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-800" />
 
         <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
           <span className="h-1.5 w-6 rounded-full bg-white/40 sm:w-8" />
@@ -953,7 +912,15 @@ export default function HomePage() {
         p.description.toLowerCase().includes(searchQuery.toLowerCase())
       return matchBranch && matchSearch
     })
-  }, [searchQuery, branch, products])
+  }, [searchQuery, numericBranch, products])
+
+  // An item can belong to several categories, so `products` can hold the same id
+  // more than once. Search results span all categories → dedupe, otherwise React
+  // gets duplicate keys and leaves stale cards in the DOM.
+  const searchResults = useMemo(() => {
+    const seen = new Set<string>()
+    return filteredProducts.filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)))
+  }, [filteredProducts])
 
   if (isLoading) {
     return (
@@ -983,12 +950,19 @@ export default function HomePage() {
       )}
 
       {/* Category nav — no bg color, transparent over the image */}
-      <div className="sticky top-0 z-30 border-b border-white/10 shadow-sm backdrop-blur-md">
-        <CategoryNav
-          categories={categories}
-          activeCategoryId={activeCategoryId}
-          onSelect={handleCategoryChange}
-        />
+      {/* Category bar + a cart that slides in at its right end once the navbar scrolls away */}
+      <div
+        className="sticky top-0 z-30 flex items-stretch"
+        style={{ backgroundColor: settings.category_navbar_background_color || 'var(--color-primary)' }}
+      >
+        <div className="min-w-0 flex-1">
+          <CategoryNav
+            categories={categories}
+            activeCategoryId={activeCategoryId}
+            onSelect={handleCategoryChange}
+          />
+        </div>
+        <StickyCartButton />
       </div>
 
       {/* ── Offers strip ── */}
@@ -1135,11 +1109,11 @@ export default function HomePage() {
                 Search results &ldquo;{searchQuery}&rdquo;
               </h2>
               <p className="text-sm text-neutral-500">
-                {filteredProducts.length} item{filteredProducts.length !== 1 ? 's' : ''} found
+                {searchResults.length} item{searchResults.length !== 1 ? 's' : ''} found
               </p>
             </div>
           </div>
-          <ProductGrid products={filteredProducts} searchQuery={searchQuery} />
+          <ProductGrid products={searchResults} searchQuery={searchQuery} />
         </section>
       ) : (
         <div>
@@ -1161,7 +1135,7 @@ export default function HomePage() {
               <section
                 key={cat.id}
                 id={`category-${cat.id}`}
-                className="mx-auto max-w-[1400px] px-4 py-8 md:px-8 scroll-mt-28"
+                className="cv-auto mx-auto max-w-[1400px] px-4 py-6 sm:py-8 md:px-8 scroll-mt-28"
               >
                 {/* Category Banner */}
                 <div className="mb-6">

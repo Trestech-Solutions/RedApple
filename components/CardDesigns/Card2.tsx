@@ -5,9 +5,8 @@
  * Uppercase name, reserved description slot, price + ADD button row.
  */
 
-import Image from 'next/image'
 import { Minus, Plus } from 'lucide-react'
-import { useCardLogic, CARD_SHELL, FOCUS_RING, Chip, type ProductCardProps } from './shared'
+import { useCardLogic, CARD_SHELL, FOCUS_RING, Chip, type ProductCardProps, ProductImage } from './shared'
 
 export function Card2({ product, onOpen }: ProductCardProps) {
   const {
@@ -43,7 +42,7 @@ export function Card2({ product, onOpen }: ProductCardProps) {
     >
       {/* Square full-bleed image */}
       <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-neutral-100">
-        <Image src={product.image} alt={product.name} fill
+        <ProductImage src={product.image} alt={product.name} fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           className="object-cover" />
 

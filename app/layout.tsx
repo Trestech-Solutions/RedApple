@@ -167,11 +167,11 @@ function SafeHtmlInject({
 // ─── Viewport ────────────────────────────────────────────────────────────────
 
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAFAFA" },
-    { media: "(prefers-color-scheme: dark)", color: "#111827" },
-  ],
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "light",
+  themeColor: "#FAFAFA",
 };
 
 // ─── Root Layout ──────────────────────────────────────────────────────────────
