@@ -1,9 +1,9 @@
 {
     "branch": {
-        "id": 55,
-        "branch_name": "North Nazimabad",
+        "id": 59,
+        "branch_name": "North nazimabad",
         "status": true,
-        "location": "",
+        "location": "North nazimabad Block l A89",
         "address": "",
         "map_location": "",
         "is_default": false,
@@ -143,9 +143,9 @@
         "restaurant": 1
     },
     "branch_settings": {
-        "id": 13,
-        "date_added": "2026-10-09T19:06:17.702842Z",
-        "date_updated": "2026-10-09T19:06:17.702871Z",
+        "id": 16,
+        "date_added": "2026-10-12T19:43:54.137700Z",
+        "date_updated": "2026-10-12T19:43:54.137752Z",
         "enable_city_on_checkout": false,
         "enable_save_my_info": false,
         "checkout_note": "",
@@ -172,7 +172,7 @@
         "apply_item_wise_discount_as_on_web_ordering": false,
         "created_by": null,
         "updated_by": null,
-        "branch": 55,
+        "branch": 59,
         "excluded_categories": [],
         "excluded_items": []
     },
@@ -589,20 +589,7 @@
             ]
         }
     ],
-    "banners": [
-        {
-            "id": 26,
-            "title": "dd",
-            "url": "",
-            "banner_image": "/media/banners/ee_EMfh4eI.png",
-            "status": true,
-            "valid_from_date": null,
-            "valid_to_date": null,
-            "start_time": null,
-            "end_time": null,
-            "is_available_now": true
-        }
-    ],
+    "banners": [],
     "popup_banners": [],
     "offers": [
         {
@@ -1007,7 +994,43 @@
                         "item_discount_type": "fixed",
                         "show_discount_tag": false,
                         "front_price": "664.00",
-                        "branch_prices": [],
+                        "branch_prices": [
+                            {
+                                "id": 24,
+                                "branch": 36,
+                                "branch_name": "Faislabad — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 25,
+                                "branch": 34,
+                                "branch_name": "Islamabad — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 26,
+                                "branch": 60,
+                                "branch_name": "Johar",
+                                "price": "0.00",
+                                "status": false
+                            },
+                            {
+                                "id": 27,
+                                "branch": 32,
+                                "branch_name": "Lahore — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 28,
+                                "branch": 59,
+                                "branch_name": "North nazimabad",
+                                "price": "0.00",
+                                "status": true
+                            }
+                        ],
                         "size_prices": [],
                         "created_by": 10,
                         "created_by_username": "Demo",
@@ -1459,7 +1482,43 @@
                                 "item_discount_type": "percentage",
                                 "show_discount_tag": true,
                                 "front_price": "6.49",
-                                "branch_prices": [],
+                                "branch_prices": [
+                                    {
+                                        "id": 9,
+                                        "branch": 36,
+                                        "branch_name": "Faislabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 10,
+                                        "branch": 34,
+                                        "branch_name": "Islamabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 11,
+                                        "branch": 60,
+                                        "branch_name": "Johar",
+                                        "price": "0.00",
+                                        "status": false
+                                    },
+                                    {
+                                        "id": 12,
+                                        "branch": 32,
+                                        "branch_name": "Lahore — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 13,
+                                        "branch": 59,
+                                        "branch_name": "North nazimabad",
+                                        "price": "0.00",
+                                        "status": true
+                                    }
+                                ],
                                 "size_prices": [],
                                 "created_by": null,
                                 "updated_by": 10,
@@ -1570,7 +1629,43 @@
                                 "item_discount_type": "percentage",
                                 "show_discount_tag": true,
                                 "front_price": "3999.00",
-                                "branch_prices": [],
+                                "branch_prices": [
+                                    {
+                                        "id": 19,
+                                        "branch": 36,
+                                        "branch_name": "Faislabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 20,
+                                        "branch": 34,
+                                        "branch_name": "Islamabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 21,
+                                        "branch": 60,
+                                        "branch_name": "Johar",
+                                        "price": "0.00",
+                                        "status": false
+                                    },
+                                    {
+                                        "id": 22,
+                                        "branch": 32,
+                                        "branch_name": "Lahore — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 23,
+                                        "branch": 59,
+                                        "branch_name": "North nazimabad",
+                                        "price": "0.00",
+                                        "status": true
+                                    }
+                                ],
                                 "size_prices": [],
                                 "created_by": null,
                                 "updated_by": 10,
@@ -2026,7 +2121,43 @@
                                 "item_discount_type": "percentage",
                                 "show_discount_tag": true,
                                 "front_price": "200.00",
-                                "branch_prices": [],
+                                "branch_prices": [
+                                    {
+                                        "id": 29,
+                                        "branch": 36,
+                                        "branch_name": "Faislabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 30,
+                                        "branch": 34,
+                                        "branch_name": "Islamabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 31,
+                                        "branch": 60,
+                                        "branch_name": "Johar",
+                                        "price": "0.00",
+                                        "status": false
+                                    },
+                                    {
+                                        "id": 32,
+                                        "branch": 32,
+                                        "branch_name": "Lahore — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 33,
+                                        "branch": 59,
+                                        "branch_name": "North nazimabad",
+                                        "price": "0.00",
+                                        "status": true
+                                    }
+                                ],
                                 "size_prices": [],
                                 "created_by": null,
                                 "updated_by": 10,
@@ -2507,7 +2638,43 @@
                         "item_discount_type": "percentage",
                         "show_discount_tag": true,
                         "front_price": "6.49",
-                        "branch_prices": [],
+                        "branch_prices": [
+                            {
+                                "id": 9,
+                                "branch": 36,
+                                "branch_name": "Faislabad — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 10,
+                                "branch": 34,
+                                "branch_name": "Islamabad — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 11,
+                                "branch": 60,
+                                "branch_name": "Johar",
+                                "price": "0.00",
+                                "status": false
+                            },
+                            {
+                                "id": 12,
+                                "branch": 32,
+                                "branch_name": "Lahore — stub",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 13,
+                                "branch": 59,
+                                "branch_name": "North nazimabad",
+                                "price": "0.00",
+                                "status": true
+                            }
+                        ],
                         "size_prices": [],
                         "created_by": null,
                         "updated_by": 10,
@@ -2836,7 +3003,43 @@
                                 "item_discount_type": "percentage",
                                 "show_discount_tag": true,
                                 "front_price": "3999.00",
-                                "branch_prices": [],
+                                "branch_prices": [
+                                    {
+                                        "id": 19,
+                                        "branch": 36,
+                                        "branch_name": "Faislabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 20,
+                                        "branch": 34,
+                                        "branch_name": "Islamabad — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 21,
+                                        "branch": 60,
+                                        "branch_name": "Johar",
+                                        "price": "0.00",
+                                        "status": false
+                                    },
+                                    {
+                                        "id": 22,
+                                        "branch": 32,
+                                        "branch_name": "Lahore — stub",
+                                        "price": "0.00",
+                                        "status": true
+                                    },
+                                    {
+                                        "id": 23,
+                                        "branch": 59,
+                                        "branch_name": "North nazimabad",
+                                        "price": "0.00",
+                                        "status": true
+                                    }
+                                ],
                                 "size_prices": [],
                                 "created_by": null,
                                 "updated_by": 10,
@@ -3136,7 +3339,43 @@
             "item_discount_type": "percentage",
             "show_discount_tag": true,
             "front_price": "100.00",
-            "branch_prices": [],
+            "branch_prices": [
+                {
+                    "id": 4,
+                    "branch": 36,
+                    "branch_name": "Faislabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 5,
+                    "branch": 34,
+                    "branch_name": "Islamabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 6,
+                    "branch": 60,
+                    "branch_name": "Johar",
+                    "price": "0.00",
+                    "status": false
+                },
+                {
+                    "id": 7,
+                    "branch": 32,
+                    "branch_name": "Lahore — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 8,
+                    "branch": 59,
+                    "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                }
+            ],
             "size_prices": [],
             "created_by": 10,
             "created_by_username": "Demo",
@@ -3145,7 +3384,7 @@
             "date_added": "2026-10-06T19:34:13.885912Z",
             "date_updated": "2026-10-09T21:31:34.686839Z",
             "is_available_now": true,
-            "price_at_branch": "100.00"
+            "price_at_branch": "0.00"
         },
         {
             "id": 12,
@@ -3241,7 +3480,43 @@
             "item_discount_type": "percentage",
             "show_discount_tag": true,
             "front_price": "700.00",
-            "branch_prices": [],
+            "branch_prices": [
+                {
+                    "id": 14,
+                    "branch": 36,
+                    "branch_name": "Faislabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 15,
+                    "branch": 34,
+                    "branch_name": "Islamabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 16,
+                    "branch": 60,
+                    "branch_name": "Johar",
+                    "price": "0.00",
+                    "status": false
+                },
+                {
+                    "id": 17,
+                    "branch": 32,
+                    "branch_name": "Lahore — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 18,
+                    "branch": 59,
+                    "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                }
+            ],
             "size_prices": [],
             "created_by": null,
             "updated_by": 10,
@@ -3249,7 +3524,7 @@
             "date_added": "2026-08-21T11:42:16.971295Z",
             "date_updated": "2026-10-09T21:19:41.011469Z",
             "is_available_now": true,
-            "price_at_branch": "700.00"
+            "price_at_branch": "0.00"
         },
         {
             "id": 3,
@@ -3690,7 +3965,43 @@
             "item_discount_type": "percentage",
             "show_discount_tag": true,
             "front_price": "200.00",
-            "branch_prices": [],
+            "branch_prices": [
+                {
+                    "id": 29,
+                    "branch": 36,
+                    "branch_name": "Faislabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 30,
+                    "branch": 34,
+                    "branch_name": "Islamabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 31,
+                    "branch": 60,
+                    "branch_name": "Johar",
+                    "price": "0.00",
+                    "status": false
+                },
+                {
+                    "id": 32,
+                    "branch": 32,
+                    "branch_name": "Lahore — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 33,
+                    "branch": 59,
+                    "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                }
+            ],
             "size_prices": [],
             "created_by": null,
             "updated_by": 10,
@@ -3698,7 +4009,7 @@
             "date_added": "2026-08-21T11:13:13.536909Z",
             "date_updated": "2026-10-09T21:25:46.716103Z",
             "is_available_now": true,
-            "price_at_branch": "200.00"
+            "price_at_branch": "0.00"
         },
         {
             "id": 4,
@@ -4139,7 +4450,43 @@
             "item_discount_type": "percentage",
             "show_discount_tag": true,
             "front_price": "2000.00",
-            "branch_prices": [],
+            "branch_prices": [
+                {
+                    "id": 34,
+                    "branch": 36,
+                    "branch_name": "Faislabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 35,
+                    "branch": 34,
+                    "branch_name": "Islamabad — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 36,
+                    "branch": 60,
+                    "branch_name": "Johar",
+                    "price": "0.00",
+                    "status": false
+                },
+                {
+                    "id": 37,
+                    "branch": 32,
+                    "branch_name": "Lahore — stub",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 38,
+                    "branch": 59,
+                    "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                }
+            ],
             "size_prices": [],
             "created_by": null,
             "updated_by": 10,
@@ -4147,7 +4494,7 @@
             "date_added": "2026-08-21T11:24:42.355413Z",
             "date_updated": "2026-10-09T21:31:25.375843Z",
             "is_available_now": true,
-            "price_at_branch": "2000.00"
+            "price_at_branch": "0.00"
         }
     ],
     "menu": [
@@ -4382,7 +4729,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "100.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 4,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 5,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 6,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 7,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 8,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": 10,
                     "created_by_username": "Demo",
@@ -4391,7 +4774,7 @@
                     "date_added": "2026-10-06T19:34:13.885912Z",
                     "date_updated": "2026-10-09T21:31:34.686839Z",
                     "is_available_now": true,
-                    "price_at_branch": "100.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 5,
@@ -4487,7 +4870,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "3999.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 19,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 20,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 21,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 22,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 23,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -4495,7 +4914,7 @@
                     "date_added": "2026-08-21T11:25:40.011946Z",
                     "date_updated": "2026-10-09T21:26:21.065706Z",
                     "is_available_now": true,
-                    "price_at_branch": "3999.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 31,
@@ -4591,7 +5010,43 @@
                     "item_discount_type": "fixed",
                     "show_discount_tag": false,
                     "front_price": "664.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 24,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 25,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 26,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 27,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 28,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": 10,
                     "created_by_username": "Demo",
@@ -4600,7 +5055,7 @@
                     "date_added": "2026-10-12T18:57:20.870613Z",
                     "date_updated": "2026-10-12T18:57:51.333110Z",
                     "is_available_now": true,
-                    "price_at_branch": "664.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 3,
@@ -5041,7 +5496,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -5049,7 +5540,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -5490,7 +5981,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -5498,7 +6025,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         },
@@ -5733,7 +6260,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "100.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 4,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 5,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 6,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 7,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 8,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": 10,
                     "created_by_username": "Demo",
@@ -5742,7 +6305,7 @@
                     "date_added": "2026-10-06T19:34:13.885912Z",
                     "date_updated": "2026-10-09T21:31:34.686839Z",
                     "is_available_now": true,
-                    "price_at_branch": "100.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 3,
@@ -6183,7 +6746,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -6191,7 +6790,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -6632,7 +7231,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -6640,7 +7275,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         },
@@ -6944,7 +7579,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 9,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 10,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 11,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 12,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 13,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -6952,7 +7623,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
                     "is_available_now": false,
-                    "price_at_branch": "6.49"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 3,
@@ -7393,7 +8064,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -7401,7 +8108,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -7842,7 +8549,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -7850,7 +8593,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         },
@@ -8154,7 +8897,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 9,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 10,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 11,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 12,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 13,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -8162,7 +8941,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
                     "is_available_now": false,
-                    "price_at_branch": "6.49"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 3,
@@ -8603,7 +9382,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -8611,7 +9426,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -9052,7 +9867,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -9060,7 +9911,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         },
@@ -9226,7 +10077,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "700.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 14,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 15,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 16,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 17,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 18,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -9234,7 +10121,7 @@
                     "date_added": "2026-08-21T11:42:16.971295Z",
                     "date_updated": "2026-10-09T21:19:41.011469Z",
                     "is_available_now": true,
-                    "price_at_branch": "700.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 9,
@@ -9468,7 +10355,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "6.49",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 9,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 10,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 11,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 12,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 13,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -9476,7 +10399,7 @@
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
                     "is_available_now": false,
-                    "price_at_branch": "6.49"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 11,
@@ -10021,7 +10944,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -10029,7 +10988,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -10470,7 +11429,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -10478,7 +11473,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         },
@@ -10989,7 +11984,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "200.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 29,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 30,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 31,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 32,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 33,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -10997,7 +12028,7 @@
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
                     "is_available_now": true,
-                    "price_at_branch": "200.00"
+                    "price_at_branch": "0.00"
                 },
                 {
                     "id": 4,
@@ -11438,7 +12469,43 @@
                     "item_discount_type": "percentage",
                     "show_discount_tag": true,
                     "front_price": "2000.00",
-                    "branch_prices": [],
+                    "branch_prices": [
+                        {
+                            "id": 34,
+                            "branch": 36,
+                            "branch_name": "Faislabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 35,
+                            "branch": 34,
+                            "branch_name": "Islamabad — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 36,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": false
+                        },
+                        {
+                            "id": 37,
+                            "branch": 32,
+                            "branch_name": "Lahore — stub",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 38,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
                     "size_prices": [],
                     "created_by": null,
                     "updated_by": 10,
@@ -11446,7 +12513,7 @@
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
                     "is_available_now": true,
-                    "price_at_branch": "2000.00"
+                    "price_at_branch": "0.00"
                 }
             ]
         }
@@ -11462,10 +12529,10 @@
         }
     ],
     "area": {
-        "id": 58,
-        "name": "NN Block A",
+        "id": 76,
+        "name": "Johar Block 1",
         "status": true,
-        "branch_id": 55,
+        "branch_id": 59,
         "delivery_charge": "0.00"
     }
 }

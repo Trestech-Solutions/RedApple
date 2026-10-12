@@ -96,19 +96,19 @@ export function useModalLogic(onClose: () => void) {
     setSelectedAreaId('')
     setSelectedBranchId('')
     if (orderType === 'delivery' && areaList.length > 0) {
+      // Not cleared afterwards: React StrictMode runs this effect twice on mount, and
+      // clearing on the first run made the second run fall back to the first area.
       const saved = restore.current.areaId
-      const useSaved = saved != null && areaList.some((a) => a.id === saved)
+      const useSaved = saved != null && selectedCityId === String(savedCityId) && areaList.some((a) => Number(a.id) === Number(saved))
       setSelectedAreaId(String(useSaved ? saved : areaList[0].id))
-      restore.current.areaId = null
     }
   }, [selectedCityId, orderType, areaList.length]) // eslint-disable-line
 
   useEffect(() => {
     if (orderType === 'pickup' && branchList.length > 0 && !selectedBranchId) {
       const saved = restore.current.branchId
-      const useSaved = saved != null && branchList.some((b) => b.branchId === saved)
+      const useSaved = saved != null && selectedCityId === String(savedCityId) && branchList.some((b) => Number(b.branchId) === Number(saved))
       setSelectedBranchId(String(useSaved ? saved : branchList[0].branchId))
-      restore.current.branchId = null
     }
   }, [branchList.length, orderType]) // eslint-disable-line
 

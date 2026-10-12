@@ -87,6 +87,12 @@ function itemToProduct(
   idPairs: Array<{ clientId: string; numericId: number }>,
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[]
 ) {
+  // Branch price of 0 = not sellable at this branch → don't show the item at all.
+  // (Items priced per size are judged by their sizes, not the item-level price.)
+  const hasSizePrices = (item.size_prices ?? []).some((sp) => sp && typeof sp.size_name === 'string' && sp.size_name.length > 0)
+  const branchPrice   = item.price_at_branch == null || String(item.price_at_branch).trim() === '' ? NaN : parseFloat(String(item.price_at_branch))
+  if (!hasSizePrices && branchPrice === 0) return
+
   const clientId = String(item.id)
   idPairs.push({ clientId, numericId: item.id })
 
