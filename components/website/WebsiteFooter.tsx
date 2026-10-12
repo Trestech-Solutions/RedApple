@@ -88,18 +88,6 @@ function mergeSocial(
   return result
 }
 
-/**
- * Footer links are configured in the admin as site paths like `/about` or
- * `/terms`, but storefront pages live under `/website/…` (CMS pages are served
- * by `/website/[slug]`). Map internal paths onto those routes so the links
- * don't 404. External URLs, `#anchors`, `/website/…` and `/` pass through.
- */
-function resolveFooterHref(url: string): string {
-  const u = (url || '').trim()
-  if (!u || u === '/' || !u.startsWith('/') || u.startsWith('//') || u.startsWith('/website')) return u || '/'
-  return `/website${u}`
-}
-
 // Shared styles
 const COL_HEADING = 'text-sm font-semibold tracking-wide text-neutral-900'
 const COL_LINK =
@@ -123,7 +111,6 @@ export function WebsiteFooter() {
   const phone = branchContact?.phone?.trim() || branch?.phone?.trim() || ''
   const email = branchContact?.email?.trim() || ''
 
-  const linkGroups = Array.isArray(footer?.link_groups) ? footer!.link_groups : []
   const footerButtons = Array.isArray(footer?.buttons) ? footer!.buttons : []
 
   const androidIcon = resolveMediaUrl(settings.android_icon)
@@ -308,22 +295,6 @@ export function WebsiteFooter() {
                   </ul>
                 </div>
               )}
-
-              {/* Link groups */}
-              {linkGroups.map((group) => (
-                <div key={group.heading}>
-                  <h4 className={COL_HEADING}>{group.heading}</h4>
-                  <ul className="mt-4 space-y-3">
-                    {group.links.map((link) => (
-                      <li key={link.url}>
-                        <Link href={resolveFooterHref(link.url)} className={COL_LINK}>
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
 
               {/* Social */}
               {activeSocial.length > 0 && (

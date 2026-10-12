@@ -83,21 +83,22 @@ type PagesListOpts = {
 
 export function useGetPages(opts: PagesListOpts = {}) {
   const restaurantId = getRestaurantId()
-  const queryKey = ['storefront-pages', restaurantId, opts.showInFooter, opts.showInMenu]
 
-  return useQuery<StorefrontPageLink[]>({
-    queryKey,
-    queryFn: () => {
-      const params: Record<string, string> = { restaurant: restaurantId }
-      if (opts.showInFooter) params.footer = '1'
-      if (opts.showInMenu) params.menu = '1'
+  // One request (shared cache) serves both the footer and the menu; each
+  // consumer filters on the show_in_footer / show_in_menu flags it needs.
+  return useQuery<StorefrontPageLink[], unknown, StorefrontPageLink[]>({
+    queryKey: ['storefront-pages', restaurantId],
+    queryFn: () =>
       // Optional content: if the endpoint is unavailable just show no extra links
       // (no retries, no error state in the footer/menu).
-      return api
-        .get<StorefrontPageLink[]>(API_ENDPOINTS.StorefrontContent.pages, { params })
+      api
+        .get<StorefrontPageLink[]>(API_ENDPOINTS.StorefrontContent.pages, { params: { restaurant: restaurantId } })
         .then((r) => (Array.isArray(r.data) ? r.data : []))
-        .catch(() => [] as StorefrontPageLink[])
-    },
+        .catch(() => [] as StorefrontPageLink[]),
+    select: (pages) =>
+      pages
+        .filter((p) => (!opts.showInFooter || p.show_in_footer) && (!opts.showInMenu || p.show_in_menu))
+        .sort((x, y) => (x.sort_order ?? 0) - (y.sort_order ?? 0)),
     staleTime: 1000 * 60 * 10,
     retry: false,
   })

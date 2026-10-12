@@ -13,10 +13,12 @@ import {
   MessageSquareWarning,
   ChevronRight,
   HelpCircle,
+  FileText,
   Phone,
   MessageCircle,
 } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
+import { useGetPages } from '@/api/client/content'
 
 const MENU_ITEMS = [
   { label: 'About Us',         href: '/website/about',     icon: Info },
@@ -38,6 +40,16 @@ const ORIGIN = 'calc(100% - 30px) 30px'
 const EASE = 'cubic-bezier(0.7, 0, 0.2, 1)'
 
 export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
+  // Pages flagged "show in menu" in the admin, after the built-in links
+  const { data: menuPages = [] } = useGetPages({ showInMenu: true })
+  const builtInTitles = new Set(MENU_ITEMS.map((m) => m.label.toLowerCase()))
+  const menuItems: { label: string; href: string; icon: typeof Info }[] = [
+    ...MENU_ITEMS,
+    ...menuPages
+      .filter((p) => !builtInTitles.has((p.title || '').trim().toLowerCase()))
+      .map((p) => ({ label: p.title || p.slug, href: `/website/${p.slug}`, icon: FileText })),
+  ]
+
   const router = useRouter()
   const { user } = useCart()
   const { settings } = useStoreSettings()
@@ -146,7 +158,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
 
         {/* Links */}
         <nav className="relative mt-4 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 pb-3">
-          {MENU_ITEMS.map((item, i) => {
+          {menuItems.map((item, i) => {
             const Icon = item.icon
             return (
               <a
@@ -189,7 +201,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
               target={isWhatsapp ? '_blank' : undefined}
               rel={isWhatsapp ? 'noopener noreferrer' : undefined}
               onClick={onClose}
-              style={enter(MENU_ITEMS.length + 1)}
+              style={enter(menuItems.length + 1)}
               className={enterCls(
                 'group mb-3 flex w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white xl:hidden'
               )}
@@ -210,7 +222,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
           {showLogin && (
             <button
               onClick={handleAuthClick}
-              style={enter(MENU_ITEMS.length + 2)}
+              style={enter(menuItems.length + 2)}
               className={enterCls(
                 'group flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left text-[var(--color-primary)] shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
               )}
@@ -236,7 +248,7 @@ export function MenuDrawer({ isOpen, onClose, onLoginClick }: MenuDrawerProps) {
             </button>
           )}
 
-          <p className={enterCls('mt-4 text-center text-xs text-white/60')} style={enter(MENU_ITEMS.length + (showLogin ? 3 : 2))}>
+          <p className={enterCls('mt-4 text-center text-xs text-white/60')} style={enter(menuItems.length + (showLogin ? 3 : 2))}>
             Powered by <span className="font-bold text-white/80">Trestech</span>
           </p>
         </div>
