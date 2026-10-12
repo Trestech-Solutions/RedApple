@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Navigation, ChevronDown, X, Loader2, MapPin, Store, Check, Sparkles } from 'lucide-react'
+import { Navigation, ChevronDown, Loader2, MapPin, Store, Check, Sparkles } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 import { useModalLogic, useSafeClose, resolveLogo, resolveImg, type OrderType } from './_hooks'
 
@@ -68,14 +68,13 @@ export function Modal3({ onClose }: { onClose: () => void }) {
   } = useModalLogic(onClose)
   const { settings }                    = useStoreSettings()
   const merchantLogo                    = resolveLogo(settings.merchant_logo)
-  const { closing, close: smoothClose } = useSafeClose(onClose, 200)
+  const { closing }                      = useSafeClose(onClose, 200)
   const mounted                         = useMounted()
   const visible                         = mounted && !closing
 
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-[radial-gradient(circle_at_50%_20%,rgba(0,0,0,.55),rgba(0,0,0,.72))] p-2 backdrop-blur-[6px] transition-opacity duration-200 sm:p-4 ${visible ? 'opacity-100' : 'opacity-0'}`}
-      onClick={(e) => { if (e.target === e.currentTarget) smoothClose() }}
     >
       <div
         className={`relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-[28px] bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,.55)] ring-1 ring-inset ring-white/40 transition-all duration-300 ease-[cubic-bezier(.2,.8,.2,1)] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/10 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${visible ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-6 scale-95 opacity-0'}`}
@@ -86,11 +85,6 @@ export function Modal3({ onClose }: { onClose: () => void }) {
           <div className="pointer-events-none absolute -left-8 -top-10 h-32 w-32 animate-pulse rounded-full bg-white/20 blur-2xl" />
           <div className="pointer-events-none absolute -right-6 top-6 h-24 w-24 animate-pulse rounded-full bg-white/10 blur-2xl [animation-delay:.8s]" />
 
-          <button type="button" onClick={smoothClose}
-            className="absolute right-4 top-4 z-10 touch-manipulation rounded-full bg-black/15 p-1.5 text-white backdrop-blur-sm active:bg-black/30"
-            aria-label="Close">
-            <X size={26} />
-          </button>
 
           <div className="relative z-10 flex flex-col items-center">
             <Pop>

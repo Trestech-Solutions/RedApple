@@ -45,7 +45,12 @@ type CategoryIcon = { type: 'image'; value: string } | { type: 'iconify'; value:
 
 function resolveIcon(icon: unknown): CategoryIcon {
   if (typeof icon === 'string' && icon.trim() !== '') {
-    const url = resolveMediaUrl(icon)
+    const value = icon.trim()
+    // Iconify id such as "solar:star-shine-bold-duotone" — an icon name, not a file URL
+    if (/^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$/i.test(value) && !/^https?:/i.test(value)) {
+      return { type: 'iconify', value }
+    }
+    const url = resolveMediaUrl(value)
     if (url) return { type: 'image', value: url }
   }
   return { type: 'iconify', value: DEFAULT_ICON }

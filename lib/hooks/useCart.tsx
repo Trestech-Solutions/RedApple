@@ -576,7 +576,14 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [menuQuery.data?.branch]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const derived = useMemo(() => deriveSettings(data), [data])
+  // Delivery charge: the selected area's own charge wins; when it is 0 / empty the
+  // restaurant-wide delivery_charges (store settings) is the fallback. Everything that
+  // reads `settings.deliveryFee` (cart drawer, checkout) therefore picks this up.
+  const areaCharge = toNumber(menuQuery.data?.area?.delivery_charge, 0)
+  const derived = useMemo(() => {
+    const base = deriveSettings(data)
+    return areaCharge > 0 ? { ...base, deliveryFee: areaCharge } : base
+  }, [data, areaCharge])
   const value = useMemo<StoreSettingsContextType>(
     () => ({ settings: derived, isLoading }),
     [derived, isLoading],

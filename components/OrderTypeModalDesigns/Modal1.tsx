@@ -8,9 +8,9 @@
  */
 
 import Image from 'next/image'
-import { Crosshair, ChevronDown, X, Loader2 } from 'lucide-react'
+import { Crosshair, ChevronDown, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
-import { useModalLogic, useSafeClose, resolveLogo, type OrderType } from './_hooks'
+import { useModalLogic, resolveLogo, type OrderType } from './_hooks'
 
 const selectCls =
   'w-full appearance-none rounded-xl border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-700 shadow-sm focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-400 min-[400px]:px-4 min-[400px]:py-3 min-[400px]:pr-11 sm:py-3.5 sm:text-base'
@@ -30,7 +30,6 @@ export function Modal1({ onClose }: { onClose: () => void }) {
   } = useModalLogic(onClose)
   const { settings } = useStoreSettings()
   const merchantLogo = resolveLogo(settings.merchant_logo)
-  const { close }    = useSafeClose(onClose)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-4">
@@ -41,11 +40,6 @@ export function Modal1({ onClose }: { onClose: () => void }) {
           className="relative flex shrink-0 items-center justify-center px-4 py-4 min-[400px]:py-5 sm:py-6"
           style={{ backgroundColor: 'var(--color-primary)' }}
         >
-          <button type="button" onClick={close} aria-label="Close"
-            className="absolute right-2.5 top-2.5 z-10 rounded-full p-1.5 transition-colors hover:bg-white/20 sm:right-3 sm:top-3"
-            style={{ color: 'var(--color-secondary)' }}>
-            <X className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
-          </button>
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-md min-[400px]:h-20 min-[400px]:w-20 min-[400px]:p-2 sm:h-[88px] sm:w-[88px]">
             <Image src={merchantLogo} alt="Logo" width={88} height={88} className="h-full w-full object-contain" priority />
           </div>

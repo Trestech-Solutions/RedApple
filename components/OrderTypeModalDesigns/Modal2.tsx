@@ -7,9 +7,9 @@
  */
 
 import Image from 'next/image'
-import { Navigation, ChevronDown, X, Loader2 } from 'lucide-react'
+import { Navigation, ChevronDown, Loader2 } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
-import { useModalLogic, useSafeClose, resolveLogo, resolveImg, type OrderType } from './_hooks'
+import { useModalLogic, resolveLogo, resolveImg, type OrderType } from './_hooks'
 
 export function Modal2({ onClose }: { onClose: () => void }) {
   const {
@@ -23,7 +23,6 @@ export function Modal2({ onClose }: { onClose: () => void }) {
   } = useModalLogic(onClose)
   const { settings } = useStoreSettings()
   const merchantLogo = resolveLogo(settings.merchant_logo)
-  const { close }    = useSafeClose(onClose)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
@@ -32,10 +31,6 @@ export function Modal2({ onClose }: { onClose: () => void }) {
         {/* Colored header */}
         <div className="relative rounded-t-3xl pb-10 pt-6 flex flex-col items-center"
           style={{ backgroundColor: 'var(--color-primary)' }}>
-          <button type="button" onClick={close} className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-black/10 transition-colors" aria-label="Close"
-            style={{ color: 'var(--color-secondary)' }}>
-            <X size={18} />
-          </button>
           <div className="flex h-20 w-20 items-center justify-center rounded-2xl shadow-lg overflow-hidden"
             style={{ backgroundColor: 'var(--color-primary)' }}>
             <Image src={merchantLogo} alt="Logo" width={80} height={80} className="h-full w-full object-contain" priority />

@@ -54,18 +54,22 @@ export function useSafeClose(onClose: () => void, delay = 0) {
   return { closing, close }
 }
 
-// ─── useModalLogic ────────────────────────────────────────────────────────────
-
 const PICKUP_STATIC_AREA_ID = null
+
+// ─── useModalLogic ────────────────────────────────────────────────────────────
 
 export function useModalLogic(onClose: () => void) {
   const { orderType, setOrderType, setLocation, setBranch, setAreaId } = useCart()
-  const { setStoreLocation } = useStoreLocation()
+  const { setStoreLocation, cityId: savedCityId, areaId: savedAreaId, branchId: savedBranchId } = useStoreLocation()
   const { data: cities, isLoading: loadingCities } = useGetCities()
   const cityList: City[]   = cities ?? []
   const sortedCities       = [...cityList].sort((a, b) => a.name.localeCompare(b.name))
 
-  const [selectedCityId,   setSelectedCityId]   = useState<string>('')
+  // Re-opening the modal starts from what the customer already chose (city / area /
+  // branch from the store location), not from the first list entry. Applied once.
+  const restore = useRef({ areaId: savedAreaId, branchId: savedBranchId })
+
+  const [selectedCityId,   setSelectedCityId]   = useState<string>(savedCityId ? String(savedCityId) : '')
   const [selectedAreaId,   setSelectedAreaId]    = useState<string>('')
   const [selectedBranchId, setSelectedBranchId] = useState<string>('')
   const [geoLoading,       setGeoLoading]        = useState(false)
@@ -91,12 +95,21 @@ export function useModalLogic(onClose: () => void) {
   useEffect(() => {
     setSelectedAreaId('')
     setSelectedBranchId('')
-    if (orderType === 'delivery' && areaList.length > 0) setSelectedAreaId(String(areaList[0].id))
+    if (orderType === 'delivery' && areaList.length > 0) {
+      const saved = restore.current.areaId
+      const useSaved = saved != null && areaList.some((a) => a.id === saved)
+      setSelectedAreaId(String(useSaved ? saved : areaList[0].id))
+      restore.current.areaId = null
+    }
   }, [selectedCityId, orderType, areaList.length]) // eslint-disable-line
 
   useEffect(() => {
-    if (orderType === 'pickup' && branchList.length > 0 && !selectedBranchId)
-      setSelectedBranchId(String(branchList[0].branchId))
+    if (orderType === 'pickup' && branchList.length > 0 && !selectedBranchId) {
+      const saved = restore.current.branchId
+      const useSaved = saved != null && branchList.some((b) => b.branchId === saved)
+      setSelectedBranchId(String(useSaved ? saved : branchList[0].branchId))
+      restore.current.branchId = null
+    }
   }, [branchList.length, orderType]) // eslint-disable-line
 
   const handleUseCurrentLocation = () => {

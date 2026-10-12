@@ -420,6 +420,8 @@ export type Area = {
   latitude?: number | string | null;
   longitude?: number | string | null;
   radius_km?: number | string | null;
+  /** Area-specific delivery charge; 0 / empty = use the restaurant-wide delivery_charges */
+  delivery_charge?: number | string | null;
   is_active?: boolean;
   created_by?: number;
   created_by_username?: string;
