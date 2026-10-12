@@ -223,7 +223,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
       <style dangerouslySetInnerHTML={{ __html: NAVBAR_CSS }} />
 
       <div
-        className="wn-bar relative mx-auto max-w-[1920px] rounded-2xl sm:rounded-[20px]"
+        className="wn-bar relative mx-auto max-w-[1384px] rounded-2xl sm:rounded-[20px]"
         style={{
           backgroundColor: navBg,
           border: `1px solid ${hairline}`,

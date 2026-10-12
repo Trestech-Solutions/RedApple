@@ -719,7 +719,7 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
 function HeroSkeleton() {
   return (
     <section className="px-3 pb-2 pt-4 sm:px-5 sm:pb-3 sm:pt-5 lg:px-7 lg:pt-6">
-      <div className="relative mx-auto aspect-[2.7/1] w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
+      <div className="relative mx-auto aspect-[2.7/1] w-full max-w-[1384px] overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 sm:rounded-3xl">
         <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-800" />
 
         <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
@@ -888,9 +888,45 @@ export default function HomePage() {
     }
   }, [categories, activeCategoryId])
 
+  // Scroll-spy: highlight the category whose section is under the sticky nav.
+  // Paused briefly after a click so the smooth scroll doesn't flicker through
+  // every category on the way.
+  const spyLockUntil = useRef(0)
+  const runSpy = useRef<() => void>(() => {})
+
+  reactUseEffect(() => {
+    if (categories.length < 2) return
+    let raf = 0
+    const spy = () => {
+      raf = 0
+      if (performance.now() < spyLockUntil.current) return
+      const LINE = 150 // px from viewport top: sticky nav + breathing room
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
+      let current = categories[0].id
+      if (atBottom && window.scrollY > 0) {
+        current = categories[categories.length - 1].id
+      } else {
+        for (const c of categories) {
+          const el = document.getElementById(`category-${c.id}`)
+          if (!el) continue
+          if (el.getBoundingClientRect().top <= LINE) current = c.id
+          else break
+        }
+      }
+      setActiveCategoryId((prev) => (prev === current ? prev : current))
+    }
+    runSpy.current = spy
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(spy) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    spy()
+    return () => { window.removeEventListener('scroll', onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [categories])
+
   const handleCategoryChange = (catId: string) => {
     const cat = categories.find((c) => c.id === catId)
     if (!cat) return
+    spyLockUntil.current = performance.now() + 1000
+    window.setTimeout(() => runSpy.current(), 1050)
     setActiveCategoryId(catId)
     setSearchQuery('')
     if (typeof document !== 'undefined') {

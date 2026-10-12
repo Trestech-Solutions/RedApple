@@ -124,7 +124,7 @@ export function HeroCarousel({
       }}
     >
       <div
-        className="relative mx-auto w-full max-w-[1920px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-[aspect-ratio] duration-500 ease-out sm:rounded-3xl"
+        className="relative mx-auto w-full max-w-[1384px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] transition-[aspect-ratio] duration-500 ease-out sm:rounded-3xl"
         style={{ aspectRatio: slideRatios[slides[currentSlide]?.id ?? ''] ?? DEFAULT_RATIO }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}

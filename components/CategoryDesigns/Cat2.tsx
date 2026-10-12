@@ -6,6 +6,7 @@
  * that appear/disappear based on scroll position.
  */
 
+import { useKeepActiveVisible } from './useKeepActiveVisible'
 import { useRef, useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
@@ -14,6 +15,7 @@ import type { CategoryNavProps } from './shared'
 export function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
   const { settings } = useStoreSettings()
   const scrollRef = useRef<HTMLDivElement>(null)
+  useKeepActiveVisible(scrollRef, activeCategoryId)
   const [showLeftFade,  setShowLeftFade]  = useState(false)
   const [showRightFade, setShowRightFade] = useState(true)
 
@@ -55,7 +57,7 @@ export function Cat2({ categories, activeCategoryId, onSelect }: CategoryNavProp
           {categories.map((cat, i) => {
             const isActive = cat.id === activeCategoryId
             return (
-              <button key={cat.id} onClick={() => onSelect(cat.id)}
+              <button key={cat.id} data-cat-id={cat.id} onClick={() => onSelect(cat.id)}
                 style={{
                   animation: `catPopIn 0.35s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.03}s both`,
                   backgroundColor: isActive ? 'var(--color-secondary)' : 'rgba(255,255,255,0.08)',

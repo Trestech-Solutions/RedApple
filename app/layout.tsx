@@ -1,5 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
+import { buildRootMetadata, getSiteSeo } from "@/lib/seo/site";
+import { JsonLd } from "@/lib/seo/JsonLd";
 import Script from "next/script";
 import { Poppins } from "next/font/google";
 import { preconnect } from "react-dom";
@@ -17,81 +19,12 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-// ─── SEO from API ─────────────────────────────────────────────────────────────
+const BASE_URL = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(/\/+$/, '')
 
-const BASE_URL      = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(/\/+$/, '')
-const RESTAURANT_ID = process.env.NEXT_PUBLIC_RESTAURANT_ID ?? '2'
-
-// Fallback branch: use 1 (or whatever the default is)
-const FALLBACK_BRANCH = process.env.NEXT_PUBLIC_DEFAULT_BRANCH_ID ?? '6'
-
-type SeoData = {
-  /** Absolute URL of the merchant logo from store settings ('' if none) */
-  logo: string
-  meta_title: string
-  meta_description: string
-  insert_in_header: string
-  insert_in_body: string
-  insert_in_footer: string
-} | null
-
-function absoluteMediaUrl(path?: string | null): string {
-  if (!path) return ''
-  if (/^https?:\/\//i.test(path)) return path
-  return path.startsWith('/') && BASE_URL ? `${BASE_URL.replace(/\/api$/i, '')}${path}` : ''
-}
-
-async function fetchSeo(): Promise<SeoData> {
-  try {
-    const url = `${BASE_URL}/api/storefront/menu/?branch=${FALLBACK_BRANCH}&restaurant=${RESTAURANT_ID}`
-    const res = await fetch(url, {
-      // Revalidate every 10 minutes — SEO data rarely changes
-      next: { revalidate: 600 },
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    const seo = data?.seo ?? {}
-    return {
-      logo:             absoluteMediaUrl(data?.settings?.merchant_logo),
-      meta_title:       seo.meta_title       ?? '',
-      meta_description: seo.meta_description ?? '',
-      insert_in_header: seo.insert_in_header ?? '',
-      insert_in_body:   seo.insert_in_body   ?? '',
-      insert_in_footer: seo.insert_in_footer ?? '',
-    }
-  } catch {
-    return null
-  }
-}
-
-// ─── generateMetadata ─────────────────────────────────────────────────────────
+// ─── SEO (resolved server-side from the restaurant's own data — see lib/seo/site.ts) ──
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await fetchSeo()
-
-  const title       = seo?.meta_title?.trim()       || 'Restaurant'
-  const description = seo?.meta_description?.trim() || ''
-
-  // Tab icon = the logo uploaded in store settings (falls back to the bundled one)
-  const logo = seo?.logo || ''
-  return {
-    title,
-    description,
-    icons: {
-      icon:  [{ url: logo || '/favicon-fallback.png' }],
-      apple: [{ url: logo || '/apple-fallback.png' }],
-    },
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-    twitter: {
-      card:        'summary_large_image',
-      title,
-      description,
-    },
-  }
+  return buildRootMetadata()
 }
 
 // ─── Safe Arbitrary HTML Injector ────────────────────────────────────────────
@@ -205,7 +138,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const seo = await fetchSeo()
+  const site = await getSiteSeo()
+  const seo = site.seoRaw
 
   // Open the connection to the API/media host while JS is still downloading —
   // the menu request and product images then skip DNS + TLS setup on mobile.
@@ -214,6 +148,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body suppressHydrationWarning>
+        <JsonLd site={site} />
         {/* insert_in_header — safely injects any arbitrary HTML (meta/link/noscript + scripts) */}
         {seo?.insert_in_header && (
           <SafeHtmlInject id="seo-header" html={seo.insert_in_header} strategy="afterInteractive" />

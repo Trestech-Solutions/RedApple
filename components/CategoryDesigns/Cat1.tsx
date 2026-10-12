@@ -6,24 +6,29 @@
  * Active: secondary bg / primary text. Staggered catFadeIn on load.
  */
 
+import { useRef } from 'react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
+import { useKeepActiveVisible } from './useKeepActiveVisible'
 import type { CategoryNavProps } from './shared'
 
 export function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProps) {
   const { settings } = useStoreSettings()
   const navBg = settings.category_navbar_background_color || 'var(--color-primary)'
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  useKeepActiveVisible(scrollerRef, activeCategoryId)
 
   return (
     <nav
       className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)]"
       style={{ backgroundColor: navBg }}
     >
-      <div className="mx-auto flex max-w-[1320px] gap-1.5 overflow-x-auto scrollbar-hide snap-x px-4 py-2.5 sm:gap-2 sm:py-3 md:px-8">
+      <div ref={scrollerRef} className="relative mx-auto flex max-w-[1320px] gap-1.5 overflow-x-auto scrollbar-hide snap-x px-4 py-2.5 sm:gap-2 sm:py-3 md:px-8">
         {categories.map((cat, i) => {
           const isActive = cat.id === activeCategoryId
           return (
             <button
               key={cat.id}
+              data-cat-id={cat.id}
               onClick={() => onSelect(cat.id)}
               style={{
                 animation: `catFadeIn 0.4s ease-out ${i * 0.03}s both`,
