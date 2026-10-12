@@ -26,12 +26,20 @@ const RESTAURANT_ID = process.env.NEXT_PUBLIC_RESTAURANT_ID ?? '2'
 const FALLBACK_BRANCH = process.env.NEXT_PUBLIC_DEFAULT_BRANCH_ID ?? '6'
 
 type SeoData = {
+  /** Absolute URL of the merchant logo from store settings ('' if none) */
+  logo: string
   meta_title: string
   meta_description: string
   insert_in_header: string
   insert_in_body: string
   insert_in_footer: string
 } | null
+
+function absoluteMediaUrl(path?: string | null): string {
+  if (!path) return ''
+  if (/^https?:\/\//i.test(path)) return path
+  return path.startsWith('/') && BASE_URL ? `${BASE_URL.replace(/\/api$/i, '')}${path}` : ''
+}
 
 async function fetchSeo(): Promise<SeoData> {
   try {
@@ -42,9 +50,9 @@ async function fetchSeo(): Promise<SeoData> {
     })
     if (!res.ok) return null
     const data = await res.json()
-    const seo = data?.seo
-    if (!seo) return null
+    const seo = data?.seo ?? {}
     return {
+      logo:             absoluteMediaUrl(data?.settings?.merchant_logo),
       meta_title:       seo.meta_title       ?? '',
       meta_description: seo.meta_description ?? '',
       insert_in_header: seo.insert_in_header ?? '',
@@ -64,9 +72,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const title       = seo?.meta_title?.trim()       || 'Restaurant'
   const description = seo?.meta_description?.trim() || ''
 
+  // Tab icon = the logo uploaded in store settings (falls back to the bundled one)
+  const logo = seo?.logo || ''
   return {
     title,
     description,
+    icons: {
+      icon:  [{ url: logo || '/favicon-fallback.png' }],
+      apple: [{ url: logo || '/apple-fallback.png' }],
+    },
     openGraph: {
       title,
       description,
