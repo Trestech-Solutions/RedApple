@@ -68,7 +68,8 @@ function isWindowActiveNow(timeWindow?: string): boolean | null {
   const nowMin = now.getHours() * 60 + now.getMinutes()
 
   if (start <= end) return nowMin >= start && nowMin <= end
-  return nowMin >= start || nowMin <= end
+  // start > end → same-day window between end and start (matches utils/dealTime.ts + backend)
+  return nowMin >= end && nowMin <= start
 }
 
 // Small reusable section-label with accent dot
@@ -202,8 +203,11 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
     ? (dealMeta?.groups ?? []).every((g, gi) => !g.isRequired || groupTotal(gi) >= g.selectQty)
     : true
 
+  const itemOutsideHours = !isDeal && product.itemAvailableNow === false
+
   const isOrderable =
     hasPrice &&
+    !itemOutsideHours &&
     (isDeal
       ? isAvailableNow && requiredGroupsFilled
       : (product.productId !== null && product.productId !== undefined &&
@@ -389,6 +393,16 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                 <Clock size={12} className="text-neutral-500" />
               </span>
               <span>Ready in <span className="font-semibold text-neutral-800">{product.timeDuration}</span></span>
+            </div>
+          )}
+
+          {itemOutsideHours && product.itemWindow && (
+            <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl border border-red-100 bg-red-50 px-3.5 py-2.5 text-[11px] font-medium text-red-700 shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10">
+              <Clock size={14} className="shrink-0" />
+              <span>
+                Available: <span className="font-semibold">{product.itemWindow}</span>
+                <span className="ml-1.5 font-normal opacity-70">· not available right now</span>
+              </span>
             </div>
           )}
 
@@ -768,6 +782,15 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             <div className="footer-glass sticky bottom-0 mt-auto bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10">
               <div className="rounded-2xl bg-amber-50 px-3.5 py-2.5 text-center text-[13px] font-semibold text-amber-700 sm:px-4 sm:py-3 sm:text-sm">
                 Please select all required options to continue
+              </div>
+            </div>
+
+          ) : hasPrice && itemOutsideHours ? (
+            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-4 py-4 backdrop-blur-xl sm:gap-3 sm:px-6 sm:py-5 md:px-10">
+              <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-full bg-red-600 px-5 py-3 text-center text-[12px] font-bold text-white xs:flex-row xs:gap-2 sm:px-8 sm:py-3.5 sm:text-sm">
+                <span>Rs. {unitPrice.toLocaleString()}</span>
+                <span className="hidden text-white/40 xs:inline">|</span>
+                <span>Available {product.itemWindow ?? 'at specific hours'}</span>
               </div>
             </div>
 

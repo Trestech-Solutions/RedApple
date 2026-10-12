@@ -1,7 +1,7 @@
 {
     "branch": {
-        "id": 57,
-        "branch_name": "Highway",
+        "id": 55,
+        "branch_name": "North Nazimabad",
         "status": true,
         "location": "",
         "address": "",
@@ -10,7 +10,6 @@
         "pickup_status": true,
         "delivery_status": true
     },
-    "area": null,
     "settings": {
         "id": 1,
         "date_added": "2026-08-10T20:23:36.737152Z",
@@ -144,9 +143,9 @@
         "restaurant": 1
     },
     "branch_settings": {
-        "id": 15,
-        "date_added": "2026-10-10T14:31:31.459541Z",
-        "date_updated": "2026-10-10T14:31:31.459568Z",
+        "id": 13,
+        "date_added": "2026-10-09T19:06:17.702842Z",
+        "date_updated": "2026-10-09T19:06:17.702871Z",
         "enable_city_on_checkout": false,
         "enable_save_my_info": false,
         "checkout_note": "",
@@ -173,7 +172,7 @@
         "apply_item_wise_discount_as_on_web_ordering": false,
         "created_by": null,
         "updated_by": null,
-        "branch": 57,
+        "branch": 55,
         "excluded_categories": [],
         "excluded_items": []
     },
@@ -498,10 +497,10 @@
     ],
     "banners": [
         {
-            "id": 23,
+            "id": 26,
             "title": "dd",
             "url": "",
-            "banner_image": "/media/banners/ee.png",
+            "banner_image": "/media/banners/ee_EMfh4eI.png",
             "status": true,
             "valid_from_date": null,
             "valid_to_date": null,
@@ -511,7 +510,36 @@
         }
     ],
     "popup_banners": [],
-    "offers": [],
+    "offers": [
+        {
+            "id": 3,
+            "restaurant": 1,
+            "branch": null,
+            "banner_image": null,
+            "show_percentage_text": true,
+            "amount": "25.00",
+            "discount_type": "percentage",
+            "included_categories": [],
+            "included_categories_detail": [],
+            "orders_over": "300.00",
+            "discount_text": "Flat",
+            "discount_message": "",
+            "valid_from_date": null,
+            "valid_to_date": null,
+            "start_time": null,
+            "end_time": null,
+            "days": [
+                "mon",
+                "tue"
+            ],
+            "status": true,
+            "created_by": null,
+            "updated_by": null,
+            "date_added": "2026-09-10T20:16:08.968000Z",
+            "date_updated": "2026-09-21T12:59:17.766047Z",
+            "is_available_now": true
+        }
+    ],
     "social_media_links": {
         "id": 1,
         "date_added": "2026-09-05T17:29:42.687647Z",
@@ -10882,5 +10910,12 @@
             "title": "About Us",
             "slug": "about-us"
         }
-    ]
+    ],
+    "area": {
+        "id": 56,
+        "name": "Area",
+        "status": true,
+        "branch_id": 55,
+        "delivery_charge": "0.00"
+    }
 }

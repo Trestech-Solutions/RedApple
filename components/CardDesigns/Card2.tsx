@@ -12,7 +12,7 @@ export function Card2({ product, onOpen }: ProductCardProps) {
   const {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
-    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed,
+    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed, unavailableTitle,
   } = useCardLogic(product, onOpen)
 
   const discountBg = settings.discount_background_color
@@ -120,7 +120,7 @@ export function Card2({ product, onOpen }: ProductCardProps) {
           ) : isOrderable ? (
             <button type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
               disabled={storeClosed}
-              title={storeClosed ? 'Store is currently closed' : undefined}
+              title={storeClosed ? unavailableTitle : undefined}
               className={`flex-shrink-0 rounded-lg px-[clamp(0.875rem,2.6vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] text-[clamp(0.688rem,1.6vw,0.938rem)] font-extrabold uppercase leading-none tracking-wide transition-transform duration-150 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:opacity-90 active:scale-95'}`}
               style={!added ? { backgroundColor: storeClosed ? '#9ca3af' : btnBg, color: btnFg } : {}}>
               {added ? '✓ Added' : 'Add'}

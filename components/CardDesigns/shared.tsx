@@ -35,6 +35,10 @@ export interface ProductData {
   sizes?: SizeMeta[]
   textButtonColor?: string
   cartStyle?: string
+  /** Regular items with a daily availability window, e.g. "12:22 – 11:11" */
+  itemWindow?: string
+  /** false when the item is outside its window right now */
+  itemAvailableNow?: boolean
   dealType?: 'fixed_deal' | 'on_spot_deal'
   dealMeta?: {
     dealId: number
@@ -147,9 +151,16 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
       )
     : undefined
 
+  const outsideHours = product.itemAvailableNow === false
+  const outsideHoursMessage = `${product.name} is only available ${product.itemWindow ?? 'at specific hours'}`
+
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isOrderable) return
+    if (outsideHours) {
+      import('sonner').then(({ toast }) => toast.error(outsideHoursMessage))
+      return
+    }
     if (!storeOpen) {
       import('sonner').then(({ toast }) => toast.error(closedMessage ?? 'Store is currently closed'))
       return
@@ -177,7 +188,7 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
 
   const handleIncrease = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!storeOpen) return
+    if (!storeOpen || outsideHours) return
     if (needsSelection) { onOpen?.(product); return }
     if (cartItem) updateQuantity(cartItem, cartItem.quantity + 1)
   }
@@ -208,7 +219,9 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
     handleAdd,
     handleIncrease,
     handleDecrease,
-    storeClosed: !storeOpen,
+    storeClosed: !storeOpen || outsideHours,
+    outsideHours,
+    unavailableTitle: outsideHours ? outsideHoursMessage : 'Store is currently closed',
     closedMessage,
   }
 }

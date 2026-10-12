@@ -217,6 +217,12 @@ function itemToProduct(
     sizes:         hasSizes ? sizes : undefined,
     textButtonColor: item.text_button_color || undefined,
     cartStyle:       item.cart_style       || undefined,
+    ...(item.start_time && item.end_time
+      ? {
+          itemWindow: `${item.start_time.slice(0, 5)} – ${item.end_time.slice(0, 5)}`,
+          itemAvailableNow: isDealActiveNowPKT(item.start_time, item.end_time),
+        }
+      : {}),
   })
 }
 
@@ -251,11 +257,8 @@ function transformMenu(menu: MenuResponse | undefined): {
       if (itemRecords.length > 0) {
         itemRecords
           .filter((it) => {
-            if (it.status === false || (it.status as unknown) === 0) return false
-            if (it.start_time && it.end_time) {
-              return isDealActiveNowPKT(it.start_time, it.end_time)
-            }
-            return true
+            // Items outside their daily window stay visible but can't be ordered
+            return !(it.status === false || (it.status as unknown) === 0)
           })
           .forEach((it) => {
             itemToProduct(it, catId, idPairs, products)

@@ -34,12 +34,16 @@ export function useCheckout(options?: {
     },
     onError(err) {
       const e = err as ApiError;
+      // DRF errors: {detail}, {field: "msg"} or {field: ["msg"]} — surface the first real message
+      const first = Object.values(e).find((v) => typeof v === 'string' || (Array.isArray(v) && typeof v[0] === 'string'));
       const msg =
         typeof e.detail === 'string'
           ? e.detail
-          : Array.isArray(Object.values(e)[0])
-            ? (Object.values(e)[0] as string[])[0]
-            : 'Failed to place order. Please try again.';
+          : typeof first === 'string'
+            ? first
+            : Array.isArray(first)
+              ? (first[0] as string)
+              : 'Failed to place order. Please try again.';
       toast.error(msg);
       options?.onError?.(msg);
     },

@@ -28,7 +28,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
   const {
     settings, added, needsSelection,
     displayPriceNum, displayOriginal, displayDiscount, isOrderable,
-    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed,
+    cartQty, handleAdd, handleIncrease, handleDecrease, storeClosed, unavailableTitle, outsideHours,
   } = useCardLogic(product, onOpen)
 
   const priceBg     = settings.item_price_background
@@ -78,6 +78,13 @@ export function Card1({ product, onOpen }: ProductCardProps) {
           >
             {product.description}
           </p>
+        )}
+
+        {outsideHours && product.itemWindow && (
+          <span className="mt-2.5 inline-flex w-fit max-w-full items-center gap-1 truncate rounded-full bg-red-50 px-2 py-0.5 text-[10.5px] font-semibold text-red-600 sm:text-[11px]">
+            <Clock className="h-3 w-3 shrink-0" strokeWidth={2.4} />
+            <span className="truncate">Available {product.itemWindow}</span>
+          </span>
         )}
 
         {product.dealMeta?.timeWindow && (
@@ -170,7 +177,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
           <button
             type="button" onClick={handleAdd} aria-label={`Add ${product.name} to cart`}
             disabled={storeClosed}
-            title={storeClosed ? 'Store is currently closed' : undefined}
+            title={storeClosed ? unavailableTitle : undefined}
             className={`absolute -bottom-[7px] -right-[7px] z-20 flex items-center justify-center rounded-full shadow-[0_6px_14px_-4px_rgba(0,0,0,0.4)] ring-[3px] ring-white transition-transform duration-200 active:scale-90 ${FOCUS_RING} ${added ? 'bg-green-600 text-white' : ''} ${storeClosed ? 'cursor-not-allowed opacity-40' : 'hover:scale-110 hover:rotate-90'}`}
             style={{
               width: 'var(--btn)',
