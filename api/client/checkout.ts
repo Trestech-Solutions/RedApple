@@ -140,6 +140,7 @@ export function buildOrderPayload(params: {
     customer_address:       params.customer_address,
     customer_landmark:      params.customer_landmark,
     customer_instructions:  params.customer_instructions,
+    payment_mode:           'web-frontend',
     ...(params.is_gift ? {
       is_gift:   true,
       send_gift: params.send_gift,

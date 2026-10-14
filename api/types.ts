@@ -964,6 +964,8 @@ export type OrderCreatePayload = {
   customer_address?: string;
   customer_landmark?: string;
   customer_instructions?: string;
+  /** Order source / payment mode, e.g. "web-frontend" */
+  payment_mode?: string;
   /** True when the order is a gift */
   is_gift?: boolean;
   /** Gift recipient details — only sent when is_gift is true */
