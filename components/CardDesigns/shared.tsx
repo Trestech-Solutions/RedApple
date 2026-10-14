@@ -33,6 +33,13 @@ export interface ProductData {
   discount?: string
   image: string
   sizes?: SizeMeta[]
+  /** Add-on groups for regular items (from item.addon_groups) */
+  addonGroups?: {
+    id: number
+    name: string
+    isRequired: boolean
+    addons: { id: number; name: string; price: number; image?: string }[]
+  }[]
   textButtonColor?: string
   cartStyle?: string
   /** Regular items with a daily availability window, e.g. "12:22 – 11:11" */
@@ -117,7 +124,8 @@ export function useCardLogic(product: ProductData, onOpen?: (p: ProductData) => 
   const needsSelection =
     !!product.dealMeta ||
     (hasSizes && product.sizes!.length > 1) ||
-    (!hasSizes && product.options.length > 1)
+    (!hasSizes && product.options.length > 1) ||
+    !!product.addonGroups?.some((g) => g.isRequired)
 
   const displayPriceNum = defaultSize
     ? defaultSize.price

@@ -85,6 +85,8 @@ export function buildOrderPayload(params: {
     specialInstructions?: string;
     // deal group selections (on_spot_deal) — now populated from CartItem.groupSelections
     groupSelections?: { group: number; options: number[] }[];
+    // regular-item add-ons → order line `addons`
+    itemAddons?: { addon: number; quantity: number }[];
   }[];
 }): OrderCreatePayload {
   const safeCartItems = params.cartItems ?? [];
@@ -125,7 +127,7 @@ export function buildOrderPayload(params: {
         size:     cartItem.sizeFk ?? cartItem.variantId ?? null,
         quantity: cartItem.quantity,
         notes:    cartItem.specialInstructions || '',
-        addons:   [],
+        addons:   (cartItem.itemAddons ?? []).map((a) => ({ addon: a.addon, quantity: a.quantity })),
       };
     })
     .filter((line): line is OrderCreateLine => line !== null);

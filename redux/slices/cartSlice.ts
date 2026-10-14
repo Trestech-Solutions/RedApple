@@ -12,6 +12,12 @@ export interface SelectedAddon {
   extraCost?: number
 }
 
+/** Add-on picked for a regular menu item — sent as `addons` on the order line. */
+export interface CartItemAddon {
+  addon: number     // FoodAddon.id
+  quantity: number  // per unit of the line
+}
+
 /** Structured group selection used to build the order payload for on_spot_deals. */
 export interface CartGroupSelection {
   group: number        // OnSpotDealGroup.id
@@ -37,6 +43,8 @@ export interface CartItem {
   selectedAddons?: SelectedAddon[]
   /** Machine-readable group selections for on_spot_deal order payload */
   groupSelections?: CartGroupSelection[]
+  /** Machine-readable add-ons for a regular item order line: [{addon, quantity}] */
+  itemAddons?: CartItemAddon[]
   /** Cart-row style identifier (e.g. 'highlight', 'compact') — from item.cart_style */
   cartStyle?: string
 }
@@ -73,6 +81,7 @@ const cartSlice = createSlice({
           dealSummary?: string
           selectedAddons?: SelectedAddon[]
           groupSelections?: CartGroupSelection[]
+          itemAddons?: CartItemAddon[]
           originalPrice?: number
           cartStyle?: string
         }
@@ -85,7 +94,8 @@ const cartSlice = createSlice({
           i.selectedOption === rest.selectedOption &&
           (i.dealSummary ?? '') === (rest.dealSummary ?? '') &&
           (i.specialInstructions ?? '') === (rest.specialInstructions ?? '') &&
-          JSON.stringify(i.selectedAddons ?? []) === JSON.stringify(rest.selectedAddons ?? [])
+          JSON.stringify(i.selectedAddons ?? []) === JSON.stringify(rest.selectedAddons ?? []) &&
+          JSON.stringify(i.itemAddons ?? []) === JSON.stringify(rest.itemAddons ?? [])
       )
       if (existing) {
         existing.quantity += quantity

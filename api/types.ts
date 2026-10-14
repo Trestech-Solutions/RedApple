@@ -444,6 +444,7 @@ export type LocateResponse = {
   city_id?: number;
   city_name?: string;
   branch_id?: number;
+  branch_ids?: number[];
   area_id?: number | null;
   area_name?: string | null;
 };
@@ -469,6 +470,14 @@ export type SizePrice = {
  * price_at_branch injection). These are the records to pass as `item` to
  * POST /storefront/cart/items/.
  */
+/** Add-on group on a regular item, e.g. "Make it a Meal" (is_required=false → Optional). */
+export type MenuItemAddonGroup = {
+  id: number;
+  name: string;
+  is_required: boolean;
+  addons: { id: number; name: string; price: string }[];
+};
+
 export type MenuItem = {
   id: number;
   restaurant?: number;
@@ -494,6 +503,10 @@ export type MenuItem = {
   end_time?: string | null;
   branch_prices?: unknown[];
   size_prices?: SizePrice[];
+  /** FoodAddon ids attached to this item (Item.available_addons). */
+  available_addons?: number[];
+  /** Add-ons grouped by add-on category, with prices — use this to render the picker. */
+  addon_groups?: MenuItemAddonGroup[];
   date_added?: string;
   date_updated?: string;
 };

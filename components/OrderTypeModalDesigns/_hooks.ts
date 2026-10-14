@@ -69,9 +69,18 @@ export function useModalLogic(onClose: () => void) {
   // branch from the store location), not from the first list entry. Applied once.
   const restore = useRef({ areaId: savedAreaId, branchId: savedBranchId })
 
-  const [selectedCityId,   setSelectedCityId]   = useState<string>(savedCityId ? String(savedCityId) : '')
-  const [selectedAreaId,   setSelectedAreaId]    = useState<string>('')
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('')
+  // Area / branch returned by "use current location". Applied once the matching list
+  // has loaded, so the default-selection effects below can't overwrite it.
+  const geoPick = useRef<{ areaId?: number; branchId?: number }>({})
+
+  const [selectedCityId,   setSelectedCityIdRaw]   = useState<string>(savedCityId ? String(savedCityId) : '')
+  const [selectedAreaId,   setSelectedAreaIdRaw]    = useState<string>('')
+  const [selectedBranchId, setSelectedBranchIdRaw] = useState<string>('')
+
+  // Manual picks cancel any pending location-based pick.
+  const setSelectedCityId   = (v: string) => { geoPick.current = {}; setSelectedCityIdRaw(v) }
+  const setSelectedAreaId   = (v: string) => { geoPick.current = {}; setSelectedAreaIdRaw(v) }
+  const setSelectedBranchId = (v: string) => { geoPick.current = {}; setSelectedBranchIdRaw(v) }
   const [geoLoading,       setGeoLoading]        = useState(false)
   const [geoError,         setGeoError]          = useState('')
   const [confirming,       setConfirming]        = useState(false)
@@ -89,18 +98,18 @@ export function useModalLogic(onClose: () => void) {
   const selectedBranchObj          = branchList.find((b) => String(b.branchId) === selectedBranchId)
 
   useEffect(() => {
-    if (sortedCities.length > 0 && !selectedCityId) setSelectedCityId(String(sortedCities[0].id))
+    if (sortedCities.length > 0 && !selectedCityId) setSelectedCityIdRaw(String(sortedCities[0].id))
   }, [sortedCities.length]) // eslint-disable-line
 
   useEffect(() => {
-    setSelectedAreaId('')
-    setSelectedBranchId('')
+    setSelectedAreaIdRaw('')
+    setSelectedBranchIdRaw('')
     if (orderType === 'delivery' && areaList.length > 0) {
       // Not cleared afterwards: React StrictMode runs this effect twice on mount, and
       // clearing on the first run made the second run fall back to the first area.
       const saved = restore.current.areaId
       const useSaved = saved != null && selectedCityId === String(savedCityId) && areaList.some((a) => Number(a.id) === Number(saved))
-      setSelectedAreaId(String(useSaved ? saved : areaList[0].id))
+      setSelectedAreaIdRaw(String(useSaved ? saved : areaList[0].id))
     }
   }, [selectedCityId, orderType, areaList.length]) // eslint-disable-line
 
@@ -108,9 +117,20 @@ export function useModalLogic(onClose: () => void) {
     if (orderType === 'pickup' && branchList.length > 0 && !selectedBranchId) {
       const saved = restore.current.branchId
       const useSaved = saved != null && selectedCityId === String(savedCityId) && branchList.some((b) => Number(b.branchId) === Number(saved))
-      setSelectedBranchId(String(useSaved ? saved : branchList[0].branchId))
+      setSelectedBranchIdRaw(String(useSaved ? saved : branchList[0].branchId))
     }
   }, [branchList.length, orderType]) // eslint-disable-line
+
+  // Declared after the default-selection effects so the location-based pick wins.
+  useEffect(() => {
+    const { areaId, branchId } = geoPick.current
+    if (orderType === 'delivery' && areaId != null && areaList.some((a) => Number(a.id) === areaId)) {
+      setSelectedAreaIdRaw(String(areaId))
+    }
+    if (orderType === 'pickup' && branchId != null && branchList.some((b) => Number(b.branchId) === branchId)) {
+      setSelectedBranchIdRaw(String(branchId))
+    }
+  }, [cityAreas, cityBranches, orderType, selectedCityId]) // eslint-disable-line
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) { setGeoError('Geolocation is not supported.'); return }
@@ -121,8 +141,12 @@ export function useModalLogic(onClose: () => void) {
         try {
           const result = await locate(latitude, longitude)
           if (result.success) {
-            if (result.city_id) setSelectedCityId(String(result.city_id))
-            if (result.area_id) setTimeout(() => setSelectedAreaId(String(result.area_id)), 0)
+            const branchId = result.branch_id ?? result.branch_ids?.[0]
+            geoPick.current = { areaId: result.area_id ?? undefined, branchId }
+            if (result.city_id) setSelectedCityIdRaw(String(result.city_id))
+            // Same city → lists don't reload, so apply right away as well.
+            if (orderType === 'delivery' && result.area_id) setSelectedAreaIdRaw(String(result.area_id))
+            if (orderType === 'pickup' && branchId != null) setSelectedBranchIdRaw(String(branchId))
             setGeoLoading(false); return
           }
         } catch (_) { /* fall through */ }
@@ -133,7 +157,7 @@ export function useModalLogic(onClose: () => void) {
             const db = distanceKm(latitude, longitude, parseFloat(String(best.latitude)), parseFloat(String(best.longitude)))
             return d < db ? c : best
           })
-          setSelectedCityId(String(nearest.id))
+          setSelectedCityIdRaw(String(nearest.id))
         }
         setGeoLoading(false)
       },

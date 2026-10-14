@@ -32,7 +32,7 @@ import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
 import type { ProductData } from '../product/ProductCard'
-import type { SelectedAddon, CartGroupSelection } from '@/redux/slices/cartSlice'
+import type { SelectedAddon, CartGroupSelection, CartItemAddon } from '@/redux/slices/cartSlice'
 
 interface ProductDetailModalProps {
   product: ProductData
@@ -111,6 +111,16 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
   const [added, setAdded]                   = useState(false)
 
   const [groupSelections, setGroupSelections] = useState<Record<string, number>>({})
+
+  // Regular-item add-ons: addonId → quantity (per unit of the line)
+  const [addonQtys, setAddonQtys] = useState<Record<number, number>>({})
+  const addonGroups = !product.dealType ? (product.addonGroups ?? []) : []
+  const setAddonQty = (id: number, qty: number) =>
+    setAddonQtys((prev) => ({ ...prev, [id]: Math.max(0, Math.min(10, qty)) }))
+  const addonsTotal = addonGroups.reduce(
+    (sum, g) => sum + g.addons.reduce((s, a) => s + a.price * (addonQtys[a.id] ?? 0), 0), 0)
+  const requiredAddonsFilled = addonGroups.every(
+    (g) => !g.isRequired || g.addons.some((a) => (addonQtys[a.id] ?? 0) > 0))
 
   const [itemQtys, setItemQtys] = useState<Record<number, number>>(() => {
     const init: Record<number, number> = {}
@@ -208,6 +218,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
   const isOrderable =
     hasPrice &&
     !itemOutsideHours &&
+    requiredAddonsFilled &&
     (isDeal
       ? isAvailableNow && requiredGroupsFilled
       : (product.productId !== null && product.productId !== undefined &&
@@ -225,7 +236,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
     }
   }
 
-  const total = (unitPrice + extraCostTotal + groupExtraCostTotal) * qty
+  const total = (unitPrice + extraCostTotal + groupExtraCostTotal + addonsTotal) * qty
 
   const handleAdd = () => {
     if (!isOrderable) return
@@ -260,7 +271,23 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
         )
       : []
 
-    const selectedAddons = [...includedRows, ...groupRows]
+    const itemAddons: CartItemAddon[] = addonGroups.flatMap((g) =>
+      g.addons
+        .filter((a) => (addonQtys[a.id] ?? 0) > 0)
+        .map((a) => ({ addon: a.id, quantity: addonQtys[a.id] }))
+    )
+    const itemAddonRows: SelectedAddon[] = addonGroups.flatMap((g) =>
+      g.addons
+        .filter((a) => (addonQtys[a.id] ?? 0) > 0)
+        .map((a) => ({
+          groupName: g.name,
+          name:      a.name,
+          qty:       addonQtys[a.id],
+          extraCost: a.price > 0 ? a.price * addonQtys[a.id] : undefined,
+        }))
+    )
+
+    const selectedAddons = [...includedRows, ...groupRows, ...itemAddonRows]
 
     const payloadGroupSelections: CartGroupSelection[] =
       isOnSpot
@@ -287,7 +314,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
       id: product.id,
       productId: product.productId,
       name: product.name,
-      price: unitPrice + extraCostTotal + groupExtraCostTotal,
+      price: unitPrice + extraCostTotal + groupExtraCostTotal + addonsTotal,
       originalPrice: (() => {
         if (isDeal) return undefined
         const orig = displayOriginal
@@ -302,6 +329,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
       quantity:            qty,
       selectedAddons:      selectedAddons.length > 0 ? selectedAddons : undefined,
       groupSelections:     payloadGroupSelections.length > 0 ? payloadGroupSelections : undefined,
+      itemAddons:          itemAddons.length > 0 ? itemAddons : undefined,
       cartStyle:           product.cartStyle || undefined,
     })
     // Close the modal right away and let the product fly from where its image
@@ -705,6 +733,60 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
               </div>
             </div>
           )}
+
+          {addonGroups.map((g) => (
+            <div key={g.id} className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+              <SectionLabel>
+                {g.name} · {g.isRequired ? 'Required' : 'Optional'}
+              </SectionLabel>
+              <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+                {g.addons.map((a) => {
+                  const q = addonQtys[a.id] ?? 0
+                  return (
+                    <div key={a.id} className="flex items-center justify-between gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3">
+                      <button
+                        type="button"
+                        onClick={() => setAddonQty(a.id, q > 0 ? 0 : 1)}
+                        aria-pressed={q > 0}
+                        className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                      >
+                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${q > 0 ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-300'}`}>
+                          {q > 0 && <Check size={10} strokeWidth={3} />}
+                        </span>
+                        {a.image && (
+                          <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+                            <Image src={a.image} alt="" fill sizes="36px" className="object-cover" />
+                          </span>
+                        )}
+                        <span className="truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{a.name}</span>
+                      </button>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {a.price > 0 && (
+                          <span className="text-[11px] font-semibold text-neutral-700 sm:text-xs">+Rs.{a.price.toLocaleString()}</span>
+                        )}
+                        {q > 0 && (
+                          <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                            <button type="button" onClick={() => setAddonQty(a.id, q - 1)} aria-label={`Remove one ${a.name}`}
+                              className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100">
+                              <Minus size={10} />
+                            </button>
+                            <span className="w-4 text-center text-xs font-bold text-neutral-800">{q}</span>
+                            <button type="button" onClick={() => setAddonQty(a.id, q + 1)} aria-label={`Add one ${a.name}`}
+                              className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black">
+                              <Plus size={10} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              {g.isRequired && !g.addons.some((a) => (addonQtys[a.id] ?? 0) > 0) && (
+                <p className="mt-1.5 text-[10px] font-medium text-amber-600 sm:text-[11px]">Select at least one to continue</p>
+              )}
+            </div>
+          ))}
 
           <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
             <SectionLabel>Special instructions</SectionLabel>

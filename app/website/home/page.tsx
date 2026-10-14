@@ -85,7 +85,9 @@ function itemToProduct(
   },
   categoryId: string,
   idPairs: Array<{ clientId: string; numericId: number }>,
-  products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[]
+  products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[],
+  /** addon id → photo URL, from the menu's top-level addon_categories */
+  addonPhotos: Map<number, string> = new Map(),
 ) {
   // Branch price of 0 = not sellable at this branch → don't show the item at all.
   // (Items priced per size are judged by their sizes, not the item-level price.)
@@ -226,6 +228,14 @@ function itemToProduct(
     discount:      combinedDiscount,
     image:         resolvedImage,
     sizes:         hasSizes ? sizes : undefined,
+    addonGroups:   (item.addon_groups ?? []).length > 0
+      ? item.addon_groups!.map((g) => ({
+          id:         g.id,
+          name:       g.name,
+          isRequired: !!g.is_required,
+          addons:     (g.addons ?? []).map((a) => ({ id: a.id, name: a.name, price: Math.round(parseFloat(a.price || '0')) || 0, image: addonPhotos.get(a.id) })),
+        }))
+      : undefined,
     textButtonColor: item.text_button_color || undefined,
     cartStyle:       item.cart_style       || undefined,
     ...(item.start_time && item.end_time
@@ -244,6 +254,14 @@ function transformMenu(menu: MenuResponse | undefined): {
   popularProducts: ProductData[]
 } {
   const menuArr = menu?.menu ?? menu?.categories ?? []
+
+  const addonPhotos = new Map<number, string>()
+  ;(menu?.addon_categories ?? []).forEach((ac) =>
+    (ac.addons ?? []).forEach((a) => {
+      const url = resolveMediaUrl(a.photo)
+      if (url) addonPhotos.set(a.id, url)
+    }),
+  )
 
   if (menuArr.length === 0) {
     return { categories: [], products: [], idPairs: [], popularProducts: [] }
@@ -269,7 +287,7 @@ function transformMenu(menu: MenuResponse | undefined): {
             return !(it.status === false || (it.status as unknown) === 0)
           })
           .forEach((it) => {
-            itemToProduct(it, catId, idPairs, products)
+            itemToProduct(it, catId, idPairs, products, addonPhotos)
             if (it.is_popular) popularRawItems.push(it)
           })
 
@@ -503,7 +521,7 @@ function transformMenu(menu: MenuResponse | undefined): {
   // branch-vs-front price differences, which the old popular-only builder missed).
   const popularIdPairs: Array<{ clientId: string; numericId: number }> = []
   const popularBuilt: Parameters<typeof itemToProduct>[3] = []
-  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt))
+  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos))
   const popularProducts: ProductData[] = popularBuilt.map((p) => ({ ...p, tag: '🔥 Popular' }))
 
   return { categories, products, idPairs, popularProducts }
@@ -603,7 +621,7 @@ function PopularItemCard({ product, onOpen }: { product: ProductData; onOpen: (p
   const hasOrig       = !!origPriceStr && parseInt(origPriceStr, 10) > priceNum
   const savePct       = hasOrig ? Math.round(((parseInt(origPriceStr!, 10) - priceNum) / parseInt(origPriceStr!, 10)) * 100) : 0
 
-  const needsSelection = hasSizes && product.sizes!.length > 1
+  const needsSelection = (hasSizes && product.sizes!.length > 1) || !!product.addonGroups?.some((g) => g.isRequired)
   const isOrderable    = priceNum > 0 && product.productId != null
 
   const cartItem = items.find((i) =>

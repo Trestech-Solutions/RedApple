@@ -1,10 +1,10 @@
 {
     "branch": {
-        "id": 59,
-        "branch_name": "North nazimabad",
+        "id": 60,
+        "branch_name": "Johar",
         "status": true,
-        "location": "North nazimabad Block l A89",
-        "address": "",
+        "location": "block 1",
+        "address": "johar 12",
         "map_location": "",
         "is_default": false,
         "pickup_status": true,
@@ -143,9 +143,9 @@
         "restaurant": 1
     },
     "branch_settings": {
-        "id": 16,
-        "date_added": "2026-10-12T19:43:54.137700Z",
-        "date_updated": "2026-10-12T19:43:54.137752Z",
+        "id": 17,
+        "date_added": "2026-10-13T17:32:32.016338Z",
+        "date_updated": "2026-10-13T17:32:32.016365Z",
         "enable_city_on_checkout": false,
         "enable_save_my_info": false,
         "checkout_note": "",
@@ -172,7 +172,7 @@
         "apply_item_wise_discount_as_on_web_ordering": false,
         "created_by": null,
         "updated_by": null,
-        "branch": 59,
+        "branch": 60,
         "excluded_categories": [],
         "excluded_items": []
     },
@@ -589,38 +589,22 @@
             ]
         }
     ],
-    "banners": [],
-    "popup_banners": [],
-    "offers": [
+    "banners": [
         {
-            "id": 3,
-            "restaurant": 1,
-            "branch": null,
-            "banner_image": null,
-            "show_percentage_text": true,
-            "amount": "25.00",
-            "discount_type": "percentage",
-            "included_categories": [],
-            "included_categories_detail": [],
-            "orders_over": "300.00",
-            "discount_text": "Flat",
-            "discount_message": "",
+            "id": 27,
+            "title": "Beef Mushroom Madness",
+            "url": "",
+            "banner_image": "/media/banners/1788767447_8501b219292b4cd7.png",
+            "status": true,
             "valid_from_date": null,
             "valid_to_date": null,
             "start_time": null,
             "end_time": null,
-            "days": [
-                "mon",
-                "tue"
-            ],
-            "status": true,
-            "created_by": null,
-            "updated_by": null,
-            "date_added": "2026-09-10T20:16:08.968000Z",
-            "date_updated": "2026-09-21T12:59:17.766047Z",
             "is_available_now": true
         }
     ],
+    "popup_banners": [],
+    "offers": [],
     "social_media_links": {
         "id": 1,
         "date_added": "2026-09-05T17:29:42.687647Z",
@@ -638,7 +622,92 @@
         "updated_by": null,
         "restaurant": 1
     },
-    "branch_business_hours": [],
+    "branch_business_hours": [
+        {
+            "id": 19,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "fri",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 15,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "mon",
+            "is_open": true,
+            "time_from": "10:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 20,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "sat",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 21,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "sun",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 18,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "thu",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 16,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "tue",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        },
+        {
+            "id": 17,
+            "branch": 60,
+            "branch_name": "Johar",
+            "day": "wed",
+            "is_open": true,
+            "time_from": "09:00:00",
+            "time_to": "23:59:00",
+            "second_start": null,
+            "second_end": null,
+            "custom_text": ""
+        }
+    ],
     "holidays": [
         {
             "id": 2,
@@ -996,30 +1065,9 @@
                         "front_price": "664.00",
                         "branch_prices": [
                             {
-                                "id": 24,
-                                "branch": 36,
-                                "branch_name": "Faislabad — stub",
-                                "price": "0.00",
-                                "status": true
-                            },
-                            {
-                                "id": 25,
-                                "branch": 34,
-                                "branch_name": "Islamabad — stub",
-                                "price": "0.00",
-                                "status": true
-                            },
-                            {
                                 "id": 26,
                                 "branch": 60,
                                 "branch_name": "Johar",
-                                "price": "0.00",
-                                "status": false
-                            },
-                            {
-                                "id": 27,
-                                "branch": 32,
-                                "branch_name": "Lahore — stub",
                                 "price": "0.00",
                                 "status": true
                             },
@@ -1027,6 +1075,13 @@
                                 "id": 28,
                                 "branch": 59,
                                 "branch_name": "North nazimabad",
+                                "price": "0.00",
+                                "status": true
+                            },
+                            {
+                                "id": 48,
+                                "branch": 61,
+                                "branch_name": "Sukkur Branch",
                                 "price": "0.00",
                                 "status": true
                             }
@@ -1037,7 +1092,63 @@
                         "updated_by": 10,
                         "updated_by_username": "Demo",
                         "date_added": "2026-10-12T18:57:20.870613Z",
-                        "date_updated": "2026-10-12T18:57:51.333110Z"
+                        "date_updated": "2026-10-14T20:52:13.201060Z",
+                        "available_addons": [
+                            13,
+                            8,
+                            4,
+                            12
+                        ],
+                        "addon_groups": [
+                            {
+                                "id": 3,
+                                "name": "Drink",
+                                "is_required": false,
+                                "addons": [
+                                    {
+                                        "id": 4,
+                                        "name": "Pepsi",
+                                        "price": "100.00"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 4,
+                                "name": "Sauces",
+                                "is_required": false,
+                                "addons": [
+                                    {
+                                        "id": 8,
+                                        "name": "Honey Mastard",
+                                        "price": "120.00"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 7,
+                                "name": "Beef Patty",
+                                "is_required": false,
+                                "addons": [
+                                    {
+                                        "id": 12,
+                                        "name": "beef patty",
+                                        "price": "10.00"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 8,
+                                "name": "Classic American Adds ON",
+                                "is_required": false,
+                                "addons": [
+                                    {
+                                        "id": 13,
+                                        "name": "Beef Patty",
+                                        "price": "330.00"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     "quantity": 1,
                     "extra_cost": "0.00",
@@ -1484,30 +1595,9 @@
                                 "front_price": "6.49",
                                 "branch_prices": [
                                     {
-                                        "id": 9,
-                                        "branch": 36,
-                                        "branch_name": "Faislabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
-                                        "id": 10,
-                                        "branch": 34,
-                                        "branch_name": "Islamabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
                                         "id": 11,
                                         "branch": 60,
                                         "branch_name": "Johar",
-                                        "price": "0.00",
-                                        "status": false
-                                    },
-                                    {
-                                        "id": 12,
-                                        "branch": 32,
-                                        "branch_name": "Lahore — stub",
                                         "price": "0.00",
                                         "status": true
                                     },
@@ -1517,6 +1607,13 @@
                                         "branch_name": "North nazimabad",
                                         "price": "0.00",
                                         "status": true
+                                    },
+                                    {
+                                        "id": 45,
+                                        "branch": 61,
+                                        "branch_name": "Sukkur Branch",
+                                        "price": "0.00",
+                                        "status": true
                                     }
                                 ],
                                 "size_prices": [],
@@ -1524,7 +1621,9 @@
                                 "updated_by": 10,
                                 "updated_by_username": "Demo",
                                 "date_added": "2026-08-21T11:38:27.950460Z",
-                                "date_updated": "2026-10-09T21:25:41.356935Z"
+                                "date_updated": "2026-10-09T21:25:41.356935Z",
+                                "available_addons": [],
+                                "addon_groups": []
                             },
                             "quantity": 1,
                             "max_quantity": null,
@@ -1631,30 +1730,9 @@
                                 "front_price": "3999.00",
                                 "branch_prices": [
                                     {
-                                        "id": 19,
-                                        "branch": 36,
-                                        "branch_name": "Faislabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
-                                        "id": 20,
-                                        "branch": 34,
-                                        "branch_name": "Islamabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
                                         "id": 21,
                                         "branch": 60,
                                         "branch_name": "Johar",
-                                        "price": "0.00",
-                                        "status": false
-                                    },
-                                    {
-                                        "id": 22,
-                                        "branch": 32,
-                                        "branch_name": "Lahore — stub",
                                         "price": "0.00",
                                         "status": true
                                     },
@@ -1664,6 +1742,13 @@
                                         "branch_name": "North nazimabad",
                                         "price": "0.00",
                                         "status": true
+                                    },
+                                    {
+                                        "id": 47,
+                                        "branch": 61,
+                                        "branch_name": "Sukkur Branch",
+                                        "price": "0.00",
+                                        "status": true
                                     }
                                 ],
                                 "size_prices": [],
@@ -1671,7 +1756,9 @@
                                 "updated_by": 10,
                                 "updated_by_username": "Demo",
                                 "date_added": "2026-08-21T11:25:40.011946Z",
-                                "date_updated": "2026-10-09T21:26:21.065706Z"
+                                "date_updated": "2026-10-09T21:26:21.065706Z",
+                                "available_addons": [],
+                                "addon_groups": []
                             },
                             "quantity": 1,
                             "max_quantity": null,
@@ -2123,30 +2210,9 @@
                                 "front_price": "200.00",
                                 "branch_prices": [
                                     {
-                                        "id": 29,
-                                        "branch": 36,
-                                        "branch_name": "Faislabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
-                                        "id": 30,
-                                        "branch": 34,
-                                        "branch_name": "Islamabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
                                         "id": 31,
                                         "branch": 60,
                                         "branch_name": "Johar",
-                                        "price": "0.00",
-                                        "status": false
-                                    },
-                                    {
-                                        "id": 32,
-                                        "branch": 32,
-                                        "branch_name": "Lahore — stub",
                                         "price": "0.00",
                                         "status": true
                                     },
@@ -2156,6 +2222,13 @@
                                         "branch_name": "North nazimabad",
                                         "price": "0.00",
                                         "status": true
+                                    },
+                                    {
+                                        "id": 49,
+                                        "branch": 61,
+                                        "branch_name": "Sukkur Branch",
+                                        "price": "0.00",
+                                        "status": true
                                     }
                                 ],
                                 "size_prices": [],
@@ -2163,7 +2236,9 @@
                                 "updated_by": 10,
                                 "updated_by_username": "Demo",
                                 "date_added": "2026-08-21T11:13:13.536909Z",
-                                "date_updated": "2026-10-09T21:25:46.716103Z"
+                                "date_updated": "2026-10-09T21:25:46.716103Z",
+                                "available_addons": [],
+                                "addon_groups": []
                             },
                             "quantity": 1,
                             "max_quantity": null,
@@ -2640,30 +2715,9 @@
                         "front_price": "6.49",
                         "branch_prices": [
                             {
-                                "id": 9,
-                                "branch": 36,
-                                "branch_name": "Faislabad — stub",
-                                "price": "0.00",
-                                "status": true
-                            },
-                            {
-                                "id": 10,
-                                "branch": 34,
-                                "branch_name": "Islamabad — stub",
-                                "price": "0.00",
-                                "status": true
-                            },
-                            {
                                 "id": 11,
                                 "branch": 60,
                                 "branch_name": "Johar",
-                                "price": "0.00",
-                                "status": false
-                            },
-                            {
-                                "id": 12,
-                                "branch": 32,
-                                "branch_name": "Lahore — stub",
                                 "price": "0.00",
                                 "status": true
                             },
@@ -2673,6 +2727,13 @@
                                 "branch_name": "North nazimabad",
                                 "price": "0.00",
                                 "status": true
+                            },
+                            {
+                                "id": 45,
+                                "branch": 61,
+                                "branch_name": "Sukkur Branch",
+                                "price": "0.00",
+                                "status": true
                             }
                         ],
                         "size_prices": [],
@@ -2680,7 +2741,9 @@
                         "updated_by": 10,
                         "updated_by_username": "Demo",
                         "date_added": "2026-08-21T11:38:27.950460Z",
-                        "date_updated": "2026-10-09T21:25:41.356935Z"
+                        "date_updated": "2026-10-09T21:25:41.356935Z",
+                        "available_addons": [],
+                        "addon_groups": []
                     },
                     "quantity": 1,
                     "extra_cost": "0.00",
@@ -3005,30 +3068,9 @@
                                 "front_price": "3999.00",
                                 "branch_prices": [
                                     {
-                                        "id": 19,
-                                        "branch": 36,
-                                        "branch_name": "Faislabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
-                                        "id": 20,
-                                        "branch": 34,
-                                        "branch_name": "Islamabad — stub",
-                                        "price": "0.00",
-                                        "status": true
-                                    },
-                                    {
                                         "id": 21,
                                         "branch": 60,
                                         "branch_name": "Johar",
-                                        "price": "0.00",
-                                        "status": false
-                                    },
-                                    {
-                                        "id": 22,
-                                        "branch": 32,
-                                        "branch_name": "Lahore — stub",
                                         "price": "0.00",
                                         "status": true
                                     },
@@ -3038,6 +3080,13 @@
                                         "branch_name": "North nazimabad",
                                         "price": "0.00",
                                         "status": true
+                                    },
+                                    {
+                                        "id": 47,
+                                        "branch": 61,
+                                        "branch_name": "Sukkur Branch",
+                                        "price": "0.00",
+                                        "status": true
                                     }
                                 ],
                                 "size_prices": [],
@@ -3045,7 +3094,9 @@
                                 "updated_by": 10,
                                 "updated_by_username": "Demo",
                                 "date_added": "2026-08-21T11:25:40.011946Z",
-                                "date_updated": "2026-10-09T21:26:21.065706Z"
+                                "date_updated": "2026-10-09T21:26:21.065706Z",
+                                "available_addons": [],
+                                "addon_groups": []
                             },
                             "quantity": 1,
                             "max_quantity": 4,
@@ -3341,30 +3392,9 @@
             "front_price": "100.00",
             "branch_prices": [
                 {
-                    "id": 4,
-                    "branch": 36,
-                    "branch_name": "Faislabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
-                    "id": 5,
-                    "branch": 34,
-                    "branch_name": "Islamabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
                     "id": 6,
                     "branch": 60,
                     "branch_name": "Johar",
-                    "price": "0.00",
-                    "status": false
-                },
-                {
-                    "id": 7,
-                    "branch": 32,
-                    "branch_name": "Lahore — stub",
                     "price": "0.00",
                     "status": true
                 },
@@ -3372,6 +3402,13 @@
                     "id": 8,
                     "branch": 59,
                     "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 44,
+                    "branch": 61,
+                    "branch_name": "Sukkur Branch",
                     "price": "0.00",
                     "status": true
                 }
@@ -3382,7 +3419,50 @@
             "updated_by": 10,
             "updated_by_username": "Demo",
             "date_added": "2026-10-06T19:34:13.885912Z",
-            "date_updated": "2026-10-09T21:31:34.686839Z",
+            "date_updated": "2026-10-14T20:48:56.618676Z",
+            "available_addons": [
+                5,
+                13,
+                6
+            ],
+            "addon_groups": [
+                {
+                    "id": 3,
+                    "name": "Drink",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 5,
+                            "name": "7up",
+                            "price": "100.00"
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "name": "Sauces",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 6,
+                            "name": "Chipotle Sauce",
+                            "price": "100.00"
+                        }
+                    ]
+                },
+                {
+                    "id": 8,
+                    "name": "Classic American Adds ON",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 13,
+                            "name": "Beef Patty",
+                            "price": "330.00"
+                        }
+                    ]
+                }
+            ],
             "is_available_now": true,
             "price_at_branch": "0.00"
         },
@@ -3482,30 +3562,9 @@
             "front_price": "700.00",
             "branch_prices": [
                 {
-                    "id": 14,
-                    "branch": 36,
-                    "branch_name": "Faislabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
-                    "id": 15,
-                    "branch": 34,
-                    "branch_name": "Islamabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
                     "id": 16,
                     "branch": 60,
                     "branch_name": "Johar",
-                    "price": "0.00",
-                    "status": false
-                },
-                {
-                    "id": 17,
-                    "branch": 32,
-                    "branch_name": "Lahore — stub",
                     "price": "0.00",
                     "status": true
                 },
@@ -3513,6 +3572,13 @@
                     "id": 18,
                     "branch": 59,
                     "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 46,
+                    "branch": 61,
+                    "branch_name": "Sukkur Branch",
                     "price": "0.00",
                     "status": true
                 }
@@ -3523,6 +3589,8 @@
             "updated_by_username": "Demo",
             "date_added": "2026-08-21T11:42:16.971295Z",
             "date_updated": "2026-10-09T21:19:41.011469Z",
+            "available_addons": [],
+            "addon_groups": [],
             "is_available_now": true,
             "price_at_branch": "0.00"
         },
@@ -3967,30 +4035,9 @@
             "front_price": "200.00",
             "branch_prices": [
                 {
-                    "id": 29,
-                    "branch": 36,
-                    "branch_name": "Faislabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
-                    "id": 30,
-                    "branch": 34,
-                    "branch_name": "Islamabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
                     "id": 31,
                     "branch": 60,
                     "branch_name": "Johar",
-                    "price": "0.00",
-                    "status": false
-                },
-                {
-                    "id": 32,
-                    "branch": 32,
-                    "branch_name": "Lahore — stub",
                     "price": "0.00",
                     "status": true
                 },
@@ -3998,6 +4045,13 @@
                     "id": 33,
                     "branch": 59,
                     "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 49,
+                    "branch": 61,
+                    "branch_name": "Sukkur Branch",
                     "price": "0.00",
                     "status": true
                 }
@@ -4008,6 +4062,8 @@
             "updated_by_username": "Demo",
             "date_added": "2026-08-21T11:13:13.536909Z",
             "date_updated": "2026-10-09T21:25:46.716103Z",
+            "available_addons": [],
+            "addon_groups": [],
             "is_available_now": true,
             "price_at_branch": "0.00"
         },
@@ -4452,30 +4508,9 @@
             "front_price": "2000.00",
             "branch_prices": [
                 {
-                    "id": 34,
-                    "branch": 36,
-                    "branch_name": "Faislabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
-                    "id": 35,
-                    "branch": 34,
-                    "branch_name": "Islamabad — stub",
-                    "price": "0.00",
-                    "status": true
-                },
-                {
                     "id": 36,
                     "branch": 60,
                     "branch_name": "Johar",
-                    "price": "0.00",
-                    "status": false
-                },
-                {
-                    "id": 37,
-                    "branch": 32,
-                    "branch_name": "Lahore — stub",
                     "price": "0.00",
                     "status": true
                 },
@@ -4483,6 +4518,13 @@
                     "id": 38,
                     "branch": 59,
                     "branch_name": "North nazimabad",
+                    "price": "0.00",
+                    "status": true
+                },
+                {
+                    "id": 50,
+                    "branch": 61,
+                    "branch_name": "Sukkur Branch",
                     "price": "0.00",
                     "status": true
                 }
@@ -4493,8 +4535,221 @@
             "updated_by_username": "Demo",
             "date_added": "2026-08-21T11:24:42.355413Z",
             "date_updated": "2026-10-09T21:31:25.375843Z",
+            "available_addons": [],
+            "addon_groups": [],
             "is_available_now": true,
             "price_at_branch": "0.00"
+        },
+        {
+            "id": 33,
+            "restaurant": 1,
+            "item_sku": "BRG-001",
+            "name": "Zinger Burger",
+            "description": "Crispy fried chicken fillet with lettuce and mayo",
+            "time_duration": "15-20 mins",
+            "start_time": "07:00:00",
+            "end_time": "23:00:00",
+            "status": 1,
+            "feature_image": null,
+            "is_popular": true,
+            "product_background_color": "#FFFFFF",
+            "product_title_color": "#000000",
+            "product_description_color": "#333333",
+            "text_button_color": "",
+            "cart_style": "",
+            "food_category": [
+                4
+            ],
+            "food_category_detail": [
+                {
+                    "id": 4,
+                    "restaurant": 1,
+                    "name": "BarBque",
+                    "hide_category_display_name_menu": false,
+                    "hide_category_from_navbar": false,
+                    "description": "Smoked to Perfection, Served with Passion.",
+                    "banner": "/media/food_categories/banners/kmkm.webp",
+                    "icon": "/media/food_categories/icons/bb1.jpeg",
+                    "dish": [],
+                    "dish_detail": [],
+                    "status": true,
+                    "schedule": false,
+                    "schedule_days_times": {
+                        "fri": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "mon": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sat": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "sun": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "thu": {
+                            "is_open": false,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "tue": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        },
+                        "wed": {
+                            "is_open": true,
+                            "open_time": "09:00",
+                            "close_time": "22:00"
+                        }
+                    },
+                    "hide_category": false,
+                    "hide_category_from_third_parties": false,
+                    "hide_product_title": false,
+                    "hide_prices": false,
+                    "app_only": false,
+                    "web_only": false,
+                    "discount_on_cards_online_payment": false,
+                    "secret_key": "",
+                    "after_schedule": "show_closed",
+                    "layout": "list-circle",
+                    "cart_style": "compact",
+                    "header_style": "minimal",
+                    "created_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
+                    "date_added": "2026-08-18T18:34:15.037873Z",
+                    "date_updated": "2026-10-09T20:57:28.711248Z"
+                }
+            ],
+            "item_discount": "1.00",
+            "item_discount_type": "fixed",
+            "show_discount_tag": true,
+            "front_price": "5.99",
+            "branch_prices": [],
+            "size_prices": [],
+            "created_by": 10,
+            "created_by_username": "Demo",
+            "updated_by": 10,
+            "updated_by_username": "Demo",
+            "date_added": "2026-10-14T20:31:14.825930Z",
+            "date_updated": "2026-10-14T20:31:14.825969Z",
+            "available_addons": [
+                5,
+                13,
+                14
+            ],
+            "addon_groups": [
+                {
+                    "id": 3,
+                    "name": "Drink",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 5,
+                            "name": "7up",
+                            "price": "100.00"
+                        }
+                    ]
+                },
+                {
+                    "id": 8,
+                    "name": "Classic American Adds ON",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 13,
+                            "name": "Beef Patty",
+                            "price": "330.00"
+                        },
+                        {
+                            "id": 14,
+                            "name": "Cheese Slice",
+                            "price": "2323.00"
+                        }
+                    ]
+                }
+            ],
+            "is_available_now": true,
+            "price_at_branch": "5.99"
+        },
+        {
+            "id": 32,
+            "restaurant": 1,
+            "item_sku": "BRG-001",
+            "name": "Zinger Burger",
+            "description": "Crispy fried chicken fillet with lettuce and mayo",
+            "time_duration": "15-20 mins",
+            "start_time": "07:00:00",
+            "end_time": "23:00:00",
+            "status": 1,
+            "feature_image": null,
+            "is_popular": true,
+            "product_background_color": "#FFFFFF",
+            "product_title_color": "#000000",
+            "product_description_color": "#333333",
+            "text_button_color": "",
+            "cart_style": "",
+            "food_category": [],
+            "food_category_detail": [],
+            "item_discount": "1.00",
+            "item_discount_type": "fixed",
+            "show_discount_tag": true,
+            "front_price": "5.99",
+            "branch_prices": [],
+            "size_prices": [],
+            "created_by": 10,
+            "created_by_username": "Demo",
+            "updated_by": 10,
+            "updated_by_username": "Demo",
+            "date_added": "2026-10-14T20:26:38.531503Z",
+            "date_updated": "2026-10-14T20:26:38.531526Z",
+            "available_addons": [
+                5,
+                13,
+                14
+            ],
+            "addon_groups": [
+                {
+                    "id": 3,
+                    "name": "Drink",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 5,
+                            "name": "7up",
+                            "price": "100.00"
+                        }
+                    ]
+                },
+                {
+                    "id": 8,
+                    "name": "Classic American Adds ON",
+                    "is_required": false,
+                    "addons": [
+                        {
+                            "id": 13,
+                            "name": "Beef Patty",
+                            "price": "330.00"
+                        },
+                        {
+                            "id": 14,
+                            "name": "Cheese Slice",
+                            "price": "2323.00"
+                        }
+                    ]
+                }
+            ],
+            "is_available_now": true,
+            "price_at_branch": "5.99"
         }
     ],
     "menu": [
@@ -4731,30 +4986,9 @@
                     "front_price": "100.00",
                     "branch_prices": [
                         {
-                            "id": 4,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 5,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 6,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 7,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -4762,6 +4996,13 @@
                             "id": 8,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 44,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -4772,7 +5013,50 @@
                     "updated_by": 10,
                     "updated_by_username": "Demo",
                     "date_added": "2026-10-06T19:34:13.885912Z",
-                    "date_updated": "2026-10-09T21:31:34.686839Z",
+                    "date_updated": "2026-10-14T20:48:56.618676Z",
+                    "available_addons": [
+                        5,
+                        13,
+                        6
+                    ],
+                    "addon_groups": [
+                        {
+                            "id": 3,
+                            "name": "Drink",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 5,
+                                    "name": "7up",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "name": "Sauces",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 6,
+                                    "name": "Chipotle Sauce",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 8,
+                            "name": "Classic American Adds ON",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 13,
+                                    "name": "Beef Patty",
+                                    "price": "330.00"
+                                }
+                            ]
+                        }
+                    ],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -4872,30 +5156,9 @@
                     "front_price": "3999.00",
                     "branch_prices": [
                         {
-                            "id": 19,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 20,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 21,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 22,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -4903,6 +5166,13 @@
                             "id": 23,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 47,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -4913,6 +5183,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:25:40.011946Z",
                     "date_updated": "2026-10-09T21:26:21.065706Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -5012,30 +5284,9 @@
                     "front_price": "664.00",
                     "branch_prices": [
                         {
-                            "id": 24,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 25,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 26,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 27,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -5043,6 +5294,13 @@
                             "id": 28,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 48,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -5053,7 +5311,63 @@
                     "updated_by": 10,
                     "updated_by_username": "Demo",
                     "date_added": "2026-10-12T18:57:20.870613Z",
-                    "date_updated": "2026-10-12T18:57:51.333110Z",
+                    "date_updated": "2026-10-14T20:52:13.201060Z",
+                    "available_addons": [
+                        13,
+                        8,
+                        4,
+                        12
+                    ],
+                    "addon_groups": [
+                        {
+                            "id": 3,
+                            "name": "Drink",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 4,
+                                    "name": "Pepsi",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "name": "Sauces",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 8,
+                                    "name": "Honey Mastard",
+                                    "price": "120.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 7,
+                            "name": "Beef Patty",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 12,
+                                    "name": "beef patty",
+                                    "price": "10.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 8,
+                            "name": "Classic American Adds ON",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 13,
+                                    "name": "Beef Patty",
+                                    "price": "330.00"
+                                }
+                            ]
+                        }
+                    ],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -5498,30 +5812,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -5529,6 +5822,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -5539,6 +5839,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -5983,30 +6285,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -6014,6 +6295,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -6024,8 +6312,151 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
+                },
+                {
+                    "id": 33,
+                    "restaurant": 1,
+                    "item_sku": "BRG-001",
+                    "name": "Zinger Burger",
+                    "description": "Crispy fried chicken fillet with lettuce and mayo",
+                    "time_duration": "15-20 mins",
+                    "start_time": "07:00:00",
+                    "end_time": "23:00:00",
+                    "status": 1,
+                    "feature_image": null,
+                    "is_popular": true,
+                    "product_background_color": "#FFFFFF",
+                    "product_title_color": "#000000",
+                    "product_description_color": "#333333",
+                    "text_button_color": "",
+                    "cart_style": "",
+                    "food_category": [
+                        4
+                    ],
+                    "food_category_detail": [
+                        {
+                            "id": 4,
+                            "restaurant": 1,
+                            "name": "BarBque",
+                            "hide_category_display_name_menu": false,
+                            "hide_category_from_navbar": false,
+                            "description": "Smoked to Perfection, Served with Passion.",
+                            "banner": "/media/food_categories/banners/kmkm.webp",
+                            "icon": "/media/food_categories/icons/bb1.jpeg",
+                            "dish": [],
+                            "dish_detail": [],
+                            "status": true,
+                            "schedule": false,
+                            "schedule_days_times": {
+                                "fri": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "mon": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "sat": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "sun": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "thu": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "tue": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "wed": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                }
+                            },
+                            "hide_category": false,
+                            "hide_category_from_third_parties": false,
+                            "hide_product_title": false,
+                            "hide_prices": false,
+                            "app_only": false,
+                            "web_only": false,
+                            "discount_on_cards_online_payment": false,
+                            "secret_key": "",
+                            "after_schedule": "show_closed",
+                            "layout": "list-circle",
+                            "cart_style": "compact",
+                            "header_style": "minimal",
+                            "created_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
+                            "date_added": "2026-08-18T18:34:15.037873Z",
+                            "date_updated": "2026-10-09T20:57:28.711248Z"
+                        }
+                    ],
+                    "item_discount": "1.00",
+                    "item_discount_type": "fixed",
+                    "show_discount_tag": true,
+                    "front_price": "5.99",
+                    "branch_prices": [],
+                    "size_prices": [],
+                    "created_by": 10,
+                    "created_by_username": "Demo",
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
+                    "date_added": "2026-10-14T20:31:14.825930Z",
+                    "date_updated": "2026-10-14T20:31:14.825969Z",
+                    "available_addons": [
+                        5,
+                        13,
+                        14
+                    ],
+                    "addon_groups": [
+                        {
+                            "id": 3,
+                            "name": "Drink",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 5,
+                                    "name": "7up",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 8,
+                            "name": "Classic American Adds ON",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 13,
+                                    "name": "Beef Patty",
+                                    "price": "330.00"
+                                },
+                                {
+                                    "id": 14,
+                                    "name": "Cheese Slice",
+                                    "price": "2323.00"
+                                }
+                            ]
+                        }
+                    ],
+                    "is_available_now": true,
+                    "price_at_branch": "5.99"
                 }
             ]
         },
@@ -6262,30 +6693,9 @@
                     "front_price": "100.00",
                     "branch_prices": [
                         {
-                            "id": 4,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 5,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 6,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 7,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -6293,6 +6703,13 @@
                             "id": 8,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 44,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -6303,7 +6720,50 @@
                     "updated_by": 10,
                     "updated_by_username": "Demo",
                     "date_added": "2026-10-06T19:34:13.885912Z",
-                    "date_updated": "2026-10-09T21:31:34.686839Z",
+                    "date_updated": "2026-10-14T20:48:56.618676Z",
+                    "available_addons": [
+                        5,
+                        13,
+                        6
+                    ],
+                    "addon_groups": [
+                        {
+                            "id": 3,
+                            "name": "Drink",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 5,
+                                    "name": "7up",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "name": "Sauces",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 6,
+                                    "name": "Chipotle Sauce",
+                                    "price": "100.00"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 8,
+                            "name": "Classic American Adds ON",
+                            "is_required": false,
+                            "addons": [
+                                {
+                                    "id": 13,
+                                    "name": "Beef Patty",
+                                    "price": "330.00"
+                                }
+                            ]
+                        }
+                    ],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -6748,30 +7208,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -6779,6 +7218,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -6789,6 +7235,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -7233,30 +7681,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -7264,6 +7691,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -7274,6 +7708,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 }
@@ -7581,30 +8017,9 @@
                     "front_price": "6.49",
                     "branch_prices": [
                         {
-                            "id": 9,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 10,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 11,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 12,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -7612,6 +8027,13 @@
                             "id": 13,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 45,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -7622,6 +8044,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": false,
                     "price_at_branch": "0.00"
                 },
@@ -8066,30 +8490,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -8097,6 +8500,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -8107,6 +8517,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -8551,30 +8963,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -8582,6 +8973,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -8592,6 +8990,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 }
@@ -8899,30 +9299,9 @@
                     "front_price": "6.49",
                     "branch_prices": [
                         {
-                            "id": 9,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 10,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 11,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 12,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -8930,6 +9309,13 @@
                             "id": 13,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 45,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -8940,6 +9326,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": false,
                     "price_at_branch": "0.00"
                 },
@@ -9384,30 +9772,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -9415,6 +9782,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -9425,6 +9799,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -9869,30 +10245,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -9900,6 +10255,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -9910,6 +10272,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 }
@@ -9983,146 +10347,6 @@
             "date_added": "2026-08-18T18:37:54.257232Z",
             "date_updated": "2026-10-09T20:59:04.029653Z",
             "items": [
-                {
-                    "id": 12,
-                    "restaurant": 1,
-                    "item_sku": "Chicken Burger",
-                    "name": "Chicken Burger",
-                    "description": "Tender Chicken marinated in aromatic spices and yogurt,",
-                    "time_duration": "",
-                    "start_time": null,
-                    "end_time": null,
-                    "status": 1,
-                    "feature_image": "/media/items/feature_images/burger.png",
-                    "is_popular": true,
-                    "product_background_color": "#ffffff",
-                    "product_title_color": "#22c55e",
-                    "product_description_color": "#6b7280",
-                    "text_button_color": "",
-                    "cart_style": "",
-                    "food_category": [
-                        8
-                    ],
-                    "food_category_detail": [
-                        {
-                            "id": 8,
-                            "restaurant": 1,
-                            "name": "Traditional",
-                            "hide_category_display_name_menu": false,
-                            "hide_category_from_navbar": false,
-                            "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
-                            "banner": "/media/food_categories/banners/pdwokdow.webp",
-                            "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
-                            "dish": [],
-                            "dish_detail": [],
-                            "status": true,
-                            "schedule": false,
-                            "schedule_days_times": {
-                                "fri": {
-                                    "is_open": false,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "mon": {
-                                    "is_open": true,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "sat": {
-                                    "is_open": false,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "sun": {
-                                    "is_open": false,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "thu": {
-                                    "is_open": true,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "tue": {
-                                    "is_open": true,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                },
-                                "wed": {
-                                    "is_open": true,
-                                    "open_time": "09:00",
-                                    "close_time": "22:00"
-                                }
-                            },
-                            "hide_category": false,
-                            "hide_category_from_third_parties": false,
-                            "hide_product_title": false,
-                            "hide_prices": false,
-                            "app_only": false,
-                            "web_only": false,
-                            "discount_on_cards_online_payment": false,
-                            "secret_key": "",
-                            "after_schedule": "show_closed",
-                            "layout": "gallery",
-                            "cart_style": "",
-                            "header_style": "",
-                            "created_by": null,
-                            "updated_by": 10,
-                            "updated_by_username": "Demo",
-                            "date_added": "2026-08-18T18:37:54.257232Z",
-                            "date_updated": "2026-10-09T20:59:04.029653Z"
-                        }
-                    ],
-                    "item_discount": "2.00",
-                    "item_discount_type": "percentage",
-                    "show_discount_tag": true,
-                    "front_price": "700.00",
-                    "branch_prices": [
-                        {
-                            "id": 14,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 15,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 16,
-                            "branch": 60,
-                            "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 17,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 18,
-                            "branch": 59,
-                            "branch_name": "North nazimabad",
-                            "price": "0.00",
-                            "status": true
-                        }
-                    ],
-                    "size_prices": [],
-                    "created_by": null,
-                    "updated_by": 10,
-                    "updated_by_username": "Demo",
-                    "date_added": "2026-08-21T11:42:16.971295Z",
-                    "date_updated": "2026-10-09T21:19:41.011469Z",
-                    "is_available_now": true,
-                    "price_at_branch": "0.00"
-                },
                 {
                     "id": 9,
                     "restaurant": 1,
@@ -10357,30 +10581,9 @@
                     "front_price": "6.49",
                     "branch_prices": [
                         {
-                            "id": 9,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 10,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 11,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 12,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -10388,6 +10591,13 @@
                             "id": 13,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 45,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -10398,7 +10608,137 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:38:27.950460Z",
                     "date_updated": "2026-10-09T21:25:41.356935Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": false,
+                    "price_at_branch": "0.00"
+                },
+                {
+                    "id": 12,
+                    "restaurant": 1,
+                    "item_sku": "Chicken Burger",
+                    "name": "Chicken Burger",
+                    "description": "Tender Chicken marinated in aromatic spices and yogurt,",
+                    "time_duration": "",
+                    "start_time": null,
+                    "end_time": null,
+                    "status": 1,
+                    "feature_image": "/media/items/feature_images/burger.png",
+                    "is_popular": true,
+                    "product_background_color": "#ffffff",
+                    "product_title_color": "#22c55e",
+                    "product_description_color": "#6b7280",
+                    "text_button_color": "",
+                    "cart_style": "",
+                    "food_category": [
+                        8
+                    ],
+                    "food_category_detail": [
+                        {
+                            "id": 8,
+                            "restaurant": 1,
+                            "name": "Traditional",
+                            "hide_category_display_name_menu": false,
+                            "hide_category_from_navbar": false,
+                            "description": "Handis — Rich, aromatic curries slow-cooked to perfection, packed with authentic desi flavor.",
+                            "banner": "/media/food_categories/banners/pdwokdow.webp",
+                            "icon": "/media/food_categories/icons/1787034036-WhatsApp-Image-2026-08-18-at-11-17-18-AM.jpeg",
+                            "dish": [],
+                            "dish_detail": [],
+                            "status": true,
+                            "schedule": false,
+                            "schedule_days_times": {
+                                "fri": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "mon": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "sat": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "sun": {
+                                    "is_open": false,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "thu": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "tue": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                },
+                                "wed": {
+                                    "is_open": true,
+                                    "open_time": "09:00",
+                                    "close_time": "22:00"
+                                }
+                            },
+                            "hide_category": false,
+                            "hide_category_from_third_parties": false,
+                            "hide_product_title": false,
+                            "hide_prices": false,
+                            "app_only": false,
+                            "web_only": false,
+                            "discount_on_cards_online_payment": false,
+                            "secret_key": "",
+                            "after_schedule": "show_closed",
+                            "layout": "gallery",
+                            "cart_style": "",
+                            "header_style": "",
+                            "created_by": null,
+                            "updated_by": 10,
+                            "updated_by_username": "Demo",
+                            "date_added": "2026-08-18T18:37:54.257232Z",
+                            "date_updated": "2026-10-09T20:59:04.029653Z"
+                        }
+                    ],
+                    "item_discount": "2.00",
+                    "item_discount_type": "percentage",
+                    "show_discount_tag": true,
+                    "front_price": "700.00",
+                    "branch_prices": [
+                        {
+                            "id": 16,
+                            "branch": 60,
+                            "branch_name": "Johar",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 18,
+                            "branch": 59,
+                            "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 46,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
+                            "price": "0.00",
+                            "status": true
+                        }
+                    ],
+                    "size_prices": [],
+                    "created_by": null,
+                    "updated_by": 10,
+                    "updated_by_username": "Demo",
+                    "date_added": "2026-08-21T11:42:16.971295Z",
+                    "date_updated": "2026-10-09T21:19:41.011469Z",
+                    "available_addons": [],
+                    "addon_groups": [],
+                    "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
                 {
@@ -10502,6 +10842,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:41:48.165851Z",
                     "date_updated": "2026-10-09T21:26:50.928623Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "600.00"
                 },
@@ -10946,30 +11288,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -10977,6 +11298,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -10987,6 +11315,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -11431,30 +11761,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -11462,6 +11771,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -11472,6 +11788,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 }
@@ -11986,30 +12304,9 @@
                     "front_price": "200.00",
                     "branch_prices": [
                         {
-                            "id": 29,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 30,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 31,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 32,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -12017,6 +12314,13 @@
                             "id": 33,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 49,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -12027,6 +12331,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:13:13.536909Z",
                     "date_updated": "2026-10-09T21:25:46.716103Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 },
@@ -12471,30 +12777,9 @@
                     "front_price": "2000.00",
                     "branch_prices": [
                         {
-                            "id": 34,
-                            "branch": 36,
-                            "branch_name": "Faislabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
-                            "id": 35,
-                            "branch": 34,
-                            "branch_name": "Islamabad — stub",
-                            "price": "0.00",
-                            "status": true
-                        },
-                        {
                             "id": 36,
                             "branch": 60,
                             "branch_name": "Johar",
-                            "price": "0.00",
-                            "status": false
-                        },
-                        {
-                            "id": 37,
-                            "branch": 32,
-                            "branch_name": "Lahore — stub",
                             "price": "0.00",
                             "status": true
                         },
@@ -12502,6 +12787,13 @@
                             "id": 38,
                             "branch": 59,
                             "branch_name": "North nazimabad",
+                            "price": "0.00",
+                            "status": true
+                        },
+                        {
+                            "id": 50,
+                            "branch": 61,
+                            "branch_name": "Sukkur Branch",
                             "price": "0.00",
                             "status": true
                         }
@@ -12512,6 +12804,8 @@
                     "updated_by_username": "Demo",
                     "date_added": "2026-08-21T11:24:42.355413Z",
                     "date_updated": "2026-10-09T21:31:25.375843Z",
+                    "available_addons": [],
+                    "addon_groups": [],
                     "is_available_now": true,
                     "price_at_branch": "0.00"
                 }
@@ -12528,11 +12822,5 @@
             "slug": "about-us"
         }
     ],
-    "area": {
-        "id": 76,
-        "name": "Johar Block 1",
-        "status": true,
-        "branch_id": 59,
-        "delivery_charge": "0.00"
-    }
+    "area": null
 }
