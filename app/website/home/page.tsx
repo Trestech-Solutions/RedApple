@@ -16,7 +16,7 @@ import { SearchBar } from '@/components/website/SearchBar'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { ProductDetailModal } from '@/components/product/ProductDetailModal'
 import { PopupBannerModal } from '@/components/website/PopupBannerModal'
-import { CATEGORIES as FALLBACK_CATS, ALL_PRODUCTS as FALLBACK_PRODS, type Category } from '@/lib/data/website-products'
+import type { Category } from '@/lib/data/website-products'
 import { useGetMenu } from '@/api/client/browse'
 import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
@@ -246,10 +246,7 @@ function transformMenu(menu: MenuResponse | undefined): {
   const menuArr = menu?.menu ?? menu?.categories ?? []
 
   if (menuArr.length === 0) {
-    const idPairs        = FALLBACK_PRODS.map((p, i) => ({ clientId: p.id, numericId: p.productId ?? i + 1 }))
-    const productsWithId = FALLBACK_PRODS.map((p, i) => ({ ...p, productId: p.productId ?? i + 1 }))
-    const categories: ResolvedCategory[] = FALLBACK_CATS.map((c) => ({ ...c, icon: resolveIcon(c.icon) }))
-    return { categories, products: productsWithId, idPairs, popularProducts: [] }
+    return { categories: [], products: [], idPairs: [], popularProducts: [] }
   }
 
   const products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[] = []
@@ -888,7 +885,7 @@ export default function HomePage() {
   }, [idPairs, registerProductId])
 
   const [activeCategoryId, setActiveCategoryId] = useState<string>(() =>
-    categories[0]?.id ?? FALLBACK_CATS[0].id
+    categories[0]?.id ?? ''
   )
 
   reactUseEffect(() => {
@@ -949,7 +946,7 @@ export default function HomePage() {
   }
 
   const activeCategory = useMemo(
-    () => categories.find((c) => c.id === activeCategoryId) ?? categories[0] ?? FALLBACK_CATS[0],
+    () => categories.find((c) => c.id === activeCategoryId) ?? categories[0],
     [categories, activeCategoryId]
   )
 
@@ -963,6 +960,12 @@ export default function HomePage() {
       return matchBranch && matchSearch
     })
   }, [searchQuery, numericBranch, products])
+
+  // Hide categories that have no products from the nav bar
+  const navCategories = useMemo(
+    () => categories.filter((c) => filteredProducts.some((p) => p.categoryId === c.id)),
+    [categories, filteredProducts],
+  )
 
   // An item can belong to several categories, so `products` can hold the same id
   // more than once. Search results span all categories → dedupe, otherwise React
@@ -982,6 +985,7 @@ export default function HomePage() {
   }
 
   const resolvedBgImage = resolveMediaUrl(settings.menu_page_background_image)
+  const hasMenu = categories.length > 0
 
   return (
     // No bg here — the layout already paints the background image
@@ -1002,7 +1006,7 @@ export default function HomePage() {
       {/* Category nav — no bg color, transparent over the image */}
       <div className="sticky top-0 z-30">
         <CategoryNav
-          categories={categories}
+          categories={navCategories}
           activeCategoryId={activeCategoryId}
           onSelect={handleCategoryChange}
         />
@@ -1138,6 +1142,11 @@ export default function HomePage() {
         )
       })()}
 
+      {!hasMenu ? (
+        <section className="mx-auto flex max-w-[1320px] items-center justify-center px-4 py-24 md:px-8">
+          <p className="text-center text-lg font-semibold text-neutral-700">This branch has no menu</p>
+        </section>
+      ) : (<>
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
@@ -1236,6 +1245,7 @@ export default function HomePage() {
           })}
         </div>
       )}
+      </>)}
     </div>
   )
 }
