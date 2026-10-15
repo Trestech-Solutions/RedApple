@@ -9,6 +9,7 @@ import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useCart, DEFAULT_DELIVERY_FEE, useStoreSettings } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useGetMenu } from '@/api/client/browse'
+import { applyItemDiscount } from '@/lib/itemDiscount'
 import { ProductDetailModal } from '@/components/product/ProductDetailModal'
 import type { ProductData } from '@/components/product/ProductCard'
 import type { MenuAddonDetail } from '@/api/types'
@@ -381,7 +382,7 @@ export function CartDrawer() {
 
                     {/* Fallback: menu items if no addons configured */}
                     {menuFallbackItems.map((prod, i) => {
-                      const price    = Math.round(parseFloat(prod.price_at_branch || prod.front_price || '0'))
+                      const price    = applyItemDiscount(Math.round(parseFloat(prod.price_at_branch || prod.front_price || '0')), prod.item_discount, prod.item_discount_type)
                       const imageUrl = resolveMediaUrl(prod.feature_image)
                       return (
                         <motion.div

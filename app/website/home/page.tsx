@@ -176,34 +176,25 @@ function itemToProduct(
   const itemDiscountType = normalizeDiscountType(item.item_discount_type)
   const showTag          = Boolean(item.show_discount_tag)
 
+  // Discount is applied on top of the item's price: fixed → price − amount, percent → price − pct%.
   let itemOriginalPrice: string | undefined
   let itemDiscountLabel: string | undefined
-  if (itemDiscountRaw && showTag && !hasSizes) {
-    if (itemDiscountType === 'fixed') {
-      const orig = Math.round(itemDiscountVal)
-      if (orig > priceInt && priceInt > 0) {
-        const saveAmt = orig - priceInt
-        const savePct = Math.round((saveAmt / orig) * 100)
-        itemOriginalPrice = String(orig)
-        itemDiscountLabel = savePct > 0 ? `${savePct}% OFF` : `Rs.${saveAmt} OFF`
-      }
-    } else if (itemDiscountType === 'percent') {
-      const pct     = itemDiscountVal
-      const origNum = priceInt / Math.max(0.0001, 1 - pct / 100)
-      itemOriginalPrice = String(Math.round(origNum))
-      itemDiscountLabel = `${Math.round(pct)}% OFF`
-    } else {
-      const orig = Math.round(itemDiscountVal)
-      if (orig > priceInt && priceInt > 0) {
-        itemOriginalPrice = String(orig)
-        itemDiscountLabel = `Rs.${orig - priceInt} OFF`
-      }
+  if (itemDiscountRaw && !hasSizes && priceInt > 0) {
+    const basePrice = priceInt
+    const saveAmt = itemDiscountType === 'percent'
+      ? Math.round(basePrice * Math.min(itemDiscountVal, 100) / 100)
+      : Math.min(Math.round(itemDiscountVal), basePrice)
+    priceInt = basePrice - saveAmt
+    if (showTag && saveAmt > 0) {
+      itemOriginalPrice = String(basePrice)
+      const savePct = Math.round((saveAmt / basePrice) * 100)
+      itemDiscountLabel = savePct > 0 ? `${savePct}% OFF` : `Rs.${saveAmt} OFF`
     }
   }
 
   const combinedOriginal = hasSizes
     ? (sizes[0]!.originalPrice != null ? String(sizes[0]!.originalPrice) : undefined)
-    : (hasPriceDiff ? String(Math.round(frontPriceNum)) : (itemOriginalPrice ?? undefined))
+    : (itemOriginalPrice ?? (hasPriceDiff ? String(Math.round(frontPriceNum)) : undefined))
 
   const combinedDiscount = hasSizes
     ? (sizes[0]!.discountLabel)
