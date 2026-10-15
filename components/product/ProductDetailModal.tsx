@@ -146,6 +146,13 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
     setGroupSelections((prev) => {
       const curQty = prev[optKey] ?? 0
       if (curQty > 0) return { ...prev, [optKey]: 0 }
+      if (selectQty === 1) {
+        // single-choice group: picking a new option replaces the previous one
+        const next = { ...prev }
+        Object.keys(next).forEach((k) => { if (k.startsWith(`${gi}-`)) next[k] = 0 })
+        next[optKey] = 1
+        return next
+      }
       if (groupTotal(gi) >= selectQty) return prev
       return { ...prev, [optKey]: 1 }
     })

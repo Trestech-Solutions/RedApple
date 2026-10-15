@@ -247,7 +247,7 @@ function itemToProduct(
   })
 }
 
-function transformMenu(menu: MenuResponse | undefined): {
+function transformMenu(menu: MenuResponse | undefined, branchId?: number | null): {
   categories: ResolvedCategory[]
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[]
   idPairs: Array<{ clientId: string; numericId: number }>
@@ -284,7 +284,14 @@ function transformMenu(menu: MenuResponse | undefined): {
         itemRecords
           .filter((it) => {
             // Items outside their daily window stay visible but can't be ordered
-            return !(it.status === false || (it.status as unknown) === 0)
+            if (it.status === false || (it.status as unknown) === 0) return false
+            // Hide items disabled (status: false) for the selected branch
+            if (branchId) {
+              const bp = ((it.branch_prices ?? []) as Array<{ branch?: number; status?: boolean }>)
+                .find((b) => Number(b.branch) === Number(branchId))
+              if (bp && bp.status === false) return false
+            }
+            return true
           })
           .forEach((it) => {
             itemToProduct(it, catId, idPairs, products, addonPhotos)
@@ -896,7 +903,7 @@ export default function HomePage() {
 
   const heroActive = HERO_SLIDES.length > 0
 
-  const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu), [menu])
+  const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu, numericBranch), [menu, numericBranch])
 
   reactUseEffect(() => {
     idPairs.forEach(({ clientId, numericId }) => registerProductId(clientId, numericId))
