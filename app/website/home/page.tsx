@@ -88,7 +88,15 @@ function itemToProduct(
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[],
   /** addon id → photo URL, from the menu's top-level addon_categories */
   addonPhotos: Map<number, string> = new Map(),
+  branchId?: number | null,
 ) {
+  // Menu items carry per-branch prices in `branch_prices`; when the API didn't
+  // resolve `price_at_branch`, derive it so the item discount applies to it.
+  if (item.price_at_branch == null && branchId) {
+    const bp = ((item.branch_prices ?? []) as Array<{ branch?: number; price?: string | number }>)
+      .find((b) => Number(b.branch) === Number(branchId))
+    if (bp?.price != null) item = { ...item, price_at_branch: String(bp.price) }
+  }
   // Branch price of 0 = not sellable at this branch → don't show the item at all.
   // (Items priced per size are judged by their sizes, not the item-level price.)
   const hasSizePrices = (item.size_prices ?? []).some((sp) => sp && typeof sp.size_name === 'string' && sp.size_name.length > 0)
@@ -285,7 +293,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
             return true
           })
           .forEach((it) => {
-            itemToProduct(it, catId, idPairs, products, addonPhotos)
+            itemToProduct(it, catId, idPairs, products, addonPhotos, branchId)
             if (it.is_popular) popularRawItems.push(it)
           })
 
@@ -519,7 +527,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   // branch-vs-front price differences, which the old popular-only builder missed).
   const popularIdPairs: Array<{ clientId: string; numericId: number }> = []
   const popularBuilt: Parameters<typeof itemToProduct>[3] = []
-  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos))
+  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos, branchId))
   const popularProducts: ProductData[] = popularBuilt.map((p) => ({ ...p, tag: '🔥 Popular' }))
 
   return { categories, products, idPairs, popularProducts }

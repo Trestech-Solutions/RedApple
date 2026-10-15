@@ -639,7 +639,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                       )
                     }
 
-                    const canToggle = isSelected || canAdd
+                    const canToggle = isSelected || canAdd || group.selectQty === 1
                     return (
                       <button
                         key={optKey}
