@@ -47,6 +47,9 @@ export function Card1({ product, onOpen }: ProductCardProps) {
   const showPrice = isOrderable || !!product.dealMeta
   const tagText = product.tag
 
+  const hasAvailabilityBadge =
+    (outsideHours && !!product.itemWindow) || !!product.dealMeta?.timeWindow
+
   return (
     <div
       onClick={() => onOpen?.(product)}
@@ -71,7 +74,8 @@ export function Card1({ product, onOpen }: ProductCardProps) {
           {product.name}
         </h3>
 
-        {product.description && (
+        {/* Hide the description while an availability badge is shown, to keep the card compact */}
+        {product.description && !hasAvailabilityBadge && (
           <p
             className="mt-1.5 line-clamp-2 whitespace-pre-line break-words font-normal text-neutral-500 sm:mt-2 md:line-clamp-3"
             style={{ fontSize: 'var(--desc)', lineHeight: 1.55 }}

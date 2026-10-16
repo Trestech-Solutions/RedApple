@@ -109,7 +109,7 @@ interface WebsiteNavbarProps {
 
 export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps) {
   const pathname = usePathname()
-  const { totalItems, openCart, location, openLocationModal } = useCart()
+  const { totalItems, openCart, location, openLocationModal, orderType } = useCart()
   const { settings } = useStoreSettings()
 
   /* ---------- theme (all from store settings) ---------- */
@@ -255,7 +255,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
               </span>
               <span className="min-w-0 leading-tight">
                 <span className={`hidden text-[10px] font-semibold uppercase tracking-[0.14em] sm:block ${muted}`}>
-                  Deliver to
+                  {orderType === 'pickup' ? 'Pick up from' : 'Deliver to'}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="block max-w-[72px] truncate text-xs font-semibold min-[400px]:max-w-[104px] sm:max-w-[150px] sm:text-sm md:max-w-[200px]">
