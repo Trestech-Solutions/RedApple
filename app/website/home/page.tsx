@@ -224,7 +224,7 @@ function itemToProduct(
     originalPrice: combinedOriginal,
     fromLabel:     Boolean(item._from_label),
     options:       hasSizes ? sizes.map((s) => s.sizeName) : [],
-    tag:           item.is_popular ? '🔥 Popular' : (item._dish_tag || undefined),
+    tag:           item._dish_tag || undefined,
     discount:      combinedDiscount,
     image:         resolvedImage,
     sizes:         hasSizes ? sizes : undefined,
@@ -546,7 +546,6 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
         discount:      hasDiscount ? `${savePct}% OFF` : undefined,
         image,
         options:       [],
-        tag:           'Fixed Deal',
         dealType:      'fixed_deal',
         dealMeta: {
           dealId:        deal.id,
@@ -623,7 +622,6 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
         discount:      hasDiscount ? `${savePct}% OFF` : undefined,
         image,
         options:       [],
-        tag:           'On Spot Deal',
         dealType:      'on_spot_deal',
         dealMeta: {
           dealId:       deal.id,
@@ -643,7 +641,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   const popularIdPairs: Array<{ clientId: string; numericId: number }> = []
   const popularBuilt: Parameters<typeof itemToProduct>[3] = []
   ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos, branchId))
-  const popularProducts: ProductData[] = popularBuilt.map((p) => ({ ...p, tag: '🔥 Popular' }))
+  const popularProducts: ProductData[] = popularBuilt
 
   // ── Apply category-level display settings to every product in that category ──
   const catById = new Map(categories.map((c) => [c.id, c]))

@@ -71,8 +71,9 @@ export function Cat3({ categories, activeCategoryId, onSelect }: CategoryNavProp
   return (
     <nav
       aria-label="Categories"
-      className="sticky top-0 z-30 w-full border-b shadow-[0_4px_24px_-8px_rgba(0,0,0,0.4)] transition-colors duration-500"
+      className="sticky top-0 z-30 w-full border-b shadow-[0_4px_24px_-8px_rgba(0,0,0,0.4)] transition-colors duration-500 [&_button]:[font-family:inherit]"
       style={{
+        fontFamily: 'var(--font-poppins)',
         backgroundColor,
         borderColor: collapsed ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.1)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',

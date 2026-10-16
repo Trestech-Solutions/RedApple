@@ -19,8 +19,8 @@ export function Cat1({ categories, activeCategoryId, onSelect }: CategoryNavProp
 
   return (
     <nav
-      className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)]"
-      style={{ backgroundColor: navBg }}
+      className="sticky top-0 z-30 border-b border-white/10 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)] [&_button]:[font-family:inherit]"
+      style={{ backgroundColor: navBg, fontFamily: 'var(--font-poppins)' }}
     >
       <div ref={scrollerRef} className="relative mx-auto flex max-w-[1320px] gap-1.5 overflow-x-auto scrollbar-hide snap-x px-4 py-2.5 sm:gap-2 sm:py-3 md:px-8">
         {categories.map((cat, i) => {
