@@ -12,6 +12,7 @@ import { WebsiteNavbar } from '@/components/website/WebsiteNavbar'
 import { WebsiteFooter } from '@/components/website/WebsiteFooter'
 import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
+import { useMenuFont } from '@/lib/hooks/useMenuFont'
 import { FloatingActions } from '@/components/website/FloatingActions'
 import { FloatingCartButton } from '@/components/website/FloatingCartButton'
 import { CartAnimationProvider } from '@/lib/context/CartAnimationContext'
@@ -117,6 +118,9 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
   const [corporateModalOpen, setCorporateModalOpen] = useState(false)
   const [menuOpen, setMenuOpen]                     = useState(false)
   const progressRef = useRef<HTMLDivElement>(null)
+
+  // Store-configured menu font (settings.menu_font_family) applied site-wide
+  useMenuFont(settings.menu_font_family)
 
   // ── Scroll progress ────────────────────────────────────────────────────────
   // Written straight to the DOM (transform: scaleX) once per animation frame.
