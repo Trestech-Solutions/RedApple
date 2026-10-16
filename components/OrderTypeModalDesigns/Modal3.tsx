@@ -223,24 +223,6 @@ export function Modal3({ onClose }: { onClose: () => void }) {
                   </div>
                 </Pop>
               )}
-              {orderType === 'delivery' && selectedAreaObj && (
-                <Pop className="mt-3">
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-100 bg-gradient-to-br from-neutral-50 to-white px-4 py-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--color-primary)_15%,white)]">
-                      <MapPin size={16} className="text-[color:var(--color-primary)]" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      {loadingAreaDetail
-                        ? <div className="flex items-center gap-2"><Loader2 size={12} className="animate-spin" /><span className="text-xs text-neutral-500">Finding your outlet…</span></div>
-                        : <p className="truncate text-sm font-bold text-neutral-800">{(areaDetail ?? selectedAreaObj)?.branch_name || '—'}</p>
-                      }
-                      <p className="truncate text-[11px] text-neutral-500">
-                        {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
-                      </p>
-                    </div>
-                  </div>
-                </Pop>
-              )}
             </Reveal>
           )}
 

@@ -156,25 +156,6 @@ export function Modal1({ onClose }: { onClose: () => void }) {
               )}
             </div>
           )}
-          {orderType === 'delivery' && !selectedAreaObj && (
-            <div className="mb-3 space-y-1 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 min-[400px]:py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 min-[400px]:text-[11px] sm:text-xs">Assigned Outlet</p>
-              <p className="text-sm font-medium text-neutral-400">Select an area to see your outlet</p>
-              <p className="text-[11px] text-neutral-400 sm:text-xs">&nbsp;</p>
-            </div>
-          )}
-          {orderType === 'delivery' && selectedAreaObj && (
-            <div className="mb-3 space-y-1 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 min-[400px]:py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 min-[400px]:text-[11px] sm:text-xs">Assigned Outlet</p>
-              {loadingAreaDetail
-                ? <div className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /><span className="text-xs text-neutral-500">Loading…</span></div>
-                : <p className="break-words text-sm font-bold text-neutral-800">{(areaDetail ?? selectedAreaObj)?.branch_name || '—'}</p>
-              }
-              <p className="break-words text-[11px] text-neutral-500 sm:text-xs">
-                {selectedAreaObj.name}, {(areaDetail ?? selectedAreaObj)?.city_name ?? selectedCityObj?.name}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Footer (always visible, even when body scrolls) */}
