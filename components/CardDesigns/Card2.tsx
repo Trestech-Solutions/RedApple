@@ -71,7 +71,7 @@ export function Card2({ product, onOpen }: ProductCardProps) {
 
       {/* Content */}
       <div className="flex flex-1 flex-col px-[clamp(0.625rem,2vw,1.25rem)] pb-[clamp(0.75rem,2.2vw,1.25rem)] pt-[clamp(0.625rem,2vw,1.125rem)]">
-        <h3 className="line-clamp-1 text-[clamp(0.813rem,2vw,1.125rem)] font-extrabold uppercase leading-tight tracking-[-0.005em] text-neutral-900">
+        <h3 className={`${product.hideTitle ? 'sr-only ' : ''}line-clamp-1 text-[clamp(0.813rem,2vw,1.125rem)] font-extrabold uppercase leading-tight tracking-[-0.005em] text-neutral-900`}>
           {product.name}
         </h3>
 
@@ -87,12 +87,12 @@ export function Card2({ product, onOpen }: ProductCardProps) {
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-[clamp(0.625rem,2.2vw,1.25rem)]">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            {isOrderable && displayOriginal && (
+            {!product.hidePrice && isOrderable && displayOriginal && (
               <span className="whitespace-nowrap text-[clamp(0.688rem,1.6vw,0.938rem)] text-neutral-400 line-through">
                 Rs.{parseInt(displayOriginal, 10).toLocaleString()}
               </span>
             )}
-            {(isOrderable || product.dealMeta) && (
+            {!product.hidePrice && (isOrderable || product.dealMeta) && (
               <span className="whitespace-nowrap text-[clamp(0.875rem,2.1vw,1.25rem)] font-extrabold tracking-[-0.01em] text-neutral-900">
                 Rs. {priceLabel}
               </span>

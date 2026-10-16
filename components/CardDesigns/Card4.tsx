@@ -69,7 +69,7 @@ export function Card4({ product, onOpen }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col px-[clamp(0.375rem,1.2vw,0.75rem)] pb-[clamp(0.25rem,0.8vw,0.5rem)] pt-[clamp(0.625rem,2vw,1.25rem)]">
-        <h3 className="line-clamp-2 text-[clamp(0.875rem,2.2vw,1.5rem)] font-bold leading-[1.1] tracking-[-0.005em] text-neutral-900">
+        <h3 className={`line-clamp-2 text-[clamp(0.875rem,2.2vw,1.5rem)] font-bold leading-[1.1] tracking-[-0.005em] text-neutral-900 ${product.hideTitle ? 'sr-only' : ''}`}>
           {product.name}
         </h3>
         {product.description && (
@@ -90,12 +90,12 @@ export function Card4({ product, onOpen }: ProductCardProps) {
                 From
               </span>
             )}
-            {isOrderable && displayOriginal && (
+            {!product.hidePrice && isOrderable && displayOriginal && (
               <span className="whitespace-nowrap text-[clamp(0.625rem,1.4vw,0.813rem)] text-neutral-400 line-through">
                 Rs.{parseInt(displayOriginal, 10).toLocaleString()}
               </span>
             )}
-            {(isOrderable || product.dealMeta) && (
+            {!product.hidePrice && (isOrderable || product.dealMeta) && (
               <span className="whitespace-nowrap text-[clamp(1rem,2.8vw,1.875rem)] font-bold leading-none tracking-[-0.01em]" style={{ color: priceColor }}>
                 Rs. {priceLabel}
               </span>

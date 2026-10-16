@@ -61,7 +61,7 @@ export function Card3({ product, onOpen }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col px-[clamp(0.625rem,2vw,1rem)] pb-[clamp(0.375rem,1.2vw,0.625rem)] pt-[clamp(0.625rem,1.8vw,1rem)]">
-        <h3 className="line-clamp-2 min-h-[2.6em] text-[clamp(0.781rem,1.9vw,1rem)] font-semibold leading-[1.3] tracking-[-0.01em] text-neutral-900">
+        <h3 className={`line-clamp-2 min-h-[2.6em] text-[clamp(0.781rem,1.9vw,1rem)] font-semibold leading-[1.3] tracking-[-0.01em] text-neutral-900 ${product.hideTitle ? 'sr-only' : ''}`}>
           {product.name}
         </h3>
         <p className="mt-[0.3em] line-clamp-2 min-h-[2.8em] text-[clamp(0.656rem,1.5vw,0.875rem)] leading-[1.4] text-neutral-500">
@@ -73,12 +73,12 @@ export function Card3({ product, onOpen }: ProductCardProps) {
           )}
         </div>
         <div className="mt-auto flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 pt-[clamp(0.25rem,1vw,0.5rem)]">
-          {isOrderable && displayOriginal && (
+          {!product.hidePrice && isOrderable && displayOriginal && (
             <span className="text-[clamp(0.656rem,1.5vw,0.813rem)] text-neutral-400 line-through">
               Rs.{parseInt(displayOriginal, 10).toLocaleString()}
             </span>
           )}
-          {(isOrderable || product.dealMeta) && (
+          {!product.hidePrice && (isOrderable || product.dealMeta) && (
             <span className="text-[clamp(0.875rem,2vw,1.125rem)] font-bold tracking-[-0.01em] text-neutral-900">
               Rs.{' '}
               {isOrderable

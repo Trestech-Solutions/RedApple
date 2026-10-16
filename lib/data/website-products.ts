@@ -16,6 +16,15 @@ export interface Category {
   cartStyle?: string
   /** Category header style identifier (e.g. 'banner', 'minimal'). */
   headerStyle?: string
+  /** Item layout: gallery | list-one | list-circle | albums | pizza | classic */
+  layout?: string
+  hideDisplayName?: boolean
+  hideFromNavbar?: boolean
+  hidePrices?: boolean
+  hideProductTitle?: boolean
+  /** Set when the category's schedule says it is closed right now (after_schedule = show_closed) */
+  closedNow?: boolean
+  nextOpen?: string
   subCategories: SubCategory[]
 }
 

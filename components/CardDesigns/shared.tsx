@@ -42,6 +42,10 @@ export interface ProductData {
   }[]
   textButtonColor?: string
   cartStyle?: string
+  /** From the category: hide price / name on the card, round the image (list-circle layout) */
+  hidePrice?: boolean
+  hideTitle?: boolean
+  circleImage?: boolean
   /** Regular items with a daily availability window, e.g. "12:22 – 11:11" */
   itemWindow?: string
   /** false when the item is outside its window right now */

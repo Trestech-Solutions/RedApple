@@ -20,8 +20,9 @@ import type { Category } from '@/lib/data/website-products'
 import { useGetMenu } from '@/api/client/browse'
 import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
+import { getCategoryScheduleState } from '@/utils/categorySchedule'
 import type { ProductData } from '@/components/product/ProductCard'
-import type { MenuResponse, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
+import type { MenuResponse, MenuCategory, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
 import { getRestaurantId } from '@/api/utils'
 import { HeroCarousel } from '@/components/website/HeroCarousel'
 
@@ -246,6 +247,115 @@ function itemToProduct(
   })
 }
 
+
+/**
+ * Category header. header_style:
+ *   banner (default) – full-width banner image, or title bar when there is no banner
+ *   minimal          – compact title row, no banner
+ *   bold             – big uppercase title over/above the banner
+ * When `hide_category_display_name_menu` is true the name is shown as a title row alongside the banner image
+ * (a banner on its own is otherwise shown without a separate title). A category closed by its schedule
+ * (`after_schedule: show_closed`) gets a "Closed now" notice with its next opening window.
+ */
+function CategoryHeader({ cat, count }: { cat: ResolvedCategory; count: number }) {
+  const style = (cat.headerStyle ?? '').toLowerCase().trim()
+  const closedNotice = cat.closedNow ? (
+    <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+      <span aria-hidden>🔴</span> Closed now{cat.nextOpen ? ` · Available ${cat.nextOpen}` : ''}
+    </p>
+  ) : null
+
+  const iconEl =
+    cat.icon.type === 'image' ? (
+      <Image src={cat.icon.value} alt={cat.label} width={48} height={48} className="h-10 w-10 rounded-full object-cover shadow-md sm:h-12 sm:w-12" />
+    ) : (
+      <span className="flex h-10 w-10 items-center justify-center text-3xl sm:h-12 sm:w-12 sm:text-4xl" style={{ fontFamily: 'sans-serif' }}>🍽️</span>
+    )
+
+  if (style === 'minimal') {
+    return (
+      <div className="mb-5">
+      {closedNotice}
+      <div className="flex items-center gap-3 border-b border-neutral-200 pb-3">
+        <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full [&>*]:h-8 [&>*]:w-8 [&>*]:text-xl">{iconEl}</div>
+        <h2 className="text-lg font-bold tracking-tight text-neutral-900 sm:text-xl">{cat.label}</h2>
+        <span className="ml-auto text-xs text-neutral-500">{count} item{count !== 1 ? 's' : ''}</span>
+      </div>
+      </div>
+    )
+  }
+
+  const bannerEl = cat.banner ? (
+    <div className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-2xl">
+      {/* width/height give the browser the banner's shape up front (no layout jump) */}
+      <Image
+        src={cat.banner}
+        alt={cat.label}
+        width={2073}
+        height={758}
+        sizes="(min-width: 1320px) 1256px, calc(100vw - 32px)"
+        className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+    </div>
+  ) : null
+
+  if (style === 'bold') {
+    return (
+      <div className="mb-6 space-y-3">
+        {closedNotice}
+        <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-900 sm:text-3xl md:text-4xl">
+          {cat.label}
+          <span className="mt-1 block h-1 w-16 rounded-full bg-[var(--color-primary)]" />
+        </h2>
+        {bannerEl}
+      </div>
+    )
+  }
+
+  // banner / default
+  if (bannerEl) {
+    return (
+      <div className="mb-6">
+        {closedNotice}
+        {cat.hideDisplayName && (
+          <h2 className="mb-3 text-lg font-bold tracking-tight text-neutral-900 sm:text-xl md:text-2xl">{cat.label}</h2>
+        )}
+        {bannerEl}
+      </div>
+    )
+  }
+  return (
+    <div className="mb-6">
+      {closedNotice}
+      <div className="mb-6 flex items-center justify-between rounded-3xl px-5 py-4 shadow-lg ring-1 ring-black/5 sm:px-8 sm:py-5">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-neutral-900 sm:text-xl md:text-2xl">
+            <span className="h-1.5 w-1.5 rounded-full bg-neutral-900/70" />
+            {cat.label}
+          </h2>
+          <p className="mt-1 text-xs text-neutral-700 sm:text-sm">{count} item{count !== 1 ? 's' : ''}</p>
+        </div>
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 shadow-inner backdrop-blur-sm sm:h-16 sm:w-16">{iconEl}</div>
+      </div>
+    </div>
+  )
+}
+
+/** Category-level display settings from the admin (layout, hide flags) */
+function categoryExtras(cat: MenuCategory) {
+  return {
+    layout:           cat.layout || undefined,
+    hideDisplayName:  cat.hide_category_display_name_menu === true,
+    hideFromNavbar:   cat.hide_category_from_navbar === true,
+    hidePrices:       cat.hide_prices === true,
+    hideProductTitle: cat.hide_product_title === true,
+    ...(() => {
+      const st = getCategoryScheduleState(cat)
+      return st.open ? {} : { closedNow: true, nextOpen: st.nextWindow }
+    })(),
+  }
+}
+
 function transformMenu(menu: MenuResponse | undefined, branchId?: number | null): {
   categories: ResolvedCategory[]
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[]
@@ -271,7 +381,9 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   const popularRawItems: MenuItem[] = []
 
   const categories: ResolvedCategory[] = menuArr
-    .filter((cat) => cat.status !== false && cat.hide_category !== true)
+    .filter((cat) => cat.status !== false && cat.hide_category !== true && cat.app_only !== true)
+    // Scheduled categories: outside their day/time window, `after_schedule: 'hide'` removes them entirely
+    .filter((cat) => getCategoryScheduleState(cat).open || cat.after_schedule === 'hide')
     .map((cat) => {
       const catId  = String(cat.id)
       const icon   = resolveIcon(cat.icon)
@@ -305,6 +417,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
           badge:         cat.badge || undefined,
           cartStyle:     cat.cart_style   || undefined,
           headerStyle:   cat.header_style || undefined,
+          ...categoryExtras(cat),
           subCategories: [{ id: catId, label: 'All Items' }],
         }
       }
@@ -352,6 +465,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
           badge:         cat.badge || undefined,
           cartStyle:     cat.cart_style   || undefined,
           headerStyle:   cat.header_style || undefined,
+          ...categoryExtras(cat),
           subCategories: [{ id: catId, label: 'All Items' }],
         }
       }
@@ -387,6 +501,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
         badge:         cat.badge || undefined,
         cartStyle:     cat.cart_style   || undefined,
         headerStyle:   cat.header_style || undefined,
+        ...categoryExtras(cat),
         subCategories: subCats.length > 0 ? subCats : [{ id: `${catId}-all`, label: 'All Items' }],
       }
     })
@@ -529,6 +644,22 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   const popularBuilt: Parameters<typeof itemToProduct>[3] = []
   ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos, branchId))
   const popularProducts: ProductData[] = popularBuilt.map((p) => ({ ...p, tag: '🔥 Popular' }))
+
+  // ── Apply category-level display settings to every product in that category ──
+  const catById = new Map(categories.map((c) => [c.id, c]))
+  products.forEach((p) => {
+    const c = catById.get(p.categoryId)
+    if (!c) return
+    if (!p.cartStyle && c.cartStyle) p.cartStyle = c.cartStyle
+    if (c.hidePrices)       p.hidePrice = true
+    if (c.hideProductTitle) p.hideTitle = true
+    if (c.layout === 'list-circle') p.circleImage = true
+    // Closed by schedule (after_schedule = show_closed): visible but not orderable, same as an item outside its hours
+    if (c.closedNow && p.itemAvailableNow !== false) {
+      p.itemAvailableNow = false
+      p.itemWindow = c.nextOpen ?? 'during the category\'s scheduled hours'
+    }
+  })
 
   return { categories, products, idPairs, popularProducts }
 }
@@ -900,9 +1031,16 @@ export default function HomePage() {
     [settings, menu?.banners],
   )
 
+  // Re-evaluate category schedules once a minute so categories open/close without a reload
+  const [minuteTick, setMinuteTick] = useState(0)
+  reactUseEffect(() => {
+    const id = setInterval(() => setMinuteTick((t) => t + 1), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
   const heroActive = HERO_SLIDES.length > 0
 
-  const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu, numericBranch), [menu, numericBranch])
+  const { categories, products, idPairs, popularProducts } = useMemo(() => transformMenu(menu, numericBranch), [menu, numericBranch, minuteTick])
 
   reactUseEffect(() => {
     idPairs.forEach(({ clientId, numericId }) => registerProductId(clientId, numericId))
@@ -987,7 +1125,7 @@ export default function HomePage() {
 
   // Hide categories that have no products from the nav bar
   const navCategories = useMemo(
-    () => categories.filter((c) => filteredProducts.some((p) => p.categoryId === c.id)),
+    () => categories.filter((c) => !c.hideFromNavbar && filteredProducts.some((p) => p.categoryId === c.id)),
     [categories, filteredProducts],
   )
 
@@ -1213,57 +1351,10 @@ export default function HomePage() {
                 id={`category-${cat.id}`}
                 className="cv-auto mx-auto max-w-[1320px] px-4 py-8 sm:py-10 md:px-8 lg:py-12 scroll-mt-28"
               >
-                {/* Category Banner */}
-                <div className="mb-6">
-                  {cat.banner ? (
-                    <div className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-2xl">
-                      {/* width/height give the browser the banner's shape up front (no layout
-                          jump while it loads); the optimizer serves a screen-sized WebP/AVIF
-                          instead of the ~200KB original. Other ratios still render correctly. */}
-                      <Image
-                        src={cat.banner}
-                        alt={cat.label}
-                        width={2073}
-                        height={758}
-                        sizes="(min-width: 1320px) 1256px, calc(100vw - 32px)"
-                        className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
-                    </div>
-                  ) : (
-                    // No bg color, no overlay — transparent over the layout image
-                    <div className="mb-6 flex items-center justify-between rounded-3xl px-5 py-4 shadow-lg ring-1 ring-black/5 sm:px-8 sm:py-5">
-                      <div>
-                        <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-neutral-900 sm:text-xl md:text-2xl">
-                          <span className="h-1.5 w-1.5 rounded-full bg-neutral-900/70" />
-                          {cat.label}
-                        </h2>
-                        <p className="mt-1 text-xs text-neutral-700 sm:text-sm">
-                          {catProducts.length} item{catProducts.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 shadow-inner backdrop-blur-sm sm:h-16 sm:w-16">
-                        {cat.icon.type === 'image' ? (
-                          <Image
-                            src={cat.icon.value}
-                            alt={cat.label}
-                            width={48}
-                            height={48}
-                            className="h-10 w-10 rounded-full object-cover shadow-md sm:h-12 sm:w-12"
-                          />
-                        ) : (
-                          <span
-                            className="flex h-10 w-10 items-center justify-center text-3xl sm:h-12 sm:w-12 sm:text-4xl"
-                            style={{ fontFamily: 'sans-serif' }}
-                          >
-                            🍽️
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {/* Category header — styled by the category's header_style (banner | minimal | bold) */}
+                <CategoryHeader cat={cat} count={catProducts.length} />
 
-                <ProductGrid products={catProducts} searchQuery="" />
+                <ProductGrid products={catProducts} searchQuery="" layout={cat.layout} />
               </section>
             )
           })}

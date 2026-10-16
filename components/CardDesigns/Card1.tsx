@@ -44,7 +44,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
   const priceText = isOrderable
     ? displayPriceNum.toLocaleString()
     : product.dealMeta ? Math.round(parseFloat(product.dealMeta.finalPrice)).toLocaleString() : ''
-  const showPrice = isOrderable || !!product.dealMeta
+  const showPrice = (isOrderable || !!product.dealMeta) && !product.hidePrice
   const tagText = product.tag
 
   const hasAvailabilityBadge =
@@ -68,7 +68,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
         )}
 
         <h3
-          className="line-clamp-2 break-words font-semibold tracking-[-0.01em] text-neutral-900"
+          className={`line-clamp-2 break-words font-semibold tracking-[-0.01em] text-neutral-900 ${product.hideTitle ? 'sr-only' : ''}`}
           style={{ fontSize: 'var(--title)', lineHeight: 1.35 }}
         >
           {product.name}
@@ -150,7 +150,7 @@ export function Card1({ product, onOpen }: ProductCardProps) {
 
       {/* ── Image ── */}
       <div className="relative flex-shrink-0" style={{ width: 'var(--img)', height: 'var(--img)' }}>
-        <div className="absolute inset-0 overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/[0.06]">
+        <div className={`absolute inset-0 overflow-hidden bg-neutral-100 ring-1 ring-black/[0.06] ${product.circleImage ? 'rounded-full' : 'rounded-xl'}`}>
           <ProductImage
             src={product.image}
             alt={product.name}

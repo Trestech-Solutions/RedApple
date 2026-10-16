@@ -9,18 +9,29 @@ import { useStoreSettings } from '@/lib/hooks/useCart'
 interface ProductGridProps {
   products: ProductData[]
   searchQuery: string
+  /** Category layout from the admin: gallery | list-one | list-circle | albums | pizza | classic */
+  layout?: string
 }
 
-export function ProductGrid({ products, searchQuery }: ProductGridProps) {
+export function ProductGrid({ products, searchQuery, layout }: ProductGridProps) {
   const [selected, setSelected] = useState<ProductData | null>(null)
   const { settings } = useStoreSettings()
   const design = (settings.product_card_design as string | undefined) ?? 'card-1'
 
   // card-1 = horizontal list — consistent gap on all screens matching the screenshot
   // card-2/card-3/card-4 = portrait grid — tight gap on mobile, grows on larger screens
-  const gridClass = design === 'card-1'
+  let gridClass = design === 'card-1'
     ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5'
     : 'grid grid-cols-2 gap-1.5 min-[400px]:gap-2 sm:gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5 2xl:grid-cols-6'
+
+  // Category layout overrides the column shape:
+  //   list-one / list-circle → single-column list      albums / pizza → fewer, larger tiles
+  //   gallery / classic / unset → the card design's own grid (above)
+  if (layout === 'list-one' || layout === 'list-circle') {
+    gridClass = 'grid grid-cols-1 gap-3 sm:gap-4'
+  } else if (layout === 'albums' || layout === 'pizza') {
+    gridClass = 'grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5'
+  }
 
   useEffect(() => {
     if (!selected) return

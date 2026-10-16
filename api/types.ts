@@ -560,6 +560,15 @@ export type MenuCategory = {
   hide_category?: boolean;
   hide_category_from_navbar?: boolean;
   hide_category_display_name_menu?: boolean;
+  hide_prices?: boolean;
+  hide_product_title?: boolean;
+  /** Day/time availability: when true, schedule_days_times applies (Pakistan time) */
+  schedule?: boolean;
+  schedule_days_times?: Record<string, { is_open?: boolean; open_time?: string; close_time?: string }> | null;
+  /** What to do outside the schedule: show the category as closed, or hide it */
+  after_schedule?: 'show_closed' | 'hide' | string;
+  app_only?: boolean;
+  web_only?: boolean;
   layout?: string;
   /** Cart-section style identifier for items belonging to this category (e.g. 'highlight') */
   cart_style?: string;
