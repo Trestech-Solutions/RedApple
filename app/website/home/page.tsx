@@ -1310,6 +1310,7 @@ export default function HomePage() {
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
+        suggestions={products.map((p) => p.name)}
         placeholder={searchQuery === '' ? 'Search dishes, sweets, bakery items...' : ''}
       />
 

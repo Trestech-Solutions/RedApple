@@ -7,9 +7,11 @@ interface SearchBarProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  /** Product names to cycle through in the typewriter placeholder (random pick). */
+  suggestions?: string[]
 }
 
-const TYPEWRITER_PHRASES = [
+const FALLBACK_PHRASES = [
   'Search for Baby Melon',
   'Search for New Arrivals',
   'Search for Fresh Mithai',
@@ -17,12 +19,24 @@ const TYPEWRITER_PHRASES = [
   'Search for Fast Food',
 ]
 
+const MAX_SUGGESTIONS = 6
+
+function pickRandomPhrases(names: string[]): string[] {
+  const pool = Array.from(new Set(names.map((n) => n.trim()).filter(Boolean)))
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  return pool.slice(0, MAX_SUGGESTIONS).map((n) => `Search for ${n}`)
+}
+
 const TYPE_SPEED   = 90
 const DELETE_SPEED = 45
 const HOLD_AFTER_TYPE_MS   = 1400
 const HOLD_AFTER_DELETE_MS = 400
 
-export function SearchBar({ value, onChange, placeholder = 'Search products...' }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder = 'Search products...', suggestions }: SearchBarProps) {
+  const [phrases, setPhrases] = useState<string[]>(FALLBACK_PHRASES)
   const [displayText, setDisplayText] = useState('')
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [deleting, setDeleting] = useState(false)
@@ -32,8 +46,19 @@ export function SearchBar({ value, onChange, placeholder = 'Search products...' 
   // Stay expanded while focused or while there is text in the box
   const expanded = focused || !!value
 
+  // Re-pick random product names whenever the product list changes
+  const suggestionsKey = suggestions?.join('|') ?? ''
   useEffect(() => {
-    const currentPhrase = TYPEWRITER_PHRASES[phraseIndex]
+    const picked = suggestions?.length ? pickRandomPhrases(suggestions) : []
+    setPhrases(picked.length ? picked : FALLBACK_PHRASES)
+    setPhraseIndex(0)
+    setDisplayText('')
+    setDeleting(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestionsKey])
+
+  useEffect(() => {
+    const currentPhrase = phrases[phraseIndex % phrases.length]
     let timeout: ReturnType<typeof setTimeout>
 
     if (!deleting && displayText.length < currentPhrase.length) {
@@ -51,13 +76,13 @@ export function SearchBar({ value, onChange, placeholder = 'Search products...' 
     } else if (deleting && displayText.length === 0) {
       setDeleting(false)
       timeout = setTimeout(
-        () => setPhraseIndex((i) => (i + 1) % TYPEWRITER_PHRASES.length),
+        () => setPhraseIndex((i) => (i + 1) % phrases.length),
         HOLD_AFTER_DELETE_MS
       )
     }
 
     return () => clearTimeout(timeout)
-  }, [displayText, deleting, phraseIndex])
+  }, [displayText, deleting, phraseIndex, phrases])
 
   const animatedPlaceholder = value ? placeholder : displayText
 

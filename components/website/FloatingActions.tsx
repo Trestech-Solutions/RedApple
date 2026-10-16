@@ -50,6 +50,11 @@ export function FloatingActions() {
     ? (cartBarVisible ? CART_BAR_HEIGHT + 8 : BASE_BOTTOM)
     : SM_BOTTOM
 
+  // Right side: WhatsApp FAB (layout.tsx) occupies the bottom-right on mobile,
+  // so the scroll-to-top button stacks above it (48px FAB + 12px gap).
+  const WA_BOTTOM_MOBILE = cartBarVisible ? 80 + 8 + 56 + 8 : BASE_BOTTOM
+  const topBtnBottom = isMobile ? WA_BOTTOM_MOBILE + 48 + 12 : bottom
+
   const base =
     'flex h-12 w-12 items-center justify-center rounded-full shadow-lg ' +
     'hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
@@ -88,6 +93,7 @@ export function FloatingActions() {
         className={`${base} fixed right-6 z-50`}
         style={{
           ...sharedStyle,
+          bottom: `${topBtnBottom}px`,
           backgroundColor: 'var(--color-primary)',
           color:           'var(--color-secondary)',
         }}

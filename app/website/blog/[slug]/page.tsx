@@ -3,34 +3,14 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams, usePathname, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import {
-  MapPin, Phone, Menu, ShoppingCart,
   Search, ArrowUp, MessageCircle, Clock, ChevronLeft, ChevronRight, Calendar,
 } from 'lucide-react'
-import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
-import { AuthModal } from '@/components/auth/AuthModal'
-import { CorporateOrderModal } from '@/components/website/CorporateOrderModal'
-import { MenuDrawer } from '@/components/website/MenuDrawer'
-import { UserDropdown } from '@/components/website/UserDropdown'
 import { getPostBySlug, getRelatedPosts } from '@/lib/data/blog-posts'
 
 export default function BlogDetailPage() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { totalItems, openCart, location, openLocationModal } = useCart()
-  const { settings } = useStoreSettings()
-  const showLogin = settings.enable_user_login !== false
-  const [authModalOpen, setAuthModalOpen]           = useState(false)
-  const [corporateModalOpen, setCorporateModalOpen] = useState(false)
-  const [menuOpen, setMenuOpen]                     = useState(false)
-  const [relatedStart, setRelatedStart]             = useState(0)
-
-  const isCheckout = pathname === '/website/checkout'
-  const handleLocationClick = () => {
-    if (isCheckout) router.push('/')
-    else openLocationModal()
-  }
+  const [relatedStart, setRelatedStart] = useState(0)
 
   const params   = useParams()
   const slug     = typeof params.slug === 'string' ? params.slug : ''
@@ -57,68 +37,6 @@ export default function BlogDetailPage() {
 
   return (
     <div className="min-h-screen font-sans text-neutral-800">
-
-      {/* ── Topbar ──────────────────────────────────────────────────────── */}
-      <header className="bg-[#000000] text-white relative relative">
-        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-4 px-4 py-2.5 md:px-8">
-          <button onClick={handleLocationClick} className="flex items-center gap-2 rounded bg-[#ffffff] px-3 py-1.5 text-xs font-semibold text-neutral-900">
-              <MapPin size={16} />
-              <span className="text-left leading-tight">
-                Change Location<br />
-                <span className="font-normal">{location || 'NED University'}</span>
-              </span>
-            </button>
-
-          <a href="tel:021111022022" className="hidden items-center gap-2 text-sm font-medium sm:flex">
-            <Phone size={16} />
-            021-111-022-022
-          </a>
-
-          {/* Logo */}
-          <Link
-            href="/"
-            className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-40 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-xl overflow-hidden border-4 border-white"
-          >
-            <Image
-              src="https://assets.indolj.io/upload/1776252259-1652698752-uk-1.jpg"
-              alt="United King"
-              width={96}
-              height={96}
-              className="object-contain"
-            />
-          </Link>
-
-          <div className="flex-1" />
-
-          <div className="hidden items-center gap-4 text-sm md:flex">
-            {showLogin && (
-              <>
-                <UserDropdown onLoginClick={() => setAuthModalOpen(true)} />
-                <span className="text-white/50">|</span>
-              </>
-            )}
-            <button
-              onClick={() => setCorporateModalOpen(true)}
-              className="rounded bg-[#ffffff] px-3 py-1.5 text-xs font-semibold text-neutral-900"
-            >
-              Corporate &amp; Special Event Orders
-            </button>
-          </div>
-
-          <button onClick={openCart} aria-label="Open cart" className="relative rounded-full p-2 hover:bg-white/10 transition-colors">
-            <ShoppingCart size={22} />
-            {totalItems > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#ffffff] text-[10px] font-bold text-neutral-900">
-                {totalItems}
-              </span>
-            )}
-          </button>
-
-          <button aria-label="Open menu" onClick={() => setMenuOpen(true)}>
-            <Menu size={22} />
-          </button>
-        </div>
-      </header>
 
       {/* ── Hero Image ──────────────────────────────────────────────────── */}
       <section className="relative h-72 overflow-hidden sm:h-96">
@@ -304,13 +222,6 @@ export default function BlogDetailPage() {
         <MessageCircle size={26} fill="white" />
       </a>
 
-      {showLogin && authModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} onGuestContinue={() => setAuthModalOpen(false)} />}
-      {corporateModalOpen && <CorporateOrderModal onClose={() => setCorporateModalOpen(false)} />}
-      <MenuDrawer
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        onLoginClick={() => setAuthModalOpen(true)}
-      />
     </div>
   )
 }
