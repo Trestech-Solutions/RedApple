@@ -568,25 +568,25 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             return (
               <div key={gi} className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
                 <div className="mb-2.5 flex items-center justify-between sm:mb-3">
-                  <p className="flex items-center gap-1.5 text-[13px] font-bold text-neutral-900 sm:text-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-tight text-neutral-900 sm:text-[15px]">
+                    <span className="h-4 w-1 rounded-full bg-gradient-to-b from-amber-400 to-red-600" />
                     {group.name}
                   </p>
                   <div className="flex items-center gap-1.5">
+                    <span className="rounded-full bg-gradient-to-r from-red-600 to-rose-500 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_2px_8px_-2px_rgba(220,38,38,0.6)] sm:px-3 sm:text-[10px]">
+                      {group.isRequired ? 'Required' : 'Optional'}
+                    </span>
                     {group.isRequired && (
-                      <span className="rounded-full border border-neutral-300 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-neutral-500 sm:px-2.5 sm:text-[10px]">
-                        Required
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide transition-colors sm:px-2.5 sm:text-[10px] ${
+                        isFull ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-neutral-900 shadow-[0_2px_8px_-2px_rgba(251,146,60,0.7)]' : 'bg-neutral-100 text-neutral-600 ring-1 ring-neutral-200'
+                      }`}>
+                        {total}/{group.selectQty}
                       </span>
                     )}
-                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide transition-colors sm:px-2.5 sm:text-[10px] ${
-                      isFull ? 'bg-amber-400 text-neutral-900' : 'bg-neutral-200 text-neutral-600'
-                    }`}>
-                      {total}/{group.selectQty}
-                    </span>
                   </div>
                 </div>
 
-                <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+                <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.15)]">
                   {group.options.map((opt) => {
                     const optKey    = `${gi}-${opt.id ?? opt.name}`
                     const selQty    = groupSelections[optKey] ?? 0
@@ -599,13 +599,13 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                         <div
                           key={optKey}
                           className={`flex w-full items-center gap-2 px-3.5 py-2.5 transition-colors sm:gap-3 sm:px-4 sm:py-3 ${
-                            isSelected ? 'bg-amber-50/70' : 'bg-white hover:bg-neutral-50/70'
+                            isSelected ? 'bg-gradient-to-r from-amber-50 to-orange-50/40' : 'bg-white hover:bg-neutral-50'
                           }`}
                         >
                           <span className="flex-1 text-[13px] font-medium text-neutral-800 sm:text-sm">{opt.name}</span>
 
                           {opt.extraCost != null && opt.extraCost > 0 && (
-                            <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-amber-600' : 'text-neutral-400'}`}>
+                            <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-red-600' : 'text-neutral-400'}`}>
                               {selQty > 0 ? `+Rs.${(opt.extraCost * selQty).toLocaleString()}` : `+Rs.${opt.extraCost.toLocaleString()} each`}
                             </span>
                           )}
@@ -647,20 +647,20 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                         disabled={!canToggle}
                         onClick={() => toggleOption(gi, optKey, group.selectQty)}
                         className={`flex w-full items-center gap-2 px-3.5 py-2.5 text-left transition-all sm:gap-3 sm:px-4 sm:py-3 ${
-                          isSelected ? 'bg-amber-50/70' : canToggle ? 'bg-white hover:bg-neutral-50/70' : 'cursor-not-allowed bg-white opacity-50'
+                          isSelected ? 'bg-gradient-to-r from-amber-50 to-orange-50/40' : canToggle ? 'bg-white hover:bg-neutral-50 active:scale-[0.995]' : 'cursor-not-allowed bg-white opacity-50'
                         }`}
                       >
                         <div className={`option-check flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border-2 transition-all sm:h-5 sm:w-5 ${
-                          isSelected ? 'scale-110 border-amber-500 bg-amber-500' : 'border-neutral-300'
+                          isSelected ? 'scale-110 border-transparent bg-gradient-to-br from-amber-400 to-red-500 shadow-[0_2px_8px_-1px_rgba(239,68,68,0.6)]' : 'border-neutral-300'
                         }`}>
                           {isSelected && <Check size={11} className="text-white sm:hidden" strokeWidth={3} />}
                           {isSelected && <Check size={12} className="hidden text-white sm:block" strokeWidth={3} />}
                         </div>
 
-                        <span className="flex-1 text-[13px] font-medium text-neutral-800 sm:text-sm">{opt.name}</span>
+                        <span className={`flex-1 text-[13px] sm:text-sm ${isSelected ? 'font-bold text-neutral-900' : 'font-medium text-neutral-700'}`}>{opt.name}</span>
 
                         {opt.extraCost != null && opt.extraCost > 0 && (
-                          <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-amber-600' : 'text-neutral-400'}`}>
+                          <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-red-600' : 'text-neutral-400'}`}>
                             +Rs.{opt.extraCost.toLocaleString()}
                           </span>
                         )}
@@ -675,7 +675,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                   })}
                 </div>
 
-                <p className={`mt-1.5 text-[10px] sm:text-[11px] ${isFull ? 'font-medium text-amber-600' : 'text-neutral-400'}`}>
+                <p className={`mt-2 text-[10px] tracking-wide sm:text-[11px] ${isFull ? 'font-semibold text-emerald-600' : 'text-neutral-400'}`}>
                   {isFull
                     ? `✓ ${group.selectQty} selected`
                     : `Select ${group.selectQty - total} more`}
