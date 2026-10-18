@@ -73,6 +73,7 @@ export interface ProductData {
         qty: number
         maxQty: number | null
         extraCost?: number
+        image?: string
       }[]
     }[]
   }

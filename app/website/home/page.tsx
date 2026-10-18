@@ -585,6 +585,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
               qty:       o.quantity,
               maxQty:    o.max_quantity,
               extraCost: undefined,
+              image:     resolveMediaUrl(o.addon_detail.photo),
             }
           }
           return {
@@ -593,6 +594,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
             name:      (o.item_detail as { name?: string } | null | undefined)?.name ?? `Item ${o.item}`,
             qty:       o.quantity,
             maxQty:    o.max_quantity,
+            image:     resolveMediaUrl((o.item_detail as { feature_image?: string | null } | null | undefined)?.feature_image),
             extraCost: (o as { extra_cost?: string }).extra_cost
               ? Math.round(parseFloat((o as { extra_cost?: string }).extra_cost!))
               : undefined,

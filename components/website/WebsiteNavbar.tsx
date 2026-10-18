@@ -209,6 +209,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
     '--wn-brand': brand,
     '--wn-on-brand': onBrand,
     '--wn-text': textColor,
+    '--wn-hair': `color-mix(in srgb, ${textColor} 9%, transparent)`,
   } as CSSProperties
 
   const muted = barIsDark ? 'text-white/60' : 'text-neutral-500'
@@ -217,29 +218,28 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
   return (
     <header
       id="site-header"
-      className="relative z-30 w-full px-3 pt-3 sm:px-5 sm:pt-4 lg:px-7"
+      className="relative z-30 w-full px-0 pt-0 sm:px-5 sm:pt-4 lg:px-7"
       style={{ ...themeVars, color: textColor }}
     >
       <style dangerouslySetInnerHTML={{ __html: NAVBAR_CSS }} />
 
       <div
-        className="wn-bar relative mx-auto max-w-[1384px] rounded-2xl sm:rounded-[20px]"
+        className="wn-bar relative mx-auto max-w-[1384px] rounded-none border border-[var(--wn-hair)] max-sm:border-x-0 max-sm:border-t-0 sm:rounded-[20px]"
         style={{
           backgroundColor: navBg,
-          border: `1px solid ${hairline}`,
           boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 12px 32px -18px rgba(0,0,0,.28)',
         }}
       >
-        <div className="relative flex h-16 items-center gap-2 px-2.5 sm:h-[72px] sm:gap-3 sm:px-4 md:h-20 md:px-5">
+        <div className="relative flex h-[68px] items-center gap-2 px-3 sm:h-[72px] sm:gap-3 sm:px-4 md:h-20 md:px-5">
           {/* ── Left ── */}
           <div className="flex min-w-0 flex-1 basis-0 items-center gap-2 sm:gap-3">
-            {logoLeftAlign && <div aria-hidden className={`${logoSpacer} shrink-0`} />}
+            <div aria-hidden className={`${logoSpacer} shrink-0 ${logoLeftAlign ? '' : 'sm:hidden'}`} />
 
             <button
               type="button"
               onClick={() => openLocationModal()}
               aria-label={`Change location (currently ${locationLabel})`}
-              className="wn-ghost wn-focus group flex min-w-0 items-center gap-2 rounded-xl p-1 pr-1.5 text-left sm:gap-2.5 sm:p-1.5 sm:pr-3"
+              className="wn-ghost wn-focus group hidden min-w-0 items-center gap-2 rounded-xl p-1 pr-1.5 sm:flex text-left sm:gap-2.5 sm:p-1.5 sm:pr-3"
             >
               <span
                 className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl sm:h-10 sm:w-10"
@@ -270,14 +270,35 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
           {/* ── Centre logo ── */}
           <div
             className={`pointer-events-none absolute z-20 ${logoPos} ${
-              logoLeftAlign ? 'left-2.5 sm:left-4 md:left-5' : 'inset-x-0 flex justify-center'
+              logoLeftAlign ? 'left-3 sm:left-4 md:left-5' : 'left-3 sm:inset-x-0 sm:left-auto sm:flex sm:justify-center'
             }`}
           >
             <div className="pointer-events-auto">{LogoLinked}</div>
           </div>
 
           {/* ── Right ── */}
-          <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-1.5 md:gap-2">
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-1.5 md:gap-2">
+            {/* Mobile quick actions: round white icon buttons */}
+            <button
+              type="button"
+              onClick={() => openLocationModal()}
+              aria-label={`Change location (currently ${locationLabel})`}
+              className="wn-focus grid h-10 w-10 place-items-center rounded-full bg-white text-neutral-900 shadow-sm transition-transform active:scale-95 sm:hidden"
+            >
+              <MapPin size={18} strokeWidth={2.2} />
+            </button>
+            {showPhone && (
+              <a
+                href={phoneHref}
+                target={isWhatsapp ? '_blank' : undefined}
+                rel={isWhatsapp ? 'noopener noreferrer' : undefined}
+                aria-label={isWhatsapp ? 'Chat on WhatsApp' : 'Call us'}
+                className="wn-focus grid h-10 w-10 place-items-center rounded-full bg-white text-neutral-900 shadow-sm transition-transform active:scale-95 sm:hidden"
+              >
+                {isWhatsapp ? <MessageCircle size={18} strokeWidth={2.2} /> : <Phone size={18} strokeWidth={2.2} />}
+              </a>
+            )}
+
             {showPhone && (
               <a
                 href={phoneHref}
@@ -300,13 +321,15 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
             )}
 
             {settings.enable_user_login !== false && (
-              <div className="wn-ghost flex h-10 min-w-10 items-center justify-center rounded-xl px-2.5 text-sm font-semibold [&_button]:hover:no-underline sm:px-3">
+              <div className="wn-ghost hidden h-10 min-w-10 items-center justify-center rounded-xl px-2.5 sm:flex text-sm font-semibold [&_button]:hover:no-underline sm:px-3">
                 <UserDropdown onLoginClick={onLoginClick} />
               </div>
             )}
 
             {/* Recent orders: only renders when the cookie has order IDs */}
-            <RecentOrdersDropdown navFg={brand} iconTextColor={onBrand} />
+            <div className="hidden sm:block">
+              <RecentOrdersDropdown navFg={brand} iconTextColor={onBrand} />
+            </div>
 
             {showCartIcon && (
               <button
@@ -314,7 +337,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
                 onClick={openCart}
                 aria-label={totalItems > 0 ? `Open cart, ${totalItems} items` : 'Open cart'}
                 data-cart-target="true"
-                className={`wn-primary wn-focus relative grid h-10 w-10 place-items-center rounded-xl sm:h-11 sm:w-11 ${bump ? 'wn-bump' : ''}`}
+                className={`wn-primary wn-focus relative grid h-10 w-10 place-items-center rounded-full max-sm:bg-white! max-sm:text-neutral-900! sm:h-11 sm:w-11 sm:rounded-xl ${bump ? 'wn-bump' : ''}`}
               >
                 <ShoppingBag size={19} strokeWidth={2.2} />
                 {totalItems > 0 && (
@@ -333,7 +356,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
               type="button"
               aria-label="Open menu"
               onClick={onMenuClick}
-              className="wn-ghost wn-focus grid h-10 w-10 place-items-center rounded-xl sm:h-11 sm:w-11"
+              className="wn-ghost wn-focus grid h-10 w-10 place-items-center rounded-full max-sm:bg-white max-sm:text-neutral-900 sm:h-11 sm:w-11 sm:rounded-xl"
             >
               <Menu size={21} strokeWidth={2.2} />
             </button>

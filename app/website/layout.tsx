@@ -85,7 +85,8 @@ function WhatsAppButton() {
       aria-label="WhatsApp"
       className="group fixed right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 sm:right-6 sm:h-14 sm:w-14"
       style={{
-        transform: `translateY(-${bottom - 24}px)`,
+        // +60 stacks it above the scroll-to-top button (48px + 12px gap)
+        transform: `translateY(-${bottom - 24 + 60}px)`,
         bottom: 'calc(24px + env(safe-area-inset-bottom))',
         transition: 'transform 300ms cubic-bezier(.2,.9,.25,1)',
       }}

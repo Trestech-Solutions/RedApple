@@ -27,7 +27,7 @@
 import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
-import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check } from 'lucide-react'
+import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useCartAnimation } from '@/lib/context/CartAnimationContext'
@@ -349,13 +349,13 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
 
   return (
     <div
-      className="modal-backdrop-in fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+      className="modal-backdrop-in fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-1.5 backdrop-blur-md sm:p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="modal-panel-in relative flex w-full max-w-[1020px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_40px_100px_-24px_rgba(0,0,0,0.5)] ring-1 ring-black/5 max-h-[92vh] sm:h-[85vh] sm:max-h-[720px] sm:flex-row sm:rounded-[28px] md:h-[75vh] lg:h-[70vh]">
+      <div className="modal-panel-in relative flex w-full max-w-[1020px] flex-col overflow-y-auto overflow-x-hidden rounded-2xl sm:overflow-hidden bg-white shadow-[0_40px_100px_-24px_rgba(0,0,0,0.5)] ring-1 ring-black/5 max-h-[94dvh] sm:h-[85vh] sm:max-h-[720px] sm:flex-row sm:rounded-[28px] md:h-[75vh] lg:h-[70vh]">
 
         {/* ── LEFT — image ────────────────────────────────────────── */}
-        <div ref={imageRef} className="relative h-40 w-full shrink-0 overflow-hidden xs:h-48 sm:h-full sm:w-[42%] md:w-[46%]">
+        <div ref={imageRef} className="relative aspect-square max-h-[62dvh] w-full shrink-0 overflow-hidden sm:aspect-auto sm:max-h-none sm:h-full sm:w-[42%] md:w-[46%]">
           <div className="ken-burns absolute inset-0">
             <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 470px, (min-width: 640px) 42vw, 100vw" className="object-cover" loading="eager" />
           </div>
@@ -377,12 +377,12 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           {/* Floating glass controls — over the image, top-right */}
           <div className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1.5 sm:right-3 sm:top-3 sm:gap-2">
             <button onClick={handleShare} disabled={sharing} aria-label="Share"
-              className="share-pulse flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-md transition-all hover:scale-105 hover:bg-white/30 disabled:opacity-50 sm:h-10 sm:w-10">
+              className="share-pulse flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-md transition-all hover:scale-105 hover:bg-white/30 disabled:opacity-50 max-sm:h-10 max-sm:w-10 max-sm:bg-red-600 max-sm:ring-0 max-sm:backdrop-blur-none sm:h-10 sm:w-10">
               <Share2 size={14} className="sm:hidden" />
               <Share2 size={16} className="hidden sm:block" />
             </button>
             <button onClick={onClose} aria-label="Close"
-              className="close-spin flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-md transition-all hover:bg-white/30 sm:h-10 sm:w-10">
+              className="close-spin flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-md transition-all hover:bg-white/30 max-sm:h-10 max-sm:w-10 max-sm:bg-red-600 max-sm:ring-0 max-sm:backdrop-blur-none sm:h-10 sm:w-10">
               <X size={16} className="sm:hidden" />
               <X size={18} className="hidden sm:block" />
             </button>
@@ -399,9 +399,9 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
         </div>
 
         {/* ── RIGHT — details ──────────────────────────────────────── */}
-        <div className="premium-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-gradient-to-b from-white to-neutral-50/60">
+        <div className="premium-scroll flex flex-none flex-col bg-neutral-50 sm:min-h-0 sm:flex-1 sm:overflow-y-auto">
 
-          <div className="flex items-start justify-between gap-2 px-4 pt-5 pb-3 sm:gap-3 sm:px-6 sm:pt-7 sm:pb-4 md:px-10 md:pt-9">
+          <div className="flex items-start justify-between gap-2 px-3 pt-4 pb-3 sm:gap-3 sm:px-5 sm:pt-6 sm:pb-4 md:px-6 md:pt-7 lg:px-7">
             {hasPrice ? (
               <div className="price-in flex flex-wrap items-baseline gap-2 sm:gap-3">
                 <span className="text-[28px] font-extrabold tracking-tight text-neutral-900 xs:text-[32px] sm:text-4xl md:text-[40px]">
@@ -423,7 +423,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
 
           {/* Prep / Cook time */}
           {!isDeal && product.timeDuration && (
-            <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl border border-neutral-100 bg-white px-3.5 py-2.5 text-[11px] font-medium text-neutral-600 shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10">
+            <div className="mx-3 mb-3 flex items-center gap-2 rounded-2xl border border-neutral-100 bg-white px-3.5 py-2.5 text-[11px] font-medium text-neutral-600 shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-100">
                 <Clock size={12} className="text-neutral-500" />
               </span>
@@ -432,7 +432,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {itemOutsideHours && product.itemWindow && (
-            <div className="mx-4 mb-3 flex items-center gap-2 rounded-2xl border border-red-100 bg-red-50 px-3.5 py-2.5 text-[11px] font-medium text-red-700 shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10">
+            <div className="mx-3 mb-3 flex items-center gap-2 rounded-2xl border border-red-100 bg-red-50 px-3.5 py-2.5 text-[11px] font-medium text-red-700 shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10">
               <Clock size={14} className="shrink-0" />
               <span>
                 Available: <span className="font-semibold">{product.itemWindow}</span>
@@ -442,7 +442,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {isOnSpot && dealMeta?.timeWindow && (
-            <div className={`mx-4 mb-3 flex items-center gap-2 rounded-2xl border px-3.5 py-2.5 text-[11px] font-medium shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10 ${
+            <div className={`mx-3 mb-3 flex items-center gap-2 rounded-2xl border px-3.5 py-2.5 text-[11px] font-medium shadow-sm sm:mx-6 sm:mb-4 sm:px-4 sm:py-3 sm:text-xs md:mx-10 ${
               !isAvailableNow ? 'border-red-100 bg-red-50 text-red-700' : 'border-amber-100 bg-amber-50 text-amber-700'
             }`}>
               <Clock size={14} className="shrink-0" />
@@ -456,7 +456,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {isFixed && dealMeta?.includedItems && dealMeta.includedItems.length > 0 && (
-            <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+            <div className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
               <SectionLabel>Included in this deal</SectionLabel>
               <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-sm">
                 {dealMeta.includedItems.map((item, i) => (
@@ -516,7 +516,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {isOnSpot && dealMeta?.includedItems && dealMeta.includedItems.length > 0 && (
-            <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+            <div className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
               <SectionLabel>Always included</SectionLabel>
               <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-sm">
                 {dealMeta.includedItems.map((item, i) => (
@@ -563,75 +563,109 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {isOnSpot && dealMeta?.groups && dealMeta.groups.map((group, gi) => {
-            const total    = groupTotal(gi)
-            const isFull   = total >= group.selectQty
+            const total  = groupTotal(gi)
+            const isFull = total >= group.selectQty
             return (
-              <div key={gi} className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
-                <div className="mb-2.5 flex items-center justify-between sm:mb-3">
-                  <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-tight text-neutral-900 sm:text-[15px]">
-                    <span className="h-4 w-1 rounded-full bg-gradient-to-b from-amber-400 to-red-600" />
-                    {group.name}
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <span className="rounded-full bg-gradient-to-r from-red-600 to-rose-500 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_2px_8px_-2px_rgba(220,38,38,0.6)] sm:px-3 sm:text-[10px]">
-                      {group.isRequired ? 'Required' : 'Optional'}
-                    </span>
-                    {group.isRequired && (
-                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide transition-colors sm:px-2.5 sm:text-[10px] ${
-                        isFull ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-neutral-900 shadow-[0_2px_8px_-2px_rgba(251,146,60,0.7)]' : 'bg-neutral-100 text-neutral-600 ring-1 ring-neutral-200'
-                      }`}>
-                        {total}/{group.selectQty}
-                      </span>
-                    )}
-                  </div>
-                </div>
+              <div key={gi} className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
+                {/* Group header card — turns green once a required group is complete */}
+                {(() => {
+                  const done = group.isRequired && isFull
+                  return (
+                    <div className={`mb-2.5 flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 shadow-sm sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3 ${
+                      done ? 'border-emerald-200 bg-gradient-to-r from-emerald-50 to-white' : 'border-neutral-200 bg-white'
+                    }`}>
+                      <div className="min-w-0">
+                        <p className={`truncate text-[14px] font-extrabold sm:text-base ${group.isRequired ? 'text-red-700' : 'text-neutral-900'}`}>{group.name}</p>
+                        {group.isRequired && !done && (
+                          <p className="mt-0.5 text-[11px] text-neutral-400">Select {group.selectQty - total} more</p>
+                        )}
+                      </div>
+                      {done ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-0.5 text-[11px] font-bold text-white sm:px-3 sm:py-1 sm:text-[12px]">
+                          <CheckCircle2 size={13} strokeWidth={2.5} /> Done
+                        </span>
+                      ) : (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[11px] font-semibold text-red-600 sm:px-3 sm:py-1 sm:text-[12px]">
+                          {group.isRequired && <AlertCircle size={12} strokeWidth={2.5} />}
+                          {group.isRequired ? 'Required' : 'Optional'}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })()}
 
-                <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.15)]">
+                {/* Selected chips — tap the red minus to remove */}
+                {group.options.some((o) => (groupSelections[`${gi}-${o.id ?? o.name}`] ?? 0) > 0 && (o.maxQty ?? 0) <= 1) && (
+                  <div className="mb-2.5 flex flex-wrap gap-2.5">
+                    {group.options.map((o) => {
+                      const k = `${gi}-${o.id ?? o.name}`
+                      if ((groupSelections[k] ?? 0) <= 0 || (o.maxQty ?? 0) > 1) return null
+                      return (
+                        <div key={k} className="relative">
+                          {o.image ? (
+                            <span className="relative block h-12 w-12 overflow-hidden sm:h-[60px] sm:w-[60px] rounded-xl bg-neutral-100 shadow-md ring-2 ring-white">
+                              <Image src={o.image} alt={o.name} fill sizes="60px" className="object-cover" />
+                            </span>
+                          ) : (
+                            <span className="block rounded-xl bg-white px-3 py-2 text-xs font-semibold text-neutral-800 shadow-md ring-1 ring-neutral-200">{o.name}</span>
+                          )}
+                          <button type="button" aria-label={`Remove ${o.name}`}
+                            onClick={() => toggleOption(gi, k, group.selectQty)}
+                            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow ring-2 ring-white">
+                            <Minus size={11} strokeWidth={3} />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Option cards */}
+                <div className="space-y-2">
                   {group.options.map((opt) => {
-                    const optKey    = `${gi}-${opt.id ?? opt.name}`
-                    const selQty    = groupSelections[optKey] ?? 0
+                    const optKey     = `${gi}-${opt.id ?? opt.name}`
+                    const selQty     = groupSelections[optKey] ?? 0
                     const isSelected = selQty > 0
                     const useCounter = (opt.maxQty ?? 0) > 1
-                    const canAdd    = groupTotal(gi) < group.selectQty
+                    const canAdd     = groupTotal(gi) < group.selectQty
+                    const canToggle  = isSelected || canAdd || group.selectQty === 1
+
+                    const rowBase = `flex w-full items-center gap-2.5 rounded-xl border bg-white px-2.5 py-2 text-left sm:gap-3 sm:px-3 sm:py-2.5 shadow-sm transition-colors ${
+                      isSelected ? 'border-red-400 bg-white' : 'border-neutral-200'
+                    }`
+
+                    const thumb = opt.image ? (
+                      <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:h-11 sm:w-11">
+                        <Image src={opt.image} alt="" fill sizes="44px" className="object-cover" />
+                      </span>
+                    ) : null
+
+                    const price = opt.extraCost != null && opt.extraCost > 0 ? (
+                      <span className="whitespace-nowrap text-[13px] font-bold text-neutral-900">
+                        Rs. {(opt.extraCost * (useCounter && selQty > 0 ? selQty : 1)).toLocaleString()}
+                      </span>
+                    ) : null
+
+                    const pcs = opt.qty > 1 ? (
+                      <span className="whitespace-nowrap text-[10px] font-medium text-neutral-400">× {opt.qty} pcs</span>
+                    ) : null
 
                     if (useCounter) {
                       return (
-                        <div
-                          key={optKey}
-                          className={`flex w-full items-center gap-2 px-3.5 py-2.5 transition-colors sm:gap-3 sm:px-4 sm:py-3 ${
-                            isSelected ? 'bg-gradient-to-r from-amber-50 to-orange-50/40' : 'bg-white hover:bg-neutral-50'
-                          }`}
-                        >
-                          <span className="flex-1 text-[13px] font-medium text-neutral-800 sm:text-sm">{opt.name}</span>
-
-                          {opt.extraCost != null && opt.extraCost > 0 && (
-                            <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-red-600' : 'text-neutral-400'}`}>
-                              {selQty > 0 ? `+Rs.${(opt.extraCost * selQty).toLocaleString()}` : `+Rs.${opt.extraCost.toLocaleString()} each`}
-                            </span>
-                          )}
-
-                          {opt.qty > 1 && selQty === 0 && (
-                            <span className="whitespace-nowrap text-[9px] font-semibold text-neutral-400 sm:text-[10px]">× {opt.qty} pcs</span>
-                          )}
-
+                        <div key={optKey} className={rowBase}>
+                          {thumb}
+                          <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{opt.name}</span>
+                          {price}{pcs}
                           <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
-                            <button
-                              type="button"
-                              disabled={selQty <= 0}
-                              onClick={() => adjustOptionQty(gi, optKey, -1, opt.maxQty!)}
-                              aria-label="Decrease"
-                              className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 disabled:opacity-30"
-                            >
+                            <button type="button" disabled={selQty <= 0}
+                              onClick={() => adjustOptionQty(gi, optKey, -1, opt.maxQty!)} aria-label="Decrease"
+                              className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 disabled:opacity-30">
                               <Minus size={11} />
                             </button>
                             <span className="w-5 text-center text-xs font-bold text-neutral-800">{selQty}</span>
-                            <button
-                              type="button"
-                              disabled={selQty >= opt.maxQty!}
-                              onClick={() => adjustOptionQty(gi, optKey, +1, opt.maxQty!)}
-                              aria-label="Increase"
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-white transition-colors hover:bg-black disabled:opacity-30"
-                            >
+                            <button type="button" disabled={selQty >= opt.maxQty!}
+                              onClick={() => adjustOptionQty(gi, optKey, +1, opt.maxQty!)} aria-label="Increase"
+                              className="flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 disabled:opacity-30">
                               <Plus size={11} />
                             </button>
                           </div>
@@ -639,53 +673,28 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                       )
                     }
 
-                    const canToggle = isSelected || canAdd || group.selectQty === 1
                     return (
-                      <button
-                        key={optKey}
-                        type="button"
-                        disabled={!canToggle}
+                      <button key={optKey} type="button" disabled={!canToggle}
                         onClick={() => toggleOption(gi, optKey, group.selectQty)}
-                        className={`flex w-full items-center gap-2 px-3.5 py-2.5 text-left transition-all sm:gap-3 sm:px-4 sm:py-3 ${
-                          isSelected ? 'bg-gradient-to-r from-amber-50 to-orange-50/40' : canToggle ? 'bg-white hover:bg-neutral-50 active:scale-[0.995]' : 'cursor-not-allowed bg-white opacity-50'
-                        }`}
-                      >
-                        <div className={`option-check flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border-2 transition-all sm:h-5 sm:w-5 ${
-                          isSelected ? 'scale-110 border-transparent bg-gradient-to-br from-amber-400 to-red-500 shadow-[0_2px_8px_-1px_rgba(239,68,68,0.6)]' : 'border-neutral-300'
+                        className={`${rowBase} ${canToggle ? 'active:scale-[0.99]' : 'cursor-not-allowed opacity-50'}`}>
+                        <span className={`option-check flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${
+                          isSelected ? 'border-red-600 bg-red-600' : 'border-neutral-300 bg-white'
                         }`}>
-                          {isSelected && <Check size={11} className="text-white sm:hidden" strokeWidth={3} />}
-                          {isSelected && <Check size={12} className="hidden text-white sm:block" strokeWidth={3} />}
-                        </div>
-
-                        <span className={`flex-1 text-[13px] sm:text-sm ${isSelected ? 'font-bold text-neutral-900' : 'font-medium text-neutral-700'}`}>{opt.name}</span>
-
-                        {opt.extraCost != null && opt.extraCost > 0 && (
-                          <span className={`whitespace-nowrap text-[11px] font-semibold sm:text-xs ${isSelected ? 'text-red-600' : 'text-neutral-400'}`}>
-                            +Rs.{opt.extraCost.toLocaleString()}
-                          </span>
-                        )}
-
-                        {opt.qty > 1 && (
-                          <span className="whitespace-nowrap text-[9px] font-semibold text-neutral-400 sm:text-[10px]">
-                            × {opt.qty} pcs
-                          </span>
-                        )}
+                          {isSelected && <Check size={12} className="text-white" strokeWidth={3} />}
+                        </span>
+                        {thumb}
+                        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{opt.name}</span>
+                        {price}{pcs}
                       </button>
                     )
                   })}
                 </div>
-
-                <p className={`mt-2 text-[10px] tracking-wide sm:text-[11px] ${isFull ? 'font-semibold text-emerald-600' : 'text-neutral-400'}`}>
-                  {isFull
-                    ? `✓ ${group.selectQty} selected`
-                    : `Select ${group.selectQty - total} more`}
-                </p>
               </div>
             )
           })}
 
           {!isDeal && hasSizes && (
-            <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+            <div className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
               <SectionLabel>Choose an option</SectionLabel>
               <div className="grid grid-cols-1 gap-2.5 xs:grid-cols-2 sm:gap-3">
                 {product.sizes!.map((s) => {
@@ -724,7 +733,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {!isDeal && !hasSizes && product.options.length > 0 && (
-            <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+            <div className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
               <SectionLabel>Select size</SectionLabel>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {product.options.map((opt) => (
@@ -742,22 +751,26 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           )}
 
           {addonGroups.map((g) => (
-            <div key={g.id} className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
-              <SectionLabel>
-                {g.name} · {g.isRequired ? 'Required' : 'Optional'}
-              </SectionLabel>
-              <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+            <div key={g.id} className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
+              <div className="mb-2.5 flex items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 shadow-sm sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3">
+                <p className="min-w-0 truncate text-[15px] font-bold text-neutral-900">{g.name}</p>
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600">
+                  {g.isRequired && <AlertCircle size={11} strokeWidth={2.5} />}
+                  {g.isRequired ? 'Required' : 'Optional'}
+                </span>
+              </div>
+              <div className="space-y-2">
                 {g.addons.map((a) => {
                   const q = addonQtys[a.id] ?? 0
                   return (
-                    <div key={a.id} className="flex items-center justify-between gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3">
+                    <div key={a.id} className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-3 py-2.5 transition-colors ${q > 0 ? 'border-red-300 bg-red-50/40' : 'border-neutral-200'}`}>
                       <button
                         type="button"
                         onClick={() => setAddonQty(a.id, q > 0 ? 0 : 1)}
                         aria-pressed={q > 0}
                         className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
                       >
-                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${q > 0 ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-300'}`}>
+                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-md border-2 ${q > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300'}`}>
                           {q > 0 && <Check size={10} strokeWidth={3} />}
                         </span>
                         {a.image && (
@@ -769,7 +782,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                       </button>
                       <div className="flex shrink-0 items-center gap-2">
                         {a.price > 0 && (
-                          <span className="text-[11px] font-semibold text-neutral-700 sm:text-xs">+Rs.{a.price.toLocaleString()}</span>
+                          <span className="text-[13px] font-bold text-neutral-900">Rs. {a.price.toLocaleString()}</span>
                         )}
                         {q > 0 && (
                           <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
@@ -795,7 +808,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             </div>
           ))}
 
-          <div className="px-4 pb-3 sm:px-6 sm:pb-4 md:px-10">
+          <div className="px-3 pb-3 sm:px-5 sm:pb-4 md:px-6 lg:px-7">
             <SectionLabel>Special instructions</SectionLabel>
             <textarea value={instructions}
               onChange={(e) => { if (e.target.value.length <= 500) setInstructions(e.target.value) }}
@@ -808,7 +821,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
           {/* ── FOOTER — frosted glass ───────────────────────────── */}
           {!storeOpen ? (
             /* ── Store closed / holiday banner ── */
-            <div className={`footer-glass sticky bottom-0 mt-auto bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10`}>
+            <div className={`footer-glass sticky bottom-0 mt-auto bg-white/85 px-3 py-3 backdrop-blur-xl sm:px-5 sm:py-4 md:px-6 lg:px-7`}>
               <div className={`flex items-center justify-center gap-2 rounded-full px-5 py-3 text-center text-[13px] font-bold text-white sm:px-8 sm:py-3.5 sm:text-sm ${isHoliday ? 'bg-amber-500' : 'bg-red-600'}`}>
                 <span>{isHoliday ? '🎌' : '🔴'}</span>
                 <span>
@@ -820,7 +833,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             </div>
 
           ) : hasPrice && isOrderable ? (
-            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-4 py-4 backdrop-blur-xl sm:gap-3 sm:px-6 sm:py-5 md:px-10">
+            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-3 py-3 backdrop-blur-xl sm:gap-3 sm:px-5 sm:py-4 md:px-6 lg:px-7">
               <div className="flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-1 py-1 shadow-sm sm:gap-2 sm:px-1.5 sm:py-1.5">
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label={qty <= 1 ? 'Remove' : 'Decrease'}
                   className={`flex h-8 w-8 items-center justify-center rounded-full transition-all sm:h-9 sm:w-9 ${
@@ -839,10 +852,9 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
               </div>
 
               <div className="relative flex-1">
-                {!added && <span className="cta-glow pointer-events-none absolute -inset-1 rounded-full" style={{ background: btnBg }} />}
                 <button onClick={handleAdd}
-                  className={`cta-shine relative flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-full border px-5 py-3 text-[13px] font-bold transition-all sm:gap-2 sm:px-8 sm:py-3.5 sm:text-sm ${
-                    added ? 'border-transparent bg-green-600 text-white' : 'hover:-translate-y-0.5 hover:shadow-xl'
+                  className={`relative flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-full border px-5 py-3 text-[13px] font-bold transition-all sm:gap-2 sm:px-8 sm:py-3.5 sm:text-sm ${
+                    added ? 'border-transparent bg-green-600 text-white' : 'shadow-md hover:opacity-95 active:scale-[0.99]'
                   }`}
                   style={!added ? { backgroundColor: btnBg, color: btnFg, borderColor: btnBorder } : {}}>
                   <span className="relative z-10">
@@ -860,7 +872,6 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                       <span className="relative z-10 xs:hidden">Add</span>
                       <ArrowRight size={14} className="relative z-10 sm:hidden" />
                       <ArrowRight size={16} className="relative z-10 hidden sm:block" />
-                      <span className="shine-sweep pointer-events-none absolute inset-0" />
                     </>
                   )}
                 </button>
@@ -868,14 +879,14 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             </div>
 
           ) : hasPrice && isOnSpot && isAvailableNow && !requiredGroupsFilled ? (
-            <div className="footer-glass sticky bottom-0 mt-auto bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10">
+            <div className="footer-glass sticky bottom-0 mt-auto bg-white/85 px-3 py-3 backdrop-blur-xl sm:px-5 sm:py-4 md:px-6 lg:px-7">
               <div className="rounded-2xl bg-amber-50 px-3.5 py-2.5 text-center text-[13px] font-semibold text-amber-700 sm:px-4 sm:py-3 sm:text-sm">
                 Please select all required options to continue
               </div>
             </div>
 
           ) : hasPrice && itemOutsideHours ? (
-            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-4 py-4 backdrop-blur-xl sm:gap-3 sm:px-6 sm:py-5 md:px-10">
+            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-3 py-3 backdrop-blur-xl sm:gap-3 sm:px-5 sm:py-4 md:px-6 lg:px-7">
               <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-full bg-red-600 px-5 py-3 text-center text-[12px] font-bold text-white xs:flex-row xs:gap-2 sm:px-8 sm:py-3.5 sm:text-sm">
                 <span>Rs. {unitPrice.toLocaleString()}</span>
                 <span className="hidden text-white/40 xs:inline">|</span>
@@ -884,7 +895,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             </div>
 
           ) : hasPrice && isDeal && !isAvailableNow ? (
-            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-4 py-4 backdrop-blur-xl sm:gap-3 sm:px-6 sm:py-5 md:px-10">
+            <div className="footer-glass sticky bottom-0 mt-auto flex items-center gap-2 bg-white/85 px-3 py-3 backdrop-blur-xl sm:gap-3 sm:px-5 sm:py-4 md:px-6 lg:px-7">
               <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-full bg-red-600 px-5 py-3 text-center text-[12px] font-bold text-white xs:flex-row xs:gap-2 sm:px-8 sm:py-3.5 sm:text-sm">
                 <span>Rs. {unitPrice.toLocaleString()}</span>
                 <span className="hidden text-white/40 xs:inline">|</span>
@@ -893,7 +904,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
             </div>
 
           ) : (
-            <div className="footer-glass sticky bottom-0 mt-auto bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10">
+            <div className="footer-glass sticky bottom-0 mt-auto bg-white/85 px-3 py-3 backdrop-blur-xl sm:px-5 sm:py-4 md:px-6 lg:px-7">
               <div className="rounded-2xl bg-neutral-100 px-3.5 py-2.5 text-center text-[13px] font-semibold text-neutral-600 sm:px-4 sm:py-3 sm:text-sm">
                 Coming Soon — This item is not available for ordering yet.
               </div>

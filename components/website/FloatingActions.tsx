@@ -50,10 +50,11 @@ export function FloatingActions() {
     ? (cartBarVisible ? CART_BAR_HEIGHT + 8 : BASE_BOTTOM)
     : SM_BOTTOM
 
-  // Right side: WhatsApp FAB (layout.tsx) occupies the bottom-right on mobile,
-  // so the scroll-to-top button stacks above it (48px FAB + 12px gap).
-  const WA_BOTTOM_MOBILE = cartBarVisible ? 80 + 8 + 56 + 8 : BASE_BOTTOM
-  const topBtnBottom = isMobile ? WA_BOTTOM_MOBILE + 48 + 12 : bottom
+  // Right side: scroll-to-top sits at the bottom of the stack; the WhatsApp
+  // FAB (layout.tsx) stacks above it (48px button + 12px gap).
+  const topBtnBottom = isMobile
+    ? (cartBarVisible ? 80 + 8 + 56 + 8 : BASE_BOTTOM)
+    : BASE_BOTTOM
 
   const base =
     'flex h-12 w-12 items-center justify-center rounded-full shadow-lg ' +
@@ -75,7 +76,7 @@ export function FloatingActions() {
         type="button"
         onClick={scrollToSearch}
         aria-label="Go to search"
-        className={`${base} fixed left-6 z-50`}
+        className={`${base} fixed left-4 z-50 sm:left-6`}
         style={{
           ...sharedStyle,
           backgroundColor: 'var(--color-secondary)',
@@ -90,7 +91,7 @@ export function FloatingActions() {
         type="button"
         onClick={scrollToTop}
         aria-label="Scroll to top"
-        className={`${base} fixed right-6 z-50`}
+        className={`${base} fixed right-4 z-50 sm:right-6`}
         style={{
           ...sharedStyle,
           bottom: `${topBtnBottom}px`,
