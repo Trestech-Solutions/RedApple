@@ -270,7 +270,7 @@ export function WebsiteNavbar({ onLoginClick, onMenuClick }: WebsiteNavbarProps)
           {/* ── Centre logo ── */}
           <div
             className={`pointer-events-none absolute z-20 ${logoPos} ${
-              logoLeftAlign ? 'left-3 sm:left-4 md:left-5' : 'left-3 sm:inset-x-0 sm:left-auto sm:flex sm:justify-center'
+              logoLeftAlign ? 'left-3 sm:left-4 md:left-5' : 'left-3 sm:left-0 sm:right-0 sm:flex sm:justify-center'
             }`}
           >
             <div className="pointer-events-auto">{LogoLinked}</div>
