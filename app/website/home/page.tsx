@@ -645,6 +645,11 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos, branchId))
   const popularProducts: ProductData[] = popularBuilt
 
+  // ── Display order: deals first, beverages/water last (stable — others keep menu order) ──
+  const catRank = (label: string) =>
+    /\bdeals?\b/i.test(label) ? 0 : /beverage|bever?age|water/i.test(label) ? 2 : 1
+  categories.sort((a, b) => catRank(a.label) - catRank(b.label))
+
   // ── Apply category-level display settings to every product in that category ──
   const catById = new Map(categories.map((c) => [c.id, c]))
   products.forEach((p) => {

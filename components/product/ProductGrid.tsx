@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { ProductCard, type ProductData } from './ProductCard'
-import { ProductDetailModal } from './ProductDetailModal'
+import Image from 'next/image'
+import { ProductDetailModal, MODAL_IMAGE_SIZES } from './ProductDetailModal'
 import { ShoppingBag } from 'lucide-react'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 
@@ -15,6 +16,7 @@ interface ProductGridProps {
 
 export function ProductGrid({ products, searchQuery, layout }: ProductGridProps) {
   const [selected, setSelected] = useState<ProductData | null>(null)
+  const [warm, setWarm] = useState<ProductData | null>(null)
   const { settings } = useStoreSettings()
   const design = (settings.product_card_design as string | undefined) ?? 'card-1'
 
@@ -65,11 +67,24 @@ export function ProductGrid({ products, searchQuery, layout }: ProductGridProps)
     <>
       <div className={`${gridClass} items-stretch`}>
         {products.map((p) => (
-          <div key={p.id} className="h-full">
+          <div
+            key={p.id}
+            className="h-full"
+            onPointerEnter={() => setWarm(p)}
+            onTouchStart={() => setWarm(p)}
+            onFocus={() => setWarm(p)}
+          >
             <ProductCard product={p} onOpen={setSelected} />
           </div>
         ))}
       </div>
+
+      {/* Warms the modal-size image (same sizes → same /_next/image URL) before the click. */}
+      {warm?.image && !selected && (
+        <div aria-hidden className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0">
+          <Image key={warm.id} src={warm.image} alt="" fill sizes={MODAL_IMAGE_SIZES} loading="eager" />
+        </div>
+      )}
 
       {selected && (
         <ProductDetailModal product={selected} onClose={() => setSelected(null)} />

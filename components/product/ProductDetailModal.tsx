@@ -39,6 +39,34 @@ interface ProductDetailModalProps {
   onClose: () => void
 }
 
+// Shared with ProductGrid, which warms this exact optimised URL on card hover/touch.
+// Mobile is capped at 640px so the file stays small (was 100vw → up to ~1280px wide).
+export const MODAL_IMAGE_SIZES = '(min-width: 768px) 470px, (min-width: 640px) 42vw, 640px'
+
+/**
+ * Hero image with a safety net: if the optimised /_next/image request fails or
+ * times out (slow/broken upstream), retry once straight from the source URL,
+ * then fall back to a soft placeholder instead of showing broken-image alt text.
+ */
+function ModalHeroImage({ src, alt }: { src: string; alt: string }) {
+  const [stage, setStage] = useState<0 | 1 | 2>(0)
+  if (!src || stage === 2) {
+    return <span role="img" aria-label={alt} className="absolute inset-0 bg-neutral-200" />
+  }
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={MODAL_IMAGE_SIZES}
+      className="object-cover"
+      loading="eager"
+      unoptimized={stage === 1}
+      onError={() => setStage((s) => (s === 0 ? 1 : 2))}
+    />
+  )
+}
+
 // ── PKT time-window check ─────────────────────────────────────────────────
 function getPKTNow(): Date {
   return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }))
@@ -357,7 +385,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
         {/* ── LEFT — image ────────────────────────────────────────── */}
         <div ref={imageRef} className="relative aspect-square max-h-[62dvh] w-full shrink-0 overflow-hidden sm:aspect-auto sm:max-h-none sm:h-full sm:w-[42%] md:w-[46%]">
           <div className="ken-burns absolute inset-0">
-            <Image src={product.image} alt={product.name} fill sizes="(min-width: 768px) 470px, (min-width: 640px) 42vw, 100vw" className="object-cover" loading="eager" />
+            <ModalHeroImage key={product.image} src={product.image} alt={product.name} />
           </div>
 
           {/* top vignette so glass controls always read well */}
