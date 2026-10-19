@@ -493,6 +493,8 @@ export type MenuItem = {
   item_discount_type?: string | null;
   show_discount_tag?: boolean;
   is_popular?: boolean;           // flagged as popular item (max 4 per restaurant)
+  /** Badge text set in the dashboard (e.g. "New", "Best Seller"); '' = none */
+  tag?: string | null;
   /** Per-item button/price text colour override (hex). Falls back to global item_price_text_color. */
   text_button_color?: string | null;
   /** Cart-row style identifier for this item (e.g. 'highlight', 'compact'). */
@@ -870,6 +872,8 @@ export type MenuFixedDeal = {
   end_time?: string | null;        // "HH:MM:SS" — time window filter (PKT)
   status: boolean | number;        // API returns 1/0 or true/false
   is_available_now?: boolean;
+  /** Badge text set in the dashboard; '' = none */
+  tag?: string | null;
 };
 
 /** Shape of an On Spot Deal as returned inside the menu endpoint response. */
@@ -893,6 +897,8 @@ export type MenuOnSpotDeal = {
   end_time?: string | null;
   status: boolean | number;        // API returns 1/0 or true/false
   is_available_now?: boolean;
+  /** Badge text set in the dashboard; '' = none */
+  tag?: string | null;
 };
 
 // ─── Storefront Cart ─────────────────────────────────────────────────────────
