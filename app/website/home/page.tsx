@@ -22,7 +22,7 @@ import { useGetPopupBanners } from '@/api/client/browse'
 import { isDealActiveNowPKT } from '@/utils/dealTime'
 import { getCategoryScheduleState } from '@/utils/categorySchedule'
 import type { ProductData } from '@/components/product/ProductCard'
-import type { MenuResponse, MenuCategory, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
+import type { MenuAddonDetail, MenuResponse, MenuCategory, MenuItem, MenuFixedDeal, MenuOnSpotDeal, MenuBanner, MenuOffer } from '@/api/types'
 import { getRestaurantId } from '@/api/utils'
 import { HeroCarousel } from '@/components/website/HeroCarousel'
 
@@ -88,7 +88,8 @@ function itemToProduct(
   idPairs: Array<{ clientId: string; numericId: number }>,
   products: (ProductData & { categoryId: string; subCategoryId: string; branchIds: string[] | '*' })[],
   /** addon id → photo URL, from the menu's top-level addon_categories */
-  addonPhotos: Map<number, string> = new Map(),
+  /** addon id → photo URL + the full add-on record from the menu's top-level addon_categories */
+  addonInfo: Map<number, { image?: string; detail: MenuAddonDetail }> = new Map(),
   branchId?: number | null,
 ) {
   // Menu items carry per-branch prices in `branch_prices`; when the API didn't
@@ -233,20 +234,24 @@ function itemToProduct(
           id:         g.id,
           name:       g.name,
           isRequired: !!g.is_required,
-          addons:     (g.addons ?? []).map((a) => ({
-            id: a.id, name: a.name, price: Math.round(parseFloat(a.price || '0')) || 0, image: addonPhotos.get(a.id),
-            cartStyle:    a.cart_style    || undefined,
-            displayImage: a.display_image || undefined,
-            subOptions:   a.sub_options && a.sub_options.options.length > 0
+          addons:     (g.addons ?? []).map((a) => {
+            const sub = a.sub_options ?? addonInfo.get(a.id)?.detail.sub_options
+            return {
+            id: a.id, name: a.name, price: Math.round(parseFloat(a.price || '0')) || 0, image: addonInfo.get(a.id)?.image,
+            // item.addon_groups on older backends lacks these; the top-level addon_categories always has them
+            cartStyle:    (a.cart_style    ?? addonInfo.get(a.id)?.detail.cart_style)    || undefined,
+            displayImage: (a.display_image ?? addonInfo.get(a.id)?.detail.display_image) || undefined,
+            subOptions:   sub && sub.options.length > 0
               ? {
-                  categoryId:     a.sub_options.category_id,
-                  name:           a.sub_options.name,
-                  isRequired:     a.sub_options.is_required,
-                  selectQuantity: Math.max(1, a.sub_options.select_quantity || 1),
-                  options:        a.sub_options.options.map((o) => ({ id: o.id, name: o.name, price: Math.round(parseFloat(o.price || '0')) || 0 })),
+                  categoryId:     sub.category_id,
+                  name:           sub.name,
+                  isRequired:     sub.is_required,
+                  selectQuantity: Math.max(1, sub.select_quantity || 1),
+                  options:        sub.options.map((o) => ({ id: o.id, name: o.name, price: Math.round(parseFloat(o.price || '0')) || 0 })),
                 }
               : undefined,
-          })),
+            }
+          }),
         }))
       : undefined,
     textButtonColor: item.text_button_color || undefined,
@@ -377,11 +382,11 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
 } {
   const menuArr = menu?.menu ?? menu?.categories ?? []
 
-  const addonPhotos = new Map<number, string>()
+  const addonInfo = new Map<number, { image?: string; detail: MenuAddonDetail }>()
   ;(menu?.addon_categories ?? []).forEach((ac) =>
     (ac.addons ?? []).forEach((a) => {
       const url = resolveMediaUrl(a.photo)
-      if (url) addonPhotos.set(a.id, url)
+      addonInfo.set(a.id, { image: url || undefined, detail: a })
     }),
   )
 
@@ -418,7 +423,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
             return true
           })
           .forEach((it) => {
-            itemToProduct(it, catId, idPairs, products, addonPhotos, branchId)
+            itemToProduct(it, catId, idPairs, products, addonInfo, branchId)
             if (it.is_popular) popularRawItems.push(it)
           })
 
@@ -657,7 +662,7 @@ function transformMenu(menu: MenuResponse | undefined, branchId?: number | null)
   // branch-vs-front price differences, which the old popular-only builder missed).
   const popularIdPairs: Array<{ clientId: string; numericId: number }> = []
   const popularBuilt: Parameters<typeof itemToProduct>[3] = []
-  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonPhotos, branchId))
+  ;(menu?.popular_items ?? []).forEach((item) => itemToProduct(item, 'popular', popularIdPairs, popularBuilt, addonInfo, branchId))
   const popularProducts: ProductData[] = popularBuilt
 
   // ── Display order: deals first, beverages/water last (stable — others keep menu order) ──

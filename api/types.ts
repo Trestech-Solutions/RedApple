@@ -779,6 +779,9 @@ export type MenuAddonDetail = {
   price: string;
   photo?: string | null;
   status: boolean;
+  display_image?: string;
+  cart_style?: string;
+  sub_options?: MenuAddonSubOptions | null;
 };
 
 export type MenuDealItemDetail = {
