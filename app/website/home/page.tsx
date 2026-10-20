@@ -247,7 +247,10 @@ function itemToProduct(
                   name:           sub.name,
                   isRequired:     sub.is_required,
                   selectQuantity: Math.max(1, sub.select_quantity || 1),
-                  options:        sub.options.map((o) => ({ id: o.id, name: o.name, price: Math.round(parseFloat(o.price || '0')) || 0 })),
+                  options:        sub.options.map((o) => ({
+                    id: o.id, name: o.name, price: Math.round(parseFloat(o.price || '0')) || 0,
+                    image: resolveMediaUrl(o.photo) || addonInfo.get(o.id)?.image,
+                  })),
                 }
               : undefined,
             }

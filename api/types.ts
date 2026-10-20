@@ -484,7 +484,7 @@ export type MenuAddonSubOptions = {
   name: string;
   is_required: boolean;
   select_quantity: number;
-  options: { id: number; name: string; price: string }[];
+  options: { id: number; name: string; price: string; photo?: string | null }[];
 };
 
 export type MenuItemAddon = {

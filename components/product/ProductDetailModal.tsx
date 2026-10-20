@@ -911,7 +911,7 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                                   <span className={`flex h-4 w-4 shrink-0 items-center justify-center border-2 ${sub.selectQuantity === 1 ? 'rounded-full' : 'rounded-md'} ${n > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300'}`}>
                                     {n > 0 && <Check size={10} strokeWidth={3} />}
                                   </span>
-                                  <span className="truncate text-[13px] text-neutral-800">{o.name}</span>
+                                  <span className="truncate text-[13px] font-medium text-neutral-800">{o.name}</span>
                                 </button>
                                 <div className="flex shrink-0 items-center gap-2">
                                   {o.price > 0 && <span className="text-xs font-bold text-neutral-900">+ Rs. {o.price.toLocaleString()}</span>}
@@ -923,6 +923,12 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                                       <button type="button" onClick={() => pickSub(a.id, o.id, sub.selectQuantity)} aria-label={`Add one ${o.name}`}
                                         className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black"><Plus size={10} /></button>
                                     </div>
+                                  )}
+                                  {o.image && (
+                                    <button type="button" onClick={() => pickSub(a.id, o.id, sub.selectQuantity)} tabIndex={-1} aria-hidden
+                                      className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+                                      <Image src={o.image} alt="" fill sizes="44px" className="object-cover" />
+                                    </button>
                                   )}
                                 </div>
                               </div>

@@ -48,7 +48,7 @@ export interface ProductData {
         name: string
         isRequired: boolean
         selectQuantity: number
-        options: { id: number; name: string; price: number }[]
+        options: { id: number; name: string; price: number; image?: string }[]
       }
     }[]
   }[]
