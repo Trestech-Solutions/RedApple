@@ -287,6 +287,7 @@ export default function CheckoutPage() {
       customer_city:          customerCity || undefined,
       customer_landmark:      (user ? undefined : values.guestLandmark) || undefined,
       customer_instructions:  values.instructions || undefined,
+      payment_mode:           values.payment,   // 'cod' | 'online'
       cartItems:              items,
       ...(values.isGift ? {
         is_gift: true,
