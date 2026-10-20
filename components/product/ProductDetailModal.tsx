@@ -145,8 +145,6 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
   const addonGroups = !product.dealType ? (product.addonGroups ?? []) : []
   const setAddonQty = (id: number, qty: number) =>
     setAddonQtys((prev) => ({ ...prev, [id]: Math.max(0, Math.min(10, qty)) }))
-  const addonsTotal = addonGroups.reduce(
-    (sum, g) => sum + g.addons.reduce((s, a) => s + (a.price + subPrice(a)) * (addonQtys[a.id] ?? 0), 0), 0)
   // Follow-up choices: parent addonId → picked sub-addon ids (repeat an id to pick it twice)
   const [subPicks, setSubPicks] = useState<Record<number, number[]>>({})
   const setAddonQtyAndSubs = (id: number, qty: number) => {
@@ -171,6 +169,8 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
   // required sub choice → exactly N picks; optional → at most N (enforced by pickSub)
   const subFilled = (a: (typeof addonGroups)[number]['addons'][number]) =>
     !a.subOptions || !a.subOptions.isRequired || (subPicks[a.id] ?? []).length === a.subOptions.selectQuantity
+  const addonsTotal = addonGroups.reduce(
+    (sum, g) => sum + g.addons.reduce((s, a) => s + (a.price + subPrice(a)) * (addonQtys[a.id] ?? 0), 0), 0)
   const requiredAddonsFilled =
     addonGroups.every((g) => !g.isRequired || g.addons.some((a) => (addonQtys[a.id] ?? 0) > 0)) &&
     addonGroups.every((g) => g.addons.every((a) => (addonQtys[a.id] ?? 0) === 0 || subFilled(a)))
