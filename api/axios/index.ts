@@ -34,10 +34,13 @@ axiosInstance.interceptors.request.use(
           config.headers.Authorization = `Bearer ${token}`;
         }
       } else {
-        // Storefront — attach customer JWT if present, otherwise send no
-        // Authorization header so AllowAny endpoints work for guests.
+        // Storefront — attach the customer JWT only where the backend reads it.
+        // Public AllowAny views (menu, banners, cities…) use the staff authenticator by
+        // default, which answers a customer token with 401 "Invalid token" — so sending it
+        // there used to sign the customer out on every page load.
         const customerToken = localStorage.getItem("trestech_customer_token");
-        if (customerToken) {
+        const usesCustomerAuth = /\/storefront\/customers\//.test(url) || /\/storefront\/orders\/?$/.test(url);
+        if (customerToken && usesCustomerAuth) {
           config.headers.Authorization = `Bearer ${customerToken}`;
         } else {
           // Explicitly remove any inherited Authorization header
