@@ -2,6 +2,8 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
+import { store } from "@/redux/store";
+import { setTokens as reduxSetTokens, logout as reduxLogout } from "@/redux/slices/authSlice";
 
 const BASE_URL = "https://api.trestechsolutions.com/api";
 
@@ -48,11 +50,53 @@ axiosInstance.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
+// ─── Customer token refresh ───────────────────────────────────────────────────
+// The access token lives 30 min. On a 401 from a storefront endpoint we trade the
+// refresh token for a new access token once, then replay the request. Only if that
+// fails is the customer really signed out (localStorage + Redux, so the UI agrees).
+let customerRefresh: Promise<string | null> | null = null;
+
+async function refreshCustomerAccessToken(): Promise<string | null> {
+  const refresh = localStorage.getItem("trestech_customer_refresh_token");
+  if (!refresh) return null;
+  try {
+    // plain axios: this call must not go through our interceptors
+    const { data } = await axios.post<{ access: string }>(
+      `${BASE_URL}/storefront/customers/refresh/`,
+      { refresh },
+      { timeout: 10000 },
+    );
+    localStorage.setItem("trestech_customer_token", data.access);
+    store.dispatch(reduxSetTokens({ accessToken: data.access, refreshToken: refresh }));
+    return data.access;
+  } catch {
+    return null;
+  }
+}
+
 axiosInstance.interceptors.response.use(
   (response) => response,
 
-  (error: AxiosError<any>) => {
+  async (error: AxiosError<any>) => {
     const status = error.response?.status;
+
+    const cfg = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    const reqUrl = cfg?.url ?? "";
+    const isStorefrontReq = reqUrl.includes("/storefront/");
+    const isCustomerAuthCall = /\/customers\/(login|register|refresh)\//.test(reqUrl);
+
+    if (
+      status === 401 && typeof window !== "undefined" && cfg && isStorefrontReq &&
+      !isCustomerAuthCall && !cfg._retry && localStorage.getItem("trestech_customer_refresh_token")
+    ) {
+      cfg._retry = true;
+      customerRefresh ??= refreshCustomerAccessToken().finally(() => { customerRefresh = null; });
+      const fresh = await customerRefresh;
+      if (fresh) {
+        cfg.headers.Authorization = `Bearer ${fresh}`;
+        return axiosInstance(cfg);
+      }
+    }
 
     switch (status) {
       case 401:
@@ -66,6 +110,8 @@ axiosInstance.interceptors.response.use(
           localStorage.removeItem("trestech_customer_refresh_token");
           localStorage.removeItem("trestech_customer_user");
           document.cookie = "user=; path=/; max-age=0";
+          // Redux-persist still held the customer: without this the UI looks signed in but sends no token
+          if (isStorefrontReq) store.dispatch(reduxLogout());
         }
         break;
 
