@@ -16,6 +16,8 @@ export interface SelectedAddon {
 export interface CartItemAddon {
   addon: number     // FoodAddon.id
   quantity: number  // per unit of the line
+  /** Follow-up choice ids (FoodAddon.id from the add-on's sub_options); repeat an id to pick it twice */
+  sub_addons?: number[]
 }
 
 /** Structured group selection used to build the order payload for on_spot_deals. */

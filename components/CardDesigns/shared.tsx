@@ -38,7 +38,19 @@ export interface ProductData {
     id: number
     name: string
     isRequired: boolean
-    addons: { id: number; name: string; price: number; image?: string }[]
+    addons: {
+      id: number; name: string; price: number; image?: string
+      cartStyle?: string
+      displayImage?: string
+      /** Follow-up choice required/offered once this add-on is picked */
+      subOptions?: {
+        categoryId: number
+        name: string
+        isRequired: boolean
+        selectQuantity: number
+        options: { id: number; name: string; price: number }[]
+      }
+    }[]
   }[]
   textButtonColor?: string
   cartStyle?: string

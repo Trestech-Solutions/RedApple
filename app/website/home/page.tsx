@@ -233,7 +233,20 @@ function itemToProduct(
           id:         g.id,
           name:       g.name,
           isRequired: !!g.is_required,
-          addons:     (g.addons ?? []).map((a) => ({ id: a.id, name: a.name, price: Math.round(parseFloat(a.price || '0')) || 0, image: addonPhotos.get(a.id) })),
+          addons:     (g.addons ?? []).map((a) => ({
+            id: a.id, name: a.name, price: Math.round(parseFloat(a.price || '0')) || 0, image: addonPhotos.get(a.id),
+            cartStyle:    a.cart_style    || undefined,
+            displayImage: a.display_image || undefined,
+            subOptions:   a.sub_options && a.sub_options.options.length > 0
+              ? {
+                  categoryId:     a.sub_options.category_id,
+                  name:           a.sub_options.name,
+                  isRequired:     a.sub_options.is_required,
+                  selectQuantity: Math.max(1, a.sub_options.select_quantity || 1),
+                  options:        a.sub_options.options.map((o) => ({ id: o.id, name: o.name, price: Math.round(parseFloat(o.price || '0')) || 0 })),
+                }
+              : undefined,
+          })),
         }))
       : undefined,
     textButtonColor: item.text_button_color || undefined,

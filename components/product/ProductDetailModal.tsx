@@ -24,7 +24,7 @@
  *    and more diffused, consistent with a premium storefront.
  */
 
-import { useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { X, Share2, Minus, Plus, Trash2, ArrowRight, Clock, Check, AlertCircle, CheckCircle2 } from 'lucide-react'
@@ -146,9 +146,34 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
   const setAddonQty = (id: number, qty: number) =>
     setAddonQtys((prev) => ({ ...prev, [id]: Math.max(0, Math.min(10, qty)) }))
   const addonsTotal = addonGroups.reduce(
-    (sum, g) => sum + g.addons.reduce((s, a) => s + a.price * (addonQtys[a.id] ?? 0), 0), 0)
-  const requiredAddonsFilled = addonGroups.every(
-    (g) => !g.isRequired || g.addons.some((a) => (addonQtys[a.id] ?? 0) > 0))
+    (sum, g) => sum + g.addons.reduce((s, a) => s + (a.price + subPrice(a)) * (addonQtys[a.id] ?? 0), 0), 0)
+  // Follow-up choices: parent addonId → picked sub-addon ids (repeat an id to pick it twice)
+  const [subPicks, setSubPicks] = useState<Record<number, number[]>>({})
+  const setAddonQtyAndSubs = (id: number, qty: number) => {
+    setAddonQty(id, qty)
+    if (qty <= 0) setSubPicks((prev) => { const { [id]: _drop, ...rest } = prev; return rest })
+  }
+  const pickSub = (addonId: number, subId: number, max: number) =>
+    setSubPicks((prev) => {
+      const cur = prev[addonId] ?? []
+      if (max === 1) return { ...prev, [addonId]: cur[0] === subId ? [] : [subId] }   // single choice: tap again to clear
+      return cur.length >= max ? prev : { ...prev, [addonId]: [...cur, subId] }
+    })
+  const unpickSub = (addonId: number, subId: number) =>
+    setSubPicks((prev) => {
+      const cur = [...(prev[addonId] ?? [])]
+      const i = cur.lastIndexOf(subId)
+      if (i >= 0) cur.splice(i, 1)
+      return { ...prev, [addonId]: cur }
+    })
+  const subPrice = (a: (typeof addonGroups)[number]['addons'][number]) =>
+    (subPicks[a.id] ?? []).reduce((s, id) => s + (a.subOptions?.options.find((o) => o.id === id)?.price ?? 0), 0)
+  // required sub choice → exactly N picks; optional → at most N (enforced by pickSub)
+  const subFilled = (a: (typeof addonGroups)[number]['addons'][number]) =>
+    !a.subOptions || !a.subOptions.isRequired || (subPicks[a.id] ?? []).length === a.subOptions.selectQuantity
+  const requiredAddonsFilled =
+    addonGroups.every((g) => !g.isRequired || g.addons.some((a) => (addonQtys[a.id] ?? 0) > 0)) &&
+    addonGroups.every((g) => g.addons.every((a) => (addonQtys[a.id] ?? 0) === 0 || subFilled(a)))
 
   const [itemQtys, setItemQtys] = useState<Record<number, number>>(() => {
     const init: Record<number, number> = {}
@@ -309,17 +334,27 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
     const itemAddons: CartItemAddon[] = addonGroups.flatMap((g) =>
       g.addons
         .filter((a) => (addonQtys[a.id] ?? 0) > 0)
-        .map((a) => ({ addon: a.id, quantity: addonQtys[a.id] }))
+        .map((a) => ({
+          addon: a.id,
+          quantity: addonQtys[a.id],
+          ...((subPicks[a.id] ?? []).length > 0 ? { sub_addons: subPicks[a.id] } : {}),
+        }))
     )
     const itemAddonRows: SelectedAddon[] = addonGroups.flatMap((g) =>
       g.addons
         .filter((a) => (addonQtys[a.id] ?? 0) > 0)
-        .map((a) => ({
-          groupName: g.name,
-          name:      a.name,
-          qty:       addonQtys[a.id],
-          extraCost: a.price > 0 ? a.price * addonQtys[a.id] : undefined,
-        }))
+        .flatMap((a) => {
+          const q = addonQtys[a.id]
+          const subs = new Map<number, number>()
+          ;(subPicks[a.id] ?? []).forEach((id) => subs.set(id, (subs.get(id) ?? 0) + 1))
+          return [
+            { groupName: g.name, name: a.name, qty: q, extraCost: a.price > 0 ? a.price * q : undefined },
+            ...[...subs].map(([id, n]) => {
+              const o = a.subOptions?.options.find((x) => x.id === id)
+              return { groupName: a.name, name: o?.name ?? `Option ${id}`, qty: n * q, extraCost: o && o.price > 0 ? o.price * n * q : undefined }
+            }),
+          ]
+        })
     )
 
     const selectedAddons = [...includedRows, ...groupRows, ...itemAddonRows]
@@ -787,46 +822,121 @@ function ProductDetailModalContent({ product, onClose }: ProductDetailModalProps
                   {g.isRequired ? 'Required' : 'Optional'}
                 </span>
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
                 {g.addons.map((a) => {
                   const q = addonQtys[a.id] ?? 0
-                  return (
-                    <div key={a.id} className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-3 py-2.5 transition-colors ${q > 0 ? 'border-red-300 bg-red-50/40' : 'border-neutral-200'}`}>
-                      <button
-                        type="button"
-                        onClick={() => setAddonQty(a.id, q > 0 ? 0 : 1)}
-                        aria-pressed={q > 0}
-                        className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-                      >
-                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-md border-2 ${q > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300'}`}>
-                          {q > 0 && <Check size={10} strokeWidth={3} />}
-                        </span>
-                        {a.image && (
-                          <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                            <Image src={a.image} alt="" fill sizes="36px" className="object-cover" />
-                          </span>
-                        )}
-                        <span className="truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{a.name}</span>
+                  const sub = a.subOptions
+                  const picks = subPicks[a.id] ?? []
+                  // Add-on display design (set in the dashboard): design-1 text-only pill, design-2 row + thumbnail, design-3 photo card
+                  const design = a.cartStyle === 'design-3' || a.cartStyle === 'design-1' ? a.cartStyle : 'design-2'
+                  const stepper = q > 0 && (
+                    <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                      <button type="button" onClick={() => setAddonQtyAndSubs(a.id, q - 1)} aria-label={`Remove one ${a.name}`}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100">
+                        <Minus size={10} />
                       </button>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {a.price > 0 && (
-                          <span className="text-[13px] font-bold text-neutral-900">Rs. {a.price.toLocaleString()}</span>
-                        )}
-                        {q > 0 && (
-                          <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
-                            <button type="button" onClick={() => setAddonQty(a.id, q - 1)} aria-label={`Remove one ${a.name}`}
-                              className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100">
-                              <Minus size={10} />
-                            </button>
-                            <span className="w-4 text-center text-xs font-bold text-neutral-800">{q}</span>
-                            <button type="button" onClick={() => setAddonQty(a.id, q + 1)} aria-label={`Add one ${a.name}`}
-                              className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black">
-                              <Plus size={10} />
-                            </button>
-                          </div>
+                      <span className="w-4 text-center text-xs font-bold text-neutral-800">{q}</span>
+                      <button type="button" onClick={() => setAddonQty(a.id, q + 1)} aria-label={`Add one ${a.name}`}
+                        className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black">
+                        <Plus size={10} />
+                      </button>
+                    </div>
+                  )
+                  const priceTag = a.price > 0 && (
+                    <span className="text-[13px] font-bold text-neutral-900">Rs. {a.price.toLocaleString()}</span>
+                  )
+                  return (
+                    <Fragment key={a.id}>
+                    <div className={design === 'design-3' ? '' : 'col-span-2'}>
+                    {design === 'design-3' ? (
+                      <div className={`relative overflow-hidden rounded-2xl border bg-white shadow-sm transition-colors ${q > 0 ? 'border-red-400 ring-1 ring-red-300' : 'border-neutral-200'}`}>
+                        <button type="button" onClick={() => setAddonQtyAndSubs(a.id, q > 0 ? 0 : 1)} aria-pressed={q > 0} className="block w-full text-left">
+                          <span className="relative block aspect-[4/3] w-full bg-neutral-100">
+                            {a.image && <Image src={a.image} alt="" fill sizes="(max-width: 640px) 45vw, 220px" className="object-cover" />}
+                            <span className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 ${q > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300 bg-white/90'}`}>
+                              {q > 0 && <Check size={14} strokeWidth={3} />}
+                            </span>
+                          </span>
+                          <span className="block px-3 pb-2 pt-2.5">
+                            <span className="block truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{a.name}</span>
+                            {a.price > 0 && <span className="block text-[12px] font-bold text-neutral-900">Rs. {a.price.toLocaleString()}</span>}
+                          </span>
+                        </button>
+                        {q > 0 && <div className="flex justify-end px-3 pb-2.5">{stepper}</div>}
+                      </div>
+                    ) : design === 'design-1' ? (
+                      <div className={`flex items-center justify-between gap-2 rounded-2xl border px-3 py-3 transition-colors ${q > 0 ? 'border-red-300 bg-gradient-to-r from-red-50 to-white' : 'border-neutral-200 bg-white'}`}>
+                        <button type="button" onClick={() => setAddonQtyAndSubs(a.id, q > 0 ? 0 : 1)} aria-pressed={q > 0}
+                          className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${q > 0 ? 'bg-red-600' : 'border-2 border-neutral-300'}`}>
+                            {q > 0 && <span className="h-2 w-2 rounded-full bg-white" />}
+                          </span>
+                          <span className="truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{a.name}</span>
+                        </button>
+                        <div className="flex shrink-0 items-center gap-2">{priceTag}{stepper}</div>
+                      </div>
+                    ) : (
+                      <div className={`flex items-center justify-between gap-2 rounded-2xl border bg-white px-3 py-2.5 transition-colors ${q > 0 ? 'border-red-300 bg-red-50/40' : 'border-neutral-200'}`}>
+                        <button type="button" onClick={() => setAddonQtyAndSubs(a.id, q > 0 ? 0 : 1)} aria-pressed={q > 0}
+                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${q > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300'}`}>
+                            {q > 0 && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          {a.image && (
+                            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                              <Image src={a.image} alt="" fill sizes="44px" className="object-cover" />
+                            </span>
+                          )}
+                          <span className="truncate text-[13px] font-medium text-neutral-800 sm:text-sm">{a.name}</span>
+                        </button>
+                        <div className="flex shrink-0 items-center gap-2">{priceTag}{stepper}</div>
+                      </div>
+                    )}
+                    </div>
+                    {q > 0 && sub && (
+                      <div className="col-span-2 ml-4 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <p className="min-w-0 truncate text-[13px] font-semibold text-neutral-900">{sub.name}</p>
+                          <span className="shrink-0 text-[11px] font-semibold text-neutral-500">
+                            {sub.isRequired ? 'Required' : 'Optional'} · {picks.length}/{sub.selectQuantity}
+                          </span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {sub.options.map((o) => {
+                            const n = picks.filter((id) => id === o.id).length
+                            return (
+                              <div key={o.id} className={`flex items-center justify-between gap-2 rounded-lg border bg-white px-2.5 py-2 ${n > 0 ? 'border-red-300 bg-red-50/40' : 'border-neutral-200'}`}>
+                                <button type="button" onClick={() => pickSub(a.id, o.id, sub.selectQuantity)} aria-pressed={n > 0}
+                                  className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                                  <span className={`flex h-4 w-4 shrink-0 items-center justify-center border-2 ${sub.selectQuantity === 1 ? 'rounded-full' : 'rounded-md'} ${n > 0 ? 'border-red-600 bg-red-600 text-white' : 'border-neutral-300'}`}>
+                                    {n > 0 && <Check size={10} strokeWidth={3} />}
+                                  </span>
+                                  <span className="truncate text-[13px] text-neutral-800">{o.name}</span>
+                                </button>
+                                <div className="flex shrink-0 items-center gap-2">
+                                  {o.price > 0 && <span className="text-xs font-bold text-neutral-900">+ Rs. {o.price.toLocaleString()}</span>}
+                                  {sub.selectQuantity > 1 && n > 0 && (
+                                    <div className="flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-1 py-0.5">
+                                      <button type="button" onClick={() => unpickSub(a.id, o.id)} aria-label={`Remove one ${o.name}`}
+                                        className="flex h-5 w-5 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100"><Minus size={10} /></button>
+                                      <span className="w-4 text-center text-xs font-bold text-neutral-800">{n}</span>
+                                      <button type="button" onClick={() => pickSub(a.id, o.id, sub.selectQuantity)} aria-label={`Add one ${o.name}`}
+                                        className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-black"><Plus size={10} /></button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        {sub.isRequired && picks.length !== sub.selectQuantity && (
+                          <p className="mt-1.5 text-[10px] font-medium text-amber-600 sm:text-[11px]">
+                            Choose {sub.selectQuantity} option{sub.selectQuantity > 1 ? 's' : ''} to continue
+                          </p>
                         )}
                       </div>
-                    </div>
+                    )}
+                    </Fragment>
                   )
                 })}
               </div>

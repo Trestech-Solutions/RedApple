@@ -475,7 +475,25 @@ export type MenuItemAddonGroup = {
   id: number;
   name: string;
   is_required: boolean;
-  addons: { id: number; name: string; price: string }[];
+  addons: MenuItemAddon[];
+};
+
+/** Follow-up choice shown after the customer picks this add-on (e.g. Fries & Drink -> pick a soft drink). */
+export type MenuAddonSubOptions = {
+  category_id: number;
+  name: string;
+  is_required: boolean;
+  select_quantity: number;
+  options: { id: number; name: string; price: string }[];
+};
+
+export type MenuItemAddon = {
+  id: number;
+  name: string;
+  price: string;
+  display_image?: string;
+  cart_style?: string;
+  sub_options?: MenuAddonSubOptions | null;
 };
 
 export type MenuItem = {
@@ -914,7 +932,7 @@ export type CartItem = {
   notes?: string;
   unit_price: string;
   line_total: string;
-  addons?: { id: number; addon: number; quantity: number }[];
+  addons?: { id: number; addon: number; quantity: number; parent?: number | null }[];
 };
 
 export type Cart = {
@@ -950,6 +968,8 @@ export type UpdateCartItemPayload = {
 export type OrderCreateAddon = {
   addon: number;
   quantity?: number;
+  /** Follow-up choice ids from the add-on's sub_options (required count = select_quantity) */
+  sub_addons?: number[];
 };
 
 export type OrderCreateGroupSelection = {
