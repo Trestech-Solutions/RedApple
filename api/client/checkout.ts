@@ -76,6 +76,9 @@ export function buildOrderPayload(params: {
   customer_instructions?: string;
   /** Customer's chosen payment method, e.g. 'cod' | 'online' */
   payment_mode?: string;
+  alternate_number?: string;
+  change?: string;
+  email?: string;
   is_gift?: boolean;
   send_gift?: { receipt_name: string; gift_message: string; receipt_number: string };
   cartItems: {
@@ -149,6 +152,9 @@ export function buildOrderPayload(params: {
     customer_landmark:      params.customer_landmark,
     customer_instructions:  params.customer_instructions,
     payment_mode:           params.payment_mode ?? '',
+    alternate_number:       params.alternate_number,
+    change:                 params.change,
+    email:                  params.email,
     ...(params.is_gift ? {
       is_gift:   true,
       send_gift: params.send_gift,

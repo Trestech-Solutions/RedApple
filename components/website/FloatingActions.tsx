@@ -10,7 +10,6 @@ import { useCart } from '@/lib/hooks/useCart'
 
 const CART_BAR_HEIGHT = 80   // CartBar ~72px + 8px gap
 const BASE_BOTTOM     = 24   // default bottom-6 (24px)
-const SM_BOTTOM       = 96   // sm: bottom-24 (96px) — no CartBar overlap issue on wide screens
 
 export function FloatingActions() {
   const [visible,    setVisible]    = useState(false)
@@ -45,14 +44,9 @@ export function FloatingActions() {
     }, 500)
   }, [])
 
-  // Calculate bottom offset
+  // Search and scroll-to-top share one bottom offset so they sit on a single
+  // line; the WhatsApp FAB (layout.tsx) stacks above the scroll-to-top button.
   const bottom = isMobile
-    ? (cartBarVisible ? CART_BAR_HEIGHT + 8 : BASE_BOTTOM)
-    : SM_BOTTOM
-
-  // Right side: scroll-to-top sits at the bottom of the stack; the WhatsApp
-  // FAB (layout.tsx) stacks above it (48px button + 12px gap).
-  const topBtnBottom = isMobile
     ? (cartBarVisible ? 80 + 8 + 56 + 8 : BASE_BOTTOM)
     : BASE_BOTTOM
 
@@ -94,7 +88,6 @@ export function FloatingActions() {
         className={`${base} fixed right-4 z-50 sm:right-6`}
         style={{
           ...sharedStyle,
-          bottom: `${topBtnBottom}px`,
           backgroundColor: 'var(--color-primary)',
           color:           'var(--color-secondary)',
         }}

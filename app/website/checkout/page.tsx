@@ -288,6 +288,9 @@ export default function CheckoutPage() {
       customer_landmark:      (user ? undefined : values.guestLandmark) || undefined,
       customer_instructions:  values.instructions || undefined,
       payment_mode:           values.payment,   // 'cod' | 'online'
+      alternate_number:       (user ? undefined : values.guestAltMobile.trim()) || undefined,
+      change:                 (isCash && values.changeAmount ? String(values.changeAmount).trim() : '') || undefined,
+      email:                  (user ? user.email : values.guestEmail.trim()) || undefined,
       cartItems:              items,
       ...(values.isGift ? {
         is_gift: true,

@@ -1017,6 +1017,10 @@ export type OrderCreatePayload = {
   customer_instructions?: string;
   /** Customer's chosen payment method, e.g. "cod" | "online" */
   payment_mode?: string;
+  alternate_number?: string;
+  /** Cash amount the customer will pay with (so the rider can bring change) */
+  change?: string;
+  email?: string;
   /** True when the order is a gift */
   is_gift?: boolean;
   /** Gift recipient details — only sent when is_gift is true */
@@ -1087,6 +1091,10 @@ export type Order = {
   customer_address?: string;
   customer_landmark?: string;
   customer_instructions?: string;
+  alternate_number?: string;
+  change?: string;
+  email?: string;
+  payment_mode?: string;
   subtotal: string;
   delivery_charge: string;
   packaging_charge: string;
