@@ -239,7 +239,8 @@ export default function CheckoutPage() {
   const checkoutMutation = useCheckout({
     onSuccess(res) {
       const orderRef = res.unique_order_number ?? String(res.id)
-      appendOrderIdToCookie(orderRef)
+      // Signed-in orders live on the account; only guest orders go in the cookie
+      if (!user) appendOrderIdToCookie(orderRef)
       clearCart()
       router.push(`/website/checkout/confirmation?id=${encodeURIComponent(orderRef)}`)
     },

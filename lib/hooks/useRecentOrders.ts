@@ -25,6 +25,7 @@ import type { Order } from '@/api/types'
 const COOKIE_KEY  = 'recent_order_ids'
 const MAX_ORDERS  = 5
 const TTL_DAYS    = 30
+const CHANGE_EVENT = 'recent-orders-changed'
 
 /**
  * Cookie stores `unique_order_number` (10-char uppercase string) values.
@@ -63,6 +64,12 @@ export function appendOrderIdToCookie(orderRef: string | number): void {
   writeOrderRefsCookie([ref, ...existing.filter((x) => x !== ref)])
 }
 
+/** Remove every stored order ref (e.g. on sign-in) and tell mounted hooks to refresh. */
+export function clearOrderIdsCookie(): void {
+  writeOrderRefsCookie([])
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(CHANGE_EVENT))
+}
+
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export interface RecentOrderEntry {
@@ -99,7 +106,10 @@ export function useRecentOrders(): UseRecentOrdersResult {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    setOrderIds(readOrderRefsCookie())
+    const sync = () => setOrderIds(readOrderRefsCookie())
+    sync()
+    window.addEventListener(CHANGE_EVENT, sync)
+    return () => window.removeEventListener(CHANGE_EVENT, sync)
   }, [])
 
   useEffect(() => {

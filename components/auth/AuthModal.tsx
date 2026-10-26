@@ -6,6 +6,8 @@ import { X, AlertCircle, Eye, EyeOff, Phone, Lock, User, Mail } from 'lucide-rea
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
+import { clearOrderIdsCookie } from '@/lib/hooks/useRecentOrders'
+import { normalizePhone, validatePakistaniPhone } from '@/utils/phone'
 import type { RegisterPayload, CustomerLoginResponse } from '@/api/types'
 import { useAppDispatch } from '@/redux/hooks'
 import { setTokens as reduxSetTokens, logout as reduxLogout } from '@/redux/slices/authSlice'
@@ -72,13 +74,6 @@ function clearCustomerAuth(dispatch?: ReturnType<typeof useAppDispatch>) {
   if (dispatch) dispatch(reduxLogout())
 }
 
-function normalizePhone(raw: string): string {
-  let cleaned = raw.replace(/\D/g, '')
-  if (cleaned.startsWith('92')) cleaned = cleaned.slice(2)
-  if (cleaned.startsWith('0')) cleaned = cleaned.slice(1)
-  return '0' + cleaned
-}
-
 export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const { setUser } = useCart()
   const { settings } = useStoreSettings()
@@ -109,6 +104,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const login = useLogin({
     onSuccess(data) {
       persistTokens(data, dispatch)
+      clearOrderIdsCookie() // guest orders must not show up while signed in
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -122,6 +118,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const register = useRegister({
     onSuccess(data) {
       persistTokens(data, dispatch)
+      clearOrderIdsCookie() // guest orders must not show up while signed in
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -151,6 +148,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
       return
     }
     setError('')
+    clearCustomerAuth(dispatch) // drop any previous session before signing in
     login.login({
       restaurant: Number(getRestaurantId()),
       phone: normalizePhone(loginPhone),
@@ -160,11 +158,12 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
 
   const handleRegister = () => {
     if (!regName.trim()) { setError('Name is required'); return }
-    const cleaned = regPhone.replace(/\D/g, '')
-    if (cleaned.length < 10) { setError('Please enter a valid mobile number'); return }
+    const phoneError = validatePakistaniPhone(regPhone)
+    if (phoneError) { setError(phoneError); return }
     if (regPass.length < 8) { setError('Password must be at least 8 characters'); return }
     if (regPass !== regPass2) { setError('Passwords do not match'); return }
     setError('')
+    clearCustomerAuth(dispatch) // drop any previous session before signing up
 
     const payload: RegisterPayload = {
       restaurant: Number(getRestaurantId()),
@@ -341,18 +340,15 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                     <Phone size={13} className="text-[var(--color-primary)]" /> Mobile Number
                   </label>
                   <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
-                    <select
-                      value={countryCode}
-                      onChange={(e) => setCC(e.target.value)}
-                      className="border-r-2 border-neutral-100 bg-transparent px-2 py-3 text-xs font-medium text-neutral-700 outline-none sm:text-sm"
-                    >
-                      {COUNTRY_CODES.map((c) => (
-                        <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
-                      ))}
-                    </select>
+                    {/* Sign-up is Pakistan-only - see validatePakistaniPhone */}
+                    <span className="flex items-center border-r-2 border-neutral-100 px-3 py-3 text-xs font-medium text-neutral-700 sm:text-sm">
+                      🇵🇰 +92
+                    </span>
                     <input
                       type="tel"
-                      placeholder="3366655786"
+                      inputMode="numeric"
+                      maxLength={11}
+                      placeholder="03001234567"
                       value={regPhone}
                       onChange={(e) => { setRegPhone(e.target.value.replace(/\D/g, '')); setError('') }}
                       className="flex-1 min-w-0 bg-transparent px-3 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:text-sm"
