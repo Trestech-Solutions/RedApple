@@ -4,9 +4,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { UserCircle, ChevronDown, Package, MapPin, LogOut, User } from 'lucide-react'
 import { useCart } from '@/lib/hooks/useCart'
+import { hardNavigate } from '@/utils/hardNavigate'
 
 export function UserDropdown({ onLoginClick }: { onLoginClick: () => void }) {
   const { user, setUser } = useCart()
@@ -14,7 +14,6 @@ export function UserDropdown({ onLoginClick }: { onLoginClick: () => void }) {
   const [pos,  setPos]    = useState({ top: 0, right: 0 })
   const ref               = useRef<HTMLDivElement>(null)
   const btnRef            = useRef<HTMLButtonElement>(null)
-  const router            = useRouter()
 
   // Recompute panel position every time it opens
   const updatePos = useCallback(() => {
@@ -58,7 +57,7 @@ export function UserDropdown({ onLoginClick }: { onLoginClick: () => void }) {
   const handleSignOut = () => {
     setUser(null)
     setOpen(false)
-    router.push('/')
+    hardNavigate('/')
   }
 
   if (!user) {

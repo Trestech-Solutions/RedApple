@@ -18,6 +18,7 @@ import { useSubmitOrderFeedback } from '@/api/client/customer'
 import { useStoreSettings } from '@/lib/hooks/useCart'
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { useRecentOrders } from '@/lib/hooks/useRecentOrders'
+import { hardNavigate } from '@/utils/hardNavigate'
 
 // ─── Theme tokens (driven by CSS variables) ───────────────────────────────────
 // NOTE: class strings are written out in full so Tailwind's scanner picks them up.
@@ -761,7 +762,7 @@ export default function OrderConfirmationPage() {
             {/* Bottom actions */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
               <button
-                onClick={() => router.push('/website/home')}
+                onClick={() => hardNavigate('/website/home')}
                 className={`${BTN_PRIMARY} group !py-4`}
               >
                 Place Another Order

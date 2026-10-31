@@ -6,6 +6,7 @@ import { X, AlertCircle, Eye, EyeOff, Phone, Lock, User, Mail } from 'lucide-rea
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
+import { hardNavigate } from '@/utils/hardNavigate'
 import { normalizePhone, toPkSubscriberDigits, validatePkSubscriberDigits } from '@/utils/phone'
 import type { RegisterPayload, CustomerLoginResponse } from '@/api/types'
 import { useAppDispatch } from '@/redux/hooks'
@@ -110,6 +111,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
         email: c?.email || undefined,
       })
       onClose()
+      hardNavigate()
     },
   })
 
@@ -123,6 +125,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
         email: c?.email || undefined,
       })
       onClose()
+      hardNavigate()
     },
   })
 
