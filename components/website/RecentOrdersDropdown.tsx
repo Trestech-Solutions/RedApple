@@ -5,7 +5,8 @@
  *
  * Shows a "Recent Orders" button in the navbar that reveals a dropdown with
  * order IDs, live statuses, and links to the confirmation/detail page.
- * Only mounts when at least one order ID is stored in the cookie.
+ * Only mounts when there is something to show: the signed-in customer's
+ * account orders, or (signed out) the order IDs stored in the cookie.
  */
 
 import { useRef, useState, useEffect } from 'react'
@@ -56,7 +57,7 @@ interface RecentOrdersDropdownProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropdownProps) {
-  const { orders, isLoading, orderIds, removeOrderId, clearOrderIds } = useRecentOrders()
+  const { orders, isLoading, orderIds, removeOrderId, clearOrderIds, isAccountOrders } = useRecentOrders()
   const [open, setOpen]         = useState(false)
   const containerRef            = useRef<HTMLDivElement>(null)
 
@@ -104,14 +105,16 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
             <p className="text-xs font-bold uppercase tracking-wide text-neutral-500">Recent Orders</p>
             <div className="flex items-center gap-2">
               {isLoading && <Loader2 size={13} className="animate-spin text-neutral-400" />}
-              <button
-                type="button"
-                onClick={clearOrderIds}
-                className="text-[10px] font-semibold text-neutral-400 transition-colors hover:text-red-600"
-                aria-label="Clear recent orders"
-              >
-                Clear
-              </button>
+              {!isAccountOrders && (
+                <button
+                  type="button"
+                  onClick={clearOrderIds}
+                  className="text-[10px] font-semibold text-neutral-400 transition-colors hover:text-red-600"
+                  aria-label="Clear recent orders"
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </div>
 
@@ -148,14 +151,14 @@ export function RecentOrdersDropdown({ navFg, iconTextColor }: RecentOrdersDropd
                     {order.status === 'unknown' ? '—' : statusLabel(order.status)}
                   </span>
                 </Link>
-                <button
+                {!isAccountOrders && <button
                   type="button"
                   onClick={() => removeOrderId(order.ref)}
                   aria-label={`Remove order ${order.order_number ?? order.unique_order_number ?? order.ref} from recent orders`}
                   className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   <X size={13} />
-                </button>
+                </button>}
               </li>
               )
             })}

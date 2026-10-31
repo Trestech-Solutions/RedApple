@@ -22,7 +22,7 @@
  *  - Whole form fades/slides in on mount.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -35,10 +35,12 @@ import {
 import { useStoreLocation } from '@/lib/hooks/useStoreLocation'
 import { FALLBACK_BRANCHES } from '@/components/website/OrderTypeModal'
 import { useCheckout, buildCheckoutPayload } from '@/api/client/checkout'
+import { track } from '@/lib/analytics/track'
 import { useGetAddresses, useAddAddress } from '@/api/client/customer'
 import { PaymentSection } from '@/components/checkout/PaymentSection'
 import type { CheckoutFormValues } from '@/components/checkout/types'
-import { appendOrderIdToCookie } from '@/lib/hooks/useRecentOrders'
+import { appendOrderIdToCookie, refreshRecentOrders } from '@/lib/hooks/useRecentOrders'
+import { normalizePhone, validatePakistaniPhone } from '@/utils/phone'
 
 const FALLBACK_PHONE = '021-111-022-022'
 
@@ -116,6 +118,16 @@ export default function CheckoutPage() {
   // ─── local state ──────────────────────────────────────────────────────────
   const [showAddrForm, setShowAddrForm] = useState(false)
   const [errorMsg, setErrorMsg]         = useState('')
+  // Phone errors show once the field has been left (or on submit), not while typing
+  const [phoneTouched, setPhoneTouched] = useState({ mobile: false, alt: false })
+
+  // Marketing funnel: one checkout_start per checkout visit with a non-empty cart
+  const checkoutTracked = useRef(false)
+  useEffect(() => {
+    if (checkoutTracked.current || items.length === 0) return
+    checkoutTracked.current = true
+    track('checkout_start')
+  }, [items.length])
 
   // auto-select first API address
   useEffect(() => {
@@ -216,9 +228,16 @@ export default function CheckoutPage() {
     (a) => String(a.id) === formValues.selectedAddressId
   )
 
+  const mobileError = validatePakistaniPhone(formValues.guestMobile)
+  // Alternate number is optional, but must be valid when given
+  const altMobileError = formValues.guestAltMobile.trim()
+    ? validatePakistaniPhone(formValues.guestAltMobile)
+    : ''
+
   const guestReady =
     formValues.guestFullName.trim() !== '' &&
-    formValues.guestMobile.trim() !== '' &&
+    !mobileError &&
+    !altMobileError &&
     (orderType === 'pickup' || formValues.guestAddress.trim() !== '')
   const userReady  = items.length > 0 && (orderType === 'pickup' || !!selectedAddr)
   const canPlace   = items.length > 0 && withinPurchaseBounds && (user ? userReady : guestReady)
@@ -241,6 +260,7 @@ export default function CheckoutPage() {
       const orderRef = res.unique_order_number ?? String(res.id)
       // Signed-in orders live on the account; only guest orders go in the cookie
       if (!user) appendOrderIdToCookie(orderRef)
+      else refreshRecentOrders()
       clearCart()
       router.push(`/website/checkout/confirmation?id=${encodeURIComponent(orderRef)}`)
     },
@@ -250,6 +270,7 @@ export default function CheckoutPage() {
   const isPlacing = checkoutMutation.isPending
 
   const onSubmit = async (values: CheckoutFormValues) => {
+    if (!user) setPhoneTouched({ mobile: true, alt: true })
     if (!canPlace) return
     setErrorMsg('')
 
@@ -260,7 +281,7 @@ export default function CheckoutPage() {
     }
 
     const customerName  = user ? user.name : values.guestFullName.trim()
-    const customerPhone = user ? user.phone : values.guestMobile.trim()
+    const customerPhone = user ? user.phone : normalizePhone(values.guestMobile)
     const customerAddr  = user
       ? (selectedAddr ? `${selectedAddr.address}, ${selectedAddr.city}` : '')
       : (orderType === 'delivery' ? values.guestAddress.trim() : '')
@@ -289,7 +310,7 @@ export default function CheckoutPage() {
       customer_landmark:      (user ? undefined : values.guestLandmark) || undefined,
       customer_instructions:  values.instructions || undefined,
       payment_mode:           values.payment,   // 'cod' | 'online'
-      alternate_number:       (user ? undefined : values.guestAltMobile.trim()) || undefined,
+      alternate_number:       (user || !values.guestAltMobile.trim() ? undefined : normalizePhone(values.guestAltMobile)),
       change:                 (isCash && values.changeAmount ? String(values.changeAmount).trim() : '') || undefined,
       email:                  (user ? user.email : values.guestEmail.trim()) || undefined,
       cartItems:              items,
@@ -507,12 +528,32 @@ export default function CheckoutPage() {
                       <label className="text-sm font-semibold text-neutral-700">Mobile</label>
                       <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
-                    <input {...register('guestMobile')} placeholder="03xx-xxxxxxx" className={inputClass} />
+                    <input
+                      {...register('guestMobile', { onBlur: () => setPhoneTouched((t) => ({ ...t, mobile: true })) })}
+                      type="tel"
+                      inputMode="tel"
+                      maxLength={16}
+                      placeholder="03xx-xxxxxxx"
+                      className={inputClass}
+                    />
+                    {phoneTouched.mobile && mobileError && (
+                      <p className="mt-1 text-xs text-red-600">{mobileError}</p>
+                    )}
                   </div>
                   {!settings.hide_alternative_number && (
                     <div>
                       <label className={labelClass}>Alternate Mobile</label>
-                      <input {...register('guestAltMobile')} placeholder="03xx-xxxxxxx" className={inputClass} />
+                      <input
+                        {...register('guestAltMobile', { onBlur: () => setPhoneTouched((t) => ({ ...t, alt: true })) })}
+                        type="tel"
+                        inputMode="tel"
+                        maxLength={16}
+                        placeholder="03xx-xxxxxxx"
+                        className={inputClass}
+                      />
+                      {phoneTouched.alt && altMobileError && (
+                        <p className="mt-1 text-xs text-red-600">{altMobileError}</p>
+                      )}
                     </div>
                   )}
                 </div>

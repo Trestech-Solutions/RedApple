@@ -8,6 +8,10 @@
  * 30-day TTL) and fetches the latest status for each from the storefront
  * orders API (which also keys off `unique_order_number`).
  *
+ * While a customer is signed in the cookie is left untouched but hidden: the
+ * list shows that customer's own account orders instead. On logout the cookie
+ * (guest) orders show again.
+ *
  * Usage:
  *   const { orders, isLoading, addOrderRef } = useRecentOrders()
  *
@@ -19,6 +23,7 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '@/api/axios'
 import API_ENDPOINTS from '@/api/endpoint'
 import type { Order } from '@/api/types'
+import { useAppSelector } from '@/redux/hooks'
 
 // ─── Cookie helpers ───────────────────────────────────────────────────────────
 
@@ -62,12 +67,25 @@ export function appendOrderIdToCookie(orderRef: string | number): void {
   if (!ref) return
   const existing = readOrderRefsCookie()
   writeOrderRefsCookie([ref, ...existing.filter((x) => x !== ref)])
+  refreshRecentOrders()
 }
 
-/** Remove every stored order ref (e.g. on sign-in) and tell mounted hooks to refresh. */
-export function clearOrderIdsCookie(): void {
-  writeOrderRefsCookie([])
+/** Tell mounted hooks to reload (e.g. after a signed-in customer places an order). */
+export function refreshRecentOrders(): void {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(CHANGE_EVENT))
+}
+
+function toEntry(o: Order, fallbackRef: string): RecentOrderEntry {
+  return {
+    ref:                 o.unique_order_number ?? fallbackRef,
+    id:                  o.id,
+    order_number:        o.order_number ?? null,
+    unique_order_number: o.unique_order_number ?? null,
+    status:              o.status,
+    grand_total:         o.grand_total,
+    order_type:          o.order_type,
+    created_at:          o.created_at,
+  }
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -98,21 +116,62 @@ interface UseRecentOrdersResult {
   removeOrderId: (orderRef: string | number) => void
   /** Clear all order refs from the browser's recent-orders cookie. */
   clearOrderIds: () => void
+  /** True when the list shows the signed-in customer's account orders (cookie hidden). */
+  isAccountOrders: boolean
 }
 
 export function useRecentOrders(): UseRecentOrdersResult {
-  const [orderIds, setOrderIds] = useState<string[]>([])
+  const customer = useAppSelector((s) => s.auth.user)
+  const signedIn = !!customer
+
+  const [cookieIds, setCookieIds] = useState<string[]>([])
   const [orders,   setOrders]   = useState<RecentOrderEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [accountOrders, setAccountOrders] = useState<RecentOrderEntry[]>([])
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
-    const sync = () => setOrderIds(readOrderRefsCookie())
+    const sync = () => {
+      setCookieIds(readOrderRefsCookie())
+      setReloadKey((k) => k + 1)
+    }
     sync()
     window.addEventListener(CHANGE_EVENT, sync)
     return () => window.removeEventListener(CHANGE_EVENT, sync)
   }, [])
 
+  // Signed in → the customer's own latest orders from their account.
   useEffect(() => {
+    if (!signedIn) {
+      setAccountOrders([])
+      return
+    }
+
+    let cancelled = false
+    setIsLoading(true)
+    api
+      .get<{ results?: Order[] } | Order[]>(API_ENDPOINTS.StorefrontCustomerAuth.getOrderHistory)
+      .then((r) => {
+        if (cancelled) return
+        const list = Array.isArray(r.data) ? r.data : r.data.results ?? []
+        setAccountOrders(
+          [...list]
+            .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+            .slice(0, MAX_ORDERS)
+            .map((o) => toEntry(o, String(o.id))),
+        )
+      })
+      .catch(() => { if (!cancelled) setAccountOrders([]) })
+      .finally(() => { if (!cancelled) setIsLoading(false) })
+
+    return () => { cancelled = true }
+  }, [signedIn, customer?.phone, reloadKey])
+
+  // Signed out → guest orders stored in the cookie.
+  const orderIds = signedIn ? accountOrders.map((o) => o.ref) : cookieIds
+
+  useEffect(() => {
+    if (signedIn) return
     if (orderIds.length === 0) {
       setOrders([])
       setIsLoading(false)
@@ -132,19 +191,7 @@ export function useRecentOrders(): UseRecentOrdersResult {
       if (cancelled) return
       const fetched: RecentOrderEntry[] = results
         .map((r, i) => {
-          if (r.status === 'fulfilled') {
-            const o = r.value
-            return {
-              ref:                  o.unique_order_number ?? orderIds[i]!,
-              id:                   o.id,
-              order_number:         o.order_number ?? null,
-              unique_order_number:  o.unique_order_number ?? null,
-              status:               o.status,
-              grand_total:          o.grand_total,
-              order_type:           o.order_type,
-              created_at:           o.created_at,
-            }
-          }
+          if (r.status === 'fulfilled') return toEntry(r.value, orderIds[i]!)
           return {
             ref:                 orderIds[i]!,
             id:                  Number.isFinite(Number(orderIds[i])) ? Number(orderIds[i]) : 0,
@@ -162,24 +209,31 @@ export function useRecentOrders(): UseRecentOrdersResult {
     })
 
     return () => { cancelled = true }
-  }, [orderIds])
+  }, [signedIn, cookieIds]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const addOrderId = useCallback((orderRef: string | number) => {
     appendOrderIdToCookie(orderRef)
-    setOrderIds(readOrderRefsCookie())
   }, [])
 
   const removeOrderId = useCallback((orderRef: string | number) => {
     const ref = String(orderRef)
     const remaining = readOrderRefsCookie().filter((x) => x !== ref)
     writeOrderRefsCookie(remaining)
-    setOrderIds(remaining)
+    setCookieIds(remaining)
   }, [])
 
   const clearOrderIds = useCallback(() => {
     writeOrderRefsCookie([])
-    setOrderIds([])
+    setCookieIds([])
   }, [])
 
-  return { orders, isLoading, orderIds, addOrderId, removeOrderId, clearOrderIds }
+  return {
+    orders: signedIn ? accountOrders : orders,
+    isLoading,
+    orderIds,
+    addOrderId,
+    removeOrderId,
+    clearOrderIds,
+    isAccountOrders: signedIn,
+  }
 }

@@ -155,9 +155,12 @@ export function buildOrderPayload(params: {
     alternate_number:       params.alternate_number,
     change:                 params.change,
     email:                  params.email,
+    // OrderCreateSerializer expects flat gift_* fields, not a nested send_gift object
     ...(params.is_gift ? {
-      is_gift:   true,
-      send_gift: params.send_gift,
+      is_gift:             true,
+      gift_receipt_name:   params.send_gift?.receipt_name ?? '',
+      gift_message:        params.send_gift?.gift_message ?? '',
+      gift_receipt_number: params.send_gift?.receipt_number ?? '',
     } : {}),
     items:                  lines,
   };

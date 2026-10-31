@@ -41,6 +41,7 @@ import {
 import { useGetSettings, useGetMenu } from '@/api/client/browse'
 import type { StoreSettings } from '@/api/types'
 import { useStoreLocation } from './useStoreLocation'
+import { track } from '@/lib/analytics/track'
 
 export type { CartItem, AuthUser, OrderType }
 
@@ -321,6 +322,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
 
       dispatch(reduxAddItem({ ...item, quantity: requestedQty, cartItemId: null }))
+      track('add_to_cart', { item_name: item.name, quantity: requestedQty })
       toast.success('Item added to cart')
     },
     [dispatch, numericBranchValid]
@@ -353,13 +355,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
   const subtotal   = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-  let effectiveCartToken = reduxCartToken ?? getCartToken()
-  if (!effectiveCartToken && items.length > 0) {
-    effectiveCartToken = generateCartToken()
-    dispatch(reduxSetCartToken(effectiveCartToken))
-    persistToken(effectiveCartToken)
-  }
-  const cartToken = effectiveCartToken
+  const cartToken = reduxCartToken ?? getCartToken()
+
+  // First item in an empty cart → mint a cart token. Done in an effect, not
+  // during render: dispatching while rendering triggers React's
+  // "Cannot update a component while rendering a different component".
+  useEffect(() => {
+    if (cartToken || items.length === 0) return
+    const token = generateCartToken()
+    dispatch(reduxSetCartToken(token))
+    persistToken(token)
+  }, [cartToken, items.length, dispatch])
 
   const value: CartContextType = {
     user,

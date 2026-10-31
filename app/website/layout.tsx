@@ -13,6 +13,7 @@ import { WebsiteFooter } from '@/components/website/WebsiteFooter'
 import { WebsiteSkeleton } from '@/components/website/WebsiteSkeleton'
 import { useBusinessHours } from '@/lib/hooks/useBusinessHours'
 import { useMenuFont } from '@/lib/hooks/useMenuFont'
+import { usePageViewTracking } from '@/lib/analytics/track'
 import { FloatingActions } from '@/components/website/FloatingActions'
 import { FloatingCartButton } from '@/components/website/FloatingCartButton'
 import { CartAnimationProvider } from '@/lib/context/CartAnimationContext'
@@ -122,6 +123,9 @@ function WebsiteLayoutInner({ children }: { children: React.ReactNode }) {
 
   // Store-configured menu font (settings.menu_font_family) applied site-wide
   useMenuFont(settings.menu_font_family)
+
+  // First-party page-view tracking for the admin Marketing dashboard
+  usePageViewTracking()
 
   // ── Scroll progress ────────────────────────────────────────────────────────
   // Written straight to the DOM (transform: scaleX) once per animation frame.

@@ -1024,11 +1024,10 @@ export type OrderCreatePayload = {
   /** True when the order is a gift */
   is_gift?: boolean;
   /** Gift recipient details — only sent when is_gift is true */
-  send_gift?: {
-    receipt_name: string;
-    gift_message: string;
-    receipt_number: string;
-  };
+  gift_receipt_name?: string;
+  gift_message?: string;
+  /** Blank → backend falls back to the order number */
+  gift_receipt_number?: string;
   items: OrderCreateLine[];
 };
 

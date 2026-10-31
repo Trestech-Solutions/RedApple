@@ -87,6 +87,13 @@ function orderTypeLabel(type: string) {
   return capitalize(type)
 }
 
+// Mirrors the labels shown in PaymentSection at checkout
+function paymentModeLabel(mode: string | undefined, orderType: string) {
+  if (mode === 'cod')    return orderType === 'pickup' ? 'Pay at Pickup' : 'Cash on Delivery'
+  if (mode === 'online') return 'Online Payment'
+  return mode ? capitalize(mode) : '—'
+}
+
 function fmtDateTime(iso?: string | null) {
   if (!iso) return '—'
   return new Date(iso).toLocaleString('en-GB', {
@@ -642,7 +649,7 @@ export default function OrderConfirmationPage() {
                     Payment Type
                   </span>
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ${P_SOFT} ${P_TEXT} ${P_RING}`}>
-                    <CreditCard size={12} /> Cash on Delivery
+                    <CreditCard size={12} /> {paymentModeLabel(order.payment_mode, order.order_type)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-600">

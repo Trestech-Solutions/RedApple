@@ -6,8 +6,7 @@ import { X, AlertCircle, Eye, EyeOff, Phone, Lock, User, Mail } from 'lucide-rea
 import { useCart, useStoreSettings } from '@/lib/hooks/useCart'
 import { useLogin, useRegister } from '@/api/client/customer'
 import { getRestaurantId } from '@/api/utils'
-import { clearOrderIdsCookie } from '@/lib/hooks/useRecentOrders'
-import { normalizePhone, validatePakistaniPhone } from '@/utils/phone'
+import { normalizePhone, toPkSubscriberDigits, validatePkSubscriberDigits } from '@/utils/phone'
 import type { RegisterPayload, CustomerLoginResponse } from '@/api/types'
 import { useAppDispatch } from '@/redux/hooks'
 import { setTokens as reduxSetTokens, logout as reduxLogout } from '@/redux/slices/authSlice'
@@ -104,7 +103,6 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const login = useLogin({
     onSuccess(data) {
       persistTokens(data, dispatch)
-      clearOrderIdsCookie() // guest orders must not show up while signed in
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -118,7 +116,6 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   const register = useRegister({
     onSuccess(data) {
       persistTokens(data, dispatch)
-      clearOrderIdsCookie() // guest orders must not show up while signed in
       const c = data.customer ?? data.user
       setUser({
         name: data.customer?.name ?? `${(data.user as any)?.first_name ?? ''} ${(data.user as any)?.last_name ?? ''}`.trim(),
@@ -158,7 +155,7 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
 
   const handleRegister = () => {
     if (!regName.trim()) { setError('Name is required'); return }
-    const phoneError = validatePakistaniPhone(regPhone)
+    const phoneError = validatePkSubscriberDigits(regPhone)
     if (phoneError) { setError(phoneError); return }
     if (regPass.length < 8) { setError('Password must be at least 8 characters'); return }
     if (regPass !== regPass2) { setError('Passwords do not match'); return }
@@ -340,17 +337,16 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                     <Phone size={13} className="text-[var(--color-primary)]" /> Mobile Number
                   </label>
                   <div className="flex overflow-hidden rounded-2xl border-2 border-neutral-100 bg-neutral-50 transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
-                    {/* Sign-up is Pakistan-only - see validatePakistaniPhone */}
+                    {/* Sign-up is Pakistan-only: user types the 10 digits after +92 - see validatePkSubscriberDigits */}
                     <span className="flex items-center border-r-2 border-neutral-100 px-3 py-3 text-xs font-medium text-neutral-700 sm:text-sm">
                       🇵🇰 +92
                     </span>
                     <input
                       type="tel"
                       inputMode="numeric"
-                      maxLength={11}
-                      placeholder="03001234567"
+                      placeholder="3001234567"
                       value={regPhone}
-                      onChange={(e) => { setRegPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                      onChange={(e) => { setRegPhone(toPkSubscriberDigits(e.target.value)); setError('') }}
                       className="flex-1 min-w-0 bg-transparent px-3 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:text-sm"
                     />
                   </div>
