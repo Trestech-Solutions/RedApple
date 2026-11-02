@@ -40,7 +40,7 @@ import { useGetAddresses, useAddAddress } from '@/api/client/customer'
 import { PaymentSection } from '@/components/checkout/PaymentSection'
 import type { CheckoutFormValues } from '@/components/checkout/types'
 import { appendOrderIdToCookie, refreshRecentOrders } from '@/lib/hooks/useRecentOrders'
-import { normalizePhone, validatePakistaniPhone } from '@/utils/phone'
+import { normalizePhone, toPkMobileInput, validatePakistaniPhone } from '@/utils/phone'
 
 const FALLBACK_PHONE = '021-111-022-022'
 
@@ -119,7 +119,18 @@ export default function CheckoutPage() {
   const [showAddrForm, setShowAddrForm] = useState(false)
   const [errorMsg, setErrorMsg]         = useState('')
   // Phone errors show once the field has been left (or on submit), not while typing
-  const [phoneTouched, setPhoneTouched] = useState({ mobile: false, alt: false })
+  const [phoneTouched, setPhoneTouched] = useState({ mobile: false, alt: false, gift: false })
+  // Phone inputs only take digits, capped at 11 (03XXXXXXXXX)
+  const registerPhone = (name: 'guestMobile' | 'guestAltMobile' | 'giftReceiptNumber', touchKey: keyof typeof phoneTouched) => {
+    const field = register(name, { onBlur: () => setPhoneTouched((t) => ({ ...t, [touchKey]: true })) })
+    return {
+      ...field,
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.target.value = toPkMobileInput(e.target.value)
+        return field.onChange(e)
+      },
+    }
+  }
 
   // Marketing funnel: one checkout_start per checkout visit with a non-empty cart
   const checkoutTracked = useRef(false)
@@ -233,6 +244,7 @@ export default function CheckoutPage() {
   const altMobileError = formValues.guestAltMobile.trim()
     ? validatePakistaniPhone(formValues.guestAltMobile)
     : ''
+  const giftMobileError = formValues.isGift ? validatePakistaniPhone(formValues.giftReceiptNumber) : ''
 
   const guestReady =
     formValues.guestFullName.trim() !== '' &&
@@ -240,7 +252,7 @@ export default function CheckoutPage() {
     !altMobileError &&
     (orderType === 'pickup' || formValues.guestAddress.trim() !== '')
   const userReady  = items.length > 0 && (orderType === 'pickup' || !!selectedAddr)
-  const canPlace   = items.length > 0 && withinPurchaseBounds && (user ? userReady : guestReady)
+  const canPlace   = items.length > 0 && withinPurchaseBounds && !giftMobileError && (user ? userReady : guestReady)
 
   const handleAddAddress = () => {
     const line = getValues('newAddrLine')
@@ -270,7 +282,7 @@ export default function CheckoutPage() {
   const isPlacing = checkoutMutation.isPending
 
   const onSubmit = async (values: CheckoutFormValues) => {
-    if (!user) setPhoneTouched({ mobile: true, alt: true })
+    setPhoneTouched({ mobile: !user, alt: !user, gift: true })
     if (!canPlace) return
     setErrorMsg('')
 
@@ -319,7 +331,7 @@ export default function CheckoutPage() {
         send_gift: {
           receipt_name:   values.giftReceiptName.trim(),
           gift_message:   values.giftMessage.trim(),
-          receipt_number: values.giftReceiptNumber.trim(),
+          receipt_number: normalizePhone(values.giftReceiptNumber),
         },
       } : {}),
     })
@@ -422,10 +434,15 @@ export default function CheckoutPage() {
                 <div>
                   <label className={labelClass}>Recipient Mobile <span className="text-pink-500">*</span></label>
                   <input
-                    {...register('giftReceiptNumber')}
-                    placeholder="03xx-xxxxxxx"
+                    {...registerPhone('giftReceiptNumber', 'gift')}
+                    type="tel"
+                    inputMode="numeric"
+                    placeholder="03xxxxxxxxx"
                     className={inputClass}
                   />
+                  {phoneTouched.gift && giftMobileError && (
+                    <p className="mt-1 text-xs text-red-600">{giftMobileError}</p>
+                  )}
                 </div>
 
                 <div>
@@ -529,11 +546,10 @@ export default function CheckoutPage() {
                       <span className="text-xs font-bold text-[var(--color-primary)]">*Required</span>
                     </div>
                     <input
-                      {...register('guestMobile', { onBlur: () => setPhoneTouched((t) => ({ ...t, mobile: true })) })}
+                      {...registerPhone('guestMobile', 'mobile')}
                       type="tel"
-                      inputMode="tel"
-                      maxLength={16}
-                      placeholder="03xx-xxxxxxx"
+                      inputMode="numeric"
+                      placeholder="03xxxxxxxxx"
                       className={inputClass}
                     />
                     {phoneTouched.mobile && mobileError && (
@@ -544,11 +560,10 @@ export default function CheckoutPage() {
                     <div>
                       <label className={labelClass}>Alternate Mobile</label>
                       <input
-                        {...register('guestAltMobile', { onBlur: () => setPhoneTouched((t) => ({ ...t, alt: true })) })}
+                        {...registerPhone('guestAltMobile', 'alt')}
                         type="tel"
-                        inputMode="tel"
-                        maxLength={16}
-                        placeholder="03xx-xxxxxxx"
+                        inputMode="numeric"
+                        placeholder="03xxxxxxxxx"
                         className={inputClass}
                       />
                       {phoneTouched.alt && altMobileError && (

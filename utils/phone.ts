@@ -28,13 +28,20 @@ export function validatePkSubscriberDigits(digits: string): string {
   return ''
 }
 
-/** Returns an error message, or '' when the number is a valid Pakistani mobile number. */
+/** Sanitizes a mobile input to 11 digits (03XXXXXXXXX); a pasted +92 3XX… becomes 03XX…. */
+export function toPkMobileInput(raw: string): string {
+  let digits = raw.replace(/\D/g, '')
+  if (digits.startsWith('923')) digits = '0' + digits.slice(2)
+  return digits.slice(0, 11)
+}
+
+/** Returns an error message, or '' when the number is a valid 11-digit Pakistani mobile number. */
 export function validatePakistaniPhone(raw: string): string {
   const digits = raw.replace(/\D/g, '')
   if (!digits) return 'Mobile number is required'
-  const national = normalizePhone(raw).slice(1)
-  if (!PK_MOBILE_RE.test(national)) {
-    return 'Enter a valid Pakistani mobile number (e.g. 0300 1234567)'
+  if (digits.length !== 11) return 'Mobile number must be 11 digits (e.g. 03001234567)'
+  if (!/^0/.test(digits) || !PK_MOBILE_RE.test(digits.slice(1))) {
+    return 'Enter a valid Pakistani mobile number (e.g. 03001234567)'
   }
   return ''
 }

@@ -138,9 +138,9 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
   }, [login.isPending, register.isPending])
 
   const handleLogin = () => {
-    const cleaned = loginPhone.replace(/\D/g, '')
-    if (cleaned.length < 10) {
-      setError('Please enter a valid mobile number')
+    const phoneError = validatePkSubscriberDigits(loginPhone)
+    if (phoneError) {
+      setError(phoneError)
       return
     }
     if (loginPass.length < 6) {
@@ -263,9 +263,10 @@ export function AuthModal({ onClose, onGuestContinue }: AuthModalProps) {
                   </select>
                   <input
                     type="tel"
-                    placeholder="3366655786"
+                    inputMode="numeric"
+                    placeholder="3001234567"
                     value={loginPhone}
-                    onChange={(e) => { setLoginPhone(e.target.value.replace(/\D/g, '')); setError('') }}
+                    onChange={(e) => { setLoginPhone(toPkSubscriberDigits(e.target.value)); setError('') }}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                     className="flex-1 bg-transparent px-3 py-3 text-xs text-neutral-800 outline-none placeholder:text-neutral-400 sm:px-4 sm:text-sm"
                   />
